@@ -9,7 +9,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Cryptography.ECDSA.Secp256k1" Version="1.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0" />
+    <PackageReference Include="Nancy" Version="2.0.0-clinteastwood" />
   </ItemGroup>
 
 </Project>

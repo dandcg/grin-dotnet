@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 namespace Grin.Wallet
 {
 
-
-
-
-
     public class Checker
     {
+
+
+
     }
 }
