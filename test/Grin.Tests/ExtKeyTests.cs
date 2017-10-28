@@ -52,8 +52,8 @@ namespace Grin.Tests
             var json = JsonConvert.SerializeObject(has_an_identifier);
             Assert.Equal("{\"identifier\":\"942b6c0bd43bdcb24f3e\"}", json);
 
-            //var deserialized = JsonConvert.DeserializeObject<HasAnIdentifier>(json);
-            //Assert.(has_an_identifier, deserialized);
+            var deserialized = JsonConvert.DeserializeObject<HasAnIdentifier>(json);
+            Assert.Equal(has_an_identifier.Identifier, deserialized.Identifier);
         }
 
 
