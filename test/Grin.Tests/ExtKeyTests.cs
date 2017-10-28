@@ -36,15 +36,20 @@ namespace Grin.Tests
         public void test_identifier_json_ser_deser()
         {
             var hex = "942b6c0bd43bdcb24f3edfe7fadbc77054ecc4f2";
+
+            Console.WriteLine(hex.Length);
+
             var identifier = Identifier.from_hex(hex);
 
             Console.WriteLine(hex);
             foreach (var v in identifier.Value)
             {
-                Console.WriteLine(v);
+                Console.Write("{0}[{1}]", v, v.ToString("X"));
             }
-        
+            Console.WriteLine();
 
+            var hex2 = identifier.to_hex();
+            Console.WriteLine(hex2);
             //var has_an_identifier = new HasAnIdentifier {Identifier = identifier};
 
             var json = JsonConvert.SerializeObject(identifier);

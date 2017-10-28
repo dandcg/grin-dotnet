@@ -1,50 +1,69 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
+﻿
 using Grin.Util;
-using Microsoft.AspNetCore.Server.Kestrel.Internal.System.Collections.Sequences;
-using Microsoft.WindowsAzure.Storage.Blob.Protocol;
+using Org.BouncyCastle.Asn1.Sec;
+using Org.BouncyCastle.Asn1.X9;
+using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Math;
+using Org.BouncyCastle.Math.EC;
+using Org.BouncyCastle.Security;
+using Konscious.Security.Cryptography;
 
 namespace Grin.Keychain
 {
     public class Identifier
     {
+        // const
+        public const int IDENTIFIER_SIZE = 10;
 
-        public const  int IDENTIFIER_SIZE = 10;
 
-        public Identifier()
+        // contructor
+        public Identifier(string hex)
         {
-        Value = new byte[IDENTIFIER_SIZE];
-        }
-       public byte[] Value { get; private set; }
-
-        public void Serialize()
-        {
-           
+            from_hex(hex);
         }
 
-        public void Deserialize()
+        public Identifier(byte[] bytes)
         {
+            from_bytes(bytes);
+        }
+
+        
+        // data 
+        public byte[] Bytes { get; } = new byte[IDENTIFIER_SIZE];
+
+        public string Hex { get; private set; }
+
+        // functions
+        public void zero()
+        {
+            for (var i = 0; i < Bytes.Length; i++)
+                Bytes[i] = 0;
+
+            HexUtil.to_hex(Bytes);
+        }
+
+
+        public void from_key_id(byte[] pubKey)
+        {
+            
+            var hashAlgorithm = new HMACBlake2B(pubKey, IDENTIFIER_SIZE);
+            from_bytes(hashAlgorithm.Key);
 
         }
 
 
-        //pub fn zero() -> Identifier {
-        //    Identifier::from_bytes(&[0; IDENTIFIER_SIZE])
-        //}
+        //private static X9ECParameters curve = SecNamedCurves.GetByName("secp256k1");
+        //private static ECDomainParameters domain = new ECDomainParameters(curve.Curve, curve.G, curve.N, curve.H);
 
-        //pub fn from_bytes(bytes: &[u8]) -> Identifier {
-        //    let mut identifier = [0; IDENTIFIER_SIZE];
-        //    for i in 0..min(IDENTIFIER_SIZE, bytes.len())
-        //    {
-        //        identifier[i] = bytes[i];
-        //    }
+        //public static byte[] ToPublicKey(byte[] privateKey)
+        //{
+        //    BigInteger d = new BigInteger(privateKey);
+        //    ECPoint q = domain.G.Multiply(d);
 
-        //    Identifier(identifier)
+        //    var publicParams = new ECPublicKeyParameters(q, domain);
+        //    return publicParams.Q.GetEncoded();
 
-        //}
 
         //pub fn from_key_id(secp: &Secp256k1, pubkey: &PublicKey) -> Identifier {
         //    let bytes = pubkey.serialize_vec(secp, true);
@@ -52,42 +71,26 @@ namespace Grin.Keychain
         //    Identifier::from_bytes(&identifier.as_bytes())
         //}
 
-    public static Identifier from_hex(string hex)
-    {
-        var bytes = HexUtil.from_hex(hex);
-        return Identifier.from_bytes(bytes);
-    }
 
-        //pub fn to_hex(&self) -> String {
-        //    util::to_hex(self.0.to_vec())
-        //}
-
-
-       public static Identifier from_bytes(byte[] bytes)
+        public void from_hex(string hex)
         {
-            var identifier = new Identifier();
+            var bytes = HexUtil.from_hex(hex);
+            from_bytes(bytes);
+        }
+
+        public void from_bytes(byte[] bytes)
+        {
+            Hex = Hex ?? HexUtil.to_hex(bytes);
 
             var min = IDENTIFIER_SIZE < bytes.Length ? IDENTIFIER_SIZE : bytes.Length;
 
-            for (int i=0; i<min; i++)
-            {
-                identifier.Value[i] = bytes[i];
-            }
-            return identifier;
-
+            for (var i = 0; i < min; i++)
+                Bytes[i] = bytes[i];
         }
-
-
-
-
-}
+    }
 
 
     public class IdentifierVisitor
     {
-        
     }
-
-
-
 }
