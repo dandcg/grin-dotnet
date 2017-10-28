@@ -1,20 +1,28 @@
 ﻿using System;
-using System.Linq;
+using System.Text;
 
 namespace Grin.Util
 {
     public static class HexUtil
     {
-        
         /// Decode a hex string into bytes.
-        public static byte[] from_hex(string hex_str)
+        public static byte[] from_hex(string hex)
         {
-            return Enumerable.Range(0, hex_str.Length)
-                .Where(x => x % 2 == 0)
-                .Select(x => Convert.ToByte(hex_str.Substring(x, 2), 16))
-                .ToArray();
+            var numberChars = hex.Length;
+            var bytes = new byte[numberChars / 2];
+            for (var i = 0; i < numberChars; i += 2)
+                bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
+            return bytes;
         }
 
+        public static string to_hex(byte[] bytes)
+        {
+            var hex = new StringBuilder(bytes.Length * 2);
 
+            foreach (var b in bytes)
+                hex.AppendFormat("{0:x2}", b);
+
+            return hex.ToString();
+        }
     }
 }

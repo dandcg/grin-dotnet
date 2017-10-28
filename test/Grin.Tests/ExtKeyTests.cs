@@ -1,4 +1,8 @@
+using System;
+using System.Diagnostics;
 using Grin.Keychain;
+using Microsoft.AspNetCore.ResponseCaching.Internal;
+using Newtonsoft.Json;
 using Xunit;
 
 namespace Grin.Tests
@@ -21,29 +25,37 @@ namespace Grin.Tests
 
         //    }
 
+
+        public class HasAnIdentifier
+        {
+           public Identifier Identifier { get; set; }
+        }
+
+
         [Fact]
-  public void test_identifier_json_ser_deser()
-    {
+        public void test_identifier_json_ser_deser()
+        {
+            var hex = "942b6c0bd43bdcb24f3edfe7fadbc77054ecc4f2";
+            var identifier = Identifier.from_hex(hex);
 
-            var hex ="942b6c0bd43bdcb24f3edfe7fadbc77054ecc4f2";
-        var identifier = Identifier.from_hex(hex);
+            Console.WriteLine(hex);
+            foreach (var v in identifier.Value)
+            {
+                Console.WriteLine(v);
+            }
+        
 
-//        #[derive(Debug, Serialize, Deserialize, PartialEq)]
-//    struct HasAnIdentifier
-//    {
-//        identifier: Identifier,
-//		}
+            //var has_an_identifier = new HasAnIdentifier {Identifier = identifier};
 
-//    let has_an_identifier = HasAnIdentifier { identifier
-//};
+            var json = JsonConvert.SerializeObject(identifier);
+            Assert.Equal("{\"value\":\"942b6c0bd43bdcb24f3e\"}", json);
 
-//let json = serde_json::to_string(&has_an_identifier).unwrap();
+            //var deserialized = JsonConvert.DeserializeObject<HasAnIdentifier>(json);
+            //Assert.(has_an_identifier, deserialized);
+        }
 
-//assert_eq!(json, "{\"identifier\":\"942b6c0bd43bdcb24f3e\"}");
 
-//		let deserialized: HasAnIdentifier = serde_json::from_str(&json).unwrap();
-//assert_eq!(deserialized, has_an_identifier);
-    }
+
 
         [Fact]
         public void extkey_from_seed()

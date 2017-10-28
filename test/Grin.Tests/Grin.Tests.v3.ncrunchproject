@@ -1,0 +1,18 @@
+﻿<ProjectConfiguration>
+  <Settings>
+    <IgnoredTests>
+      <FixtureTestSelector>
+        <FixtureName>Grin.Tests.KeychainTests</FixtureName>
+      </FixtureTestSelector>
+      <NamedTestSelector>
+        <TestName>Grin.Tests.ExtKeyTests.extkey_derivation</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Grin.Tests.ExtKeyTests.extkey_from_seed</TestName>
+      </NamedTestSelector>
+      <FixtureTestSelector>
+        <FixtureName>Grin.Tests.HexUtilTests</FixtureName>
+      </FixtureTestSelector>
+    </IgnoredTests>
+  </Settings>
+</ProjectConfiguration>

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Grin.Util;
+using Microsoft.AspNetCore.Server.Kestrel.Internal.System.Collections.Sequences;
 using Microsoft.WindowsAzure.Storage.Blob.Protocol;
 
 namespace Grin.Keychain
@@ -21,7 +22,7 @@ namespace Grin.Keychain
 
         public void Serialize()
         {
-            
+           
         }
 
         public void Deserialize()
@@ -68,7 +69,7 @@ namespace Grin.Keychain
 
             var min = IDENTIFIER_SIZE < bytes.Length ? IDENTIFIER_SIZE : bytes.Length;
 
-            for (int i=0; i<=min; i++)
+            for (int i=0; i<min; i++)
             {
                 identifier.Value[i] = bytes[i];
             }
