@@ -3,6 +3,11 @@ using System.Diagnostics;
 using Grin.Keychain;
 using Microsoft.AspNetCore.ResponseCaching.Internal;
 using Newtonsoft.Json;
+using Org.BouncyCastle.Asn1.Sec;
+using Org.BouncyCastle.Asn1.X9;
+using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Math;
+using Org.BouncyCastle.Math.EC;
 using Xunit;
 
 namespace Grin.Tests
@@ -28,7 +33,8 @@ namespace Grin.Tests
 
         public class HasAnIdentifier
         {
-           public Identifier Identifier { get; set; }
+            [JsonProperty("identifier")]
+            public string Identifier { get; set; }
         }
 
 
@@ -39,21 +45,12 @@ namespace Grin.Tests
 
             Console.WriteLine(hex.Length);
 
-            var identifier = Identifier.from_hex(hex);
-
-            Console.WriteLine(hex);
-            foreach (var v in identifier.Value)
-            {
-                Console.Write("{0}[{1}]", v, v.ToString("X"));
-            }
-            Console.WriteLine();
-
-            var hex2 = identifier.to_hex();
-            Console.WriteLine(hex2);
-            //var has_an_identifier = new HasAnIdentifier {Identifier = identifier};
-
-            var json = JsonConvert.SerializeObject(identifier);
-            Assert.Equal("{\"value\":\"942b6c0bd43bdcb24f3e\"}", json);
+            var identifier = new Identifier(hex);
+            
+            var has_an_identifier = new HasAnIdentifier {Identifier = identifier.Hex};
+        
+            var json = JsonConvert.SerializeObject(has_an_identifier);
+            Assert.Equal("{\"identifier\":\"942b6c0bd43bdcb24f3e\"}", json);
 
             //var deserialized = JsonConvert.DeserializeObject<HasAnIdentifier>(json);
             //Assert.(has_an_identifier, deserialized);
@@ -65,35 +62,54 @@ namespace Grin.Tests
         [Fact]
         public void extkey_from_seed()
 {
-    //// TODO More test vectors
-    //let s = Secp256k1::new();
-    //let seed = from_hex("000102030405060708090a0b0c0d0e0f");
-    //let extk = ExtendedKey::from_seed(&s, &seed.as_slice()).unwrap();
-    //let sec = from_hex(
-    //    "c3f5ae520f474b390a637de4669c84d0ed9bbc21742577fac930834d3c3083dd",
+    //private static X9ECParameters curve = SecNamedCurves.GetByName("secp256k1");
+    //    private static ECDomainParameters domain = new ECDomainParameters(curve.Curve, curve.G, curve.N, curve.H);
 
-    //);
-    //let secret_key = SecretKey::from_slice(&s, sec.as_slice()).unwrap();
-    //let chaincode = from_hex(
-    //    "e7298e68452b0c6d54837670896e1aee76b118075150d90d4ee416ece106ae72",
 
-    //);
-    //let identifier = from_hex("83e59c48297b78b34b73");
-    //let depth = 0;
-    //let n_child = 0;
-    //assert_eq!(extk.key, secret_key);
-    //assert_eq!(
-    //    extk.identifier(&s).unwrap(),
-    //    Identifier::from_bytes(identifier.as_slice())
-    //);
-    //assert_eq!(
-    //    extk.root_key_id,
-    //    Identifier::from_bytes(identifier.as_slice())
-    //);
-    //assert_eq!(extk.chaincode, chaincode.as_slice());
-    //assert_eq!(extk.depth, depth);
-    //assert_eq!(extk.n_child, n_child);
-}
+
+
+        //public static byte[] ToPublicKey(byte[] privateKey)
+        //{
+        //    BigInteger d = new BigInteger(privateKey);
+        //    ECPoint q = domain.G.Multiply(d);
+
+        //    var publicParams = new ECPublicKeyParameters(q, domain);
+        //    return publicParams.Q.GetEncoded();
+
+        //}
+
+
+
+
+        //// TODO More test vectors
+            //let s = Secp256k1::new();
+            //let seed = from_hex("000102030405060708090a0b0c0d0e0f");
+            //let extk = ExtendedKey::from_seed(&s, &seed.as_slice()).unwrap();
+            //let sec = from_hex(
+            //    "c3f5ae520f474b390a637de4669c84d0ed9bbc21742577fac930834d3c3083dd",
+
+            //);
+            //let secret_key = SecretKey::from_slice(&s, sec.as_slice()).unwrap();
+            //let chaincode = from_hex(
+            //    "e7298e68452b0c6d54837670896e1aee76b118075150d90d4ee416ece106ae72",
+
+            //);
+            //let identifier = from_hex("83e59c48297b78b34b73");
+            //let depth = 0;
+            //let n_child = 0;
+            //assert_eq!(extk.key, secret_key);
+            //assert_eq!(
+            //    extk.identifier(&s).unwrap(),
+            //    Identifier::from_bytes(identifier.as_slice())
+            //);
+            //assert_eq!(
+            //    extk.root_key_id,
+            //    Identifier::from_bytes(identifier.as_slice())
+            //);
+            //assert_eq!(extk.chaincode, chaincode.as_slice());
+            //assert_eq!(extk.depth, depth);
+            //assert_eq!(extk.n_child, n_child);
+        }
 
         [Fact]
         public void extkey_derivation()
@@ -129,5 +145,6 @@ namespace Grin.Tests
     //assert_eq!(derived.depth, depth);
     //assert_eq!(derived.n_child, n_child);
 }
+
     }
 }

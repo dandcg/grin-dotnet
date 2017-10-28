@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Cryptography.ECDSA;
-using Xunit;
+﻿using Xunit;
 
 namespace Grin.Tests
 {
@@ -22,7 +18,7 @@ namespace Grin.Tests
             public void test_key_derivation()
             {
 
-                var secp = new Secp256k1();
+                //var secp = new Secp256k1();
             
 
                 //let secp = secp::Secp256k1::with_caps(secp::ContextFlag::Commit);
