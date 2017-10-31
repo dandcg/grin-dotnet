@@ -1,6 +1,6 @@
 ﻿using Xunit;
 
-namespace Grin.Tests
+namespace Grin.Tests.Keychain
 {
     public class KeychainTests
     {

@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Grin", "src\Grin\Grin.csproj", "{0B68DC4E-0D06-4588-A920-E9F68697E1EC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Grin.Tests", "test\Grin.Tests\Grin.Tests.csproj", "{9E8DBEC4-3213-41D6-8D92-1FFE5C414713}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Grin.Tests", "test\Grin.Tests\Grin.Tests.csproj", "{9E8DBEC4-3213-41D6-8D92-1FFE5C414713}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

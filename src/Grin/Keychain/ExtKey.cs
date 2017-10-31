@@ -129,7 +129,9 @@ namespace Grin.Keychain
 
             switch (seed.Length)
             {
-                case 16 | 32 | 64:
+                case 16:
+                case 32:
+                case 64:
 
                     break;
 

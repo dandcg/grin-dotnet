@@ -1,7 +1,7 @@
 using Grin.Util;
 using Xunit;
 
-namespace Grin.Tests
+namespace Grin.Tests.Util
 {
     public class HexUtilTests
     {
