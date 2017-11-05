@@ -93,6 +93,12 @@ namespace Grin.Secp256k1Proxy
 
         }
 
+        public static PublicKey New()
+        {
+            return new PublicKey(KeyUtils.get_bytes(0,64));
+        }
+
+
         public static PublicKey from(byte[] value)
         {
             return new PublicKey(value);

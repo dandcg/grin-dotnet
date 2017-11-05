@@ -28,6 +28,12 @@ namespace Grin.Secp256k1Proxy
                     throw new Exception("InvalidRecoveryId");
             }
         }
+
+        public RecoveryId clone()
+        {
+            var rcid=new RecoveryId(Value);
+            return rcid;
+        }
     }
 
 
@@ -127,6 +133,8 @@ namespace Grin.Secp256k1Proxy
 
         }
 
+
+
     }
 
 
@@ -144,8 +152,47 @@ namespace Grin.Secp256k1Proxy
         {
             return new RecoverableSigniture(ret);
         }
-    }
 
+        public static RecoverableSigniture from_compact(Secp256k1 secp, byte[] data, RecoveryId recid)
+        {
+
+
+
+
+            if (data.Length != 64)
+            {
+                throw new Exception("InvalidSignature");
+            }
+
+
+            var ret = new byte[65];
+
+            if (Proxy.secp256k1_ecdsa_recoverable_signature_parse_compact(secp.Ctx, ret, data, recid.Value) == 1)
+            {
+                return new RecoverableSigniture(ret);
+            }
+            else
+            {
+                throw new Exception("InvalidSignature");
+            }
+
+        }
+
+
+        public Signiture to_standard(Secp256k1 secp)
+        {
+            var ret = new byte[65];
+
+            var err = Proxy.secp256k1_ecdsa_recoverable_signature_convert(secp.Ctx, ret, this.Value);
+            if (err == 1)
+            {
+                return Signiture.From(ret);
+            }
+
+            throw new Exception("This should never happen!");
+        }
+
+    }
 
     public class Message
     {
@@ -312,7 +359,7 @@ namespace Grin.Secp256k1Proxy
             if (Caps == ContextFlag.VerifyOnly || Caps == ContextFlag.None)
                 throw new Exception("IncapableContext");
 
-            var ret = new byte[64];
+            var ret = new byte[65];
 
             // We can assume the return value because it's not possible to construct
             // an invalid signature from a valid `Message` and `SecretKey`

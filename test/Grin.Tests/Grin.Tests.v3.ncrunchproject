@@ -37,6 +37,15 @@
       <FixtureTestSelector>
         <FixtureName>Grin.Tests.Secp256k1Proxy.KeyTests</FixtureName>
       </FixtureTestSelector>
+      <NamedTestSelector>
+        <TestName>Grin.Tests.Secp256k1Proxy.LibTests.Capabilities</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Grin.Tests.Secp256k1Proxy.LibTests.recid_sanity_check</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Grin.Tests.Secp256k1Proxy.LibTests.invalid_pubkey</TestName>
+      </NamedTestSelector>
     </IgnoredTests>
     <UseCPUArchitecture>AutoDetect</UseCPUArchitecture>
   </Settings>

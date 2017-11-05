@@ -80,9 +80,9 @@ namespace Grin.Secp256k1Proxy
         // pub fn secp256k1_ecdsa_signature_parse_der(cx: *const Context, sig: *mut Signature, input: *const c_uchar, in_len: size_t)  -> c_int;
         public static extern int secp256k1_ecdsa_signature_parse_der(IntPtr ctx, byte[] ret, byte[] data, int dataLength);
 
-        //    pub fn secp256k1_ecdsa_signature_parse_compact(cx: *const Context, sig: *mut Signature,
-        //                                                   input64: *const c_uchar)
-        //                                                   -> c_int;
+        [DllImport(LibName)]
+        // pub fn secp256k1_ecdsa_signature_parse_compact(cx: *const Context, sig: *mut Signature, input64: *const c_uchar) -> c_int;
+        public static extern int secp256k1_ecdsa_recoverable_signature_parse_compact(IntPtr secpCtx, byte[] ret, byte[] data, int recidValue);
 
         //    pub fn ecdsa_signature_parse_der_lax(cx: *const Context, sig: *mut Signature,
         //                                         input: *const c_uchar, in_len: size_t)
@@ -104,9 +104,10 @@ namespace Grin.Secp256k1Proxy
         //                                                                   recid: *mut c_int, sig: *const RecoverableSignature)
         //                                                                   -> c_int;
 
-        //    pub fn secp256k1_ecdsa_recoverable_signature_convert(cx: *const Context, sig: *mut Signature,
-        //                                                         input: *const RecoverableSignature)
-        //                                                         -> c_int;
+        [DllImport(LibName)]
+        // pub fn secp256k1_ecdsa_recoverable_signature_convert(cx: *const Context, sig: *mut Signature, input: *const RecoverableSignature) -> c_int;
+        public static extern int secp256k1_ecdsa_recoverable_signature_convert(IntPtr secpCtx, byte[] ret, byte[] value);
+   
 
         //    pub fn secp256k1_ecdsa_signature_normalize(cx: *const Context, out_sig: *mut Signature,
         //                                               in_sig: *const Signature)
@@ -317,6 +318,6 @@ namespace Grin.Secp256k1Proxy
         }
 
 
- 
+   
     }
 }
