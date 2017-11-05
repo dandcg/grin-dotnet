@@ -31,6 +31,13 @@
       <NamedTestSelector>
         <TestName>Grin.Tests.Secp256k1.KeyTests.skey_from_slice</TestName>
       </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Grin.Tests.Secp256k1.KeyTests.pubkey_from_slice</TestName>
+      </NamedTestSelector>
+      <FixtureTestSelector>
+        <FixtureName>Grin.Tests.Secp256k1Proxy.KeyTests</FixtureName>
+      </FixtureTestSelector>
     </IgnoredTests>
+    <UseCPUArchitecture>AutoDetect</UseCPUArchitecture>
   </Settings>
 </ProjectConfiguration>

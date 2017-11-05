@@ -16,9 +16,9 @@ namespace Grin.Tests.Util
         [Fact]
         public void test_to_hex()
         {
-            Assert.Equal(HexUtil.to_hex(new byte[] {0, 0, 0, 0}), "00000000");
-            Assert.Equal(HexUtil.to_hex(new byte[] {10, 11, 12, 13}), "0a0b0c0d");
-            Assert.Equal(HexUtil.to_hex(new byte[] {0, 0, 0, 255}), "000000ff");
+            Assert.Equal("00000000", HexUtil.to_hex(new byte[] {0, 0, 0, 0}));
+            Assert.Equal("0a0b0c0d", HexUtil.to_hex(new byte[] {10, 11, 12, 13}));
+            Assert.Equal("000000ff", HexUtil.to_hex(new byte[] {0, 0, 0, 255}));
         }
     }
 }

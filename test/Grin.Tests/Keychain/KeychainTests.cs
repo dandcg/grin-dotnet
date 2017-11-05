@@ -30,7 +30,7 @@ namespace Grin.Tests.Keychain
                 //      let msg_bytes = [0; 32];
                 //let msg = secp::Message::from_slice(&msg_bytes[..]).unwrap();
 
-                //      // now create a zero commitment using the key on the keychain associated with
+                //      // now New a zero commitment using the key on the keychain associated with
                 //      // the key_id
                 //      let commit = keychain.commit(0, &key_id).unwrap();
 
