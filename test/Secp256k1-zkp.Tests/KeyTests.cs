@@ -2,7 +2,7 @@ using System;
 using Grin.Secp256k1Proxy;
 using Xunit;
 
-namespace Grin.Tests.Secp256k1Proxy
+namespace Secp256k1Proxy.Tests
 {
     public class KeyTests
     {

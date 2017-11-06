@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Security.Cryptography;
+using Secp256k1Proxy;
 
 namespace Grin.Secp256k1Proxy
 {

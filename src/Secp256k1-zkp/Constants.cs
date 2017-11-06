@@ -1,4 +1,4 @@
-﻿namespace Grin.Secp256k1Proxy
+﻿namespace Secp256k1Proxy
 {
     public static class Constants
     {

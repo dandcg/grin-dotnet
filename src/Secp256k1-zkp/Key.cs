@@ -3,6 +3,7 @@ using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
+using Secp256k1Proxy;
 
 namespace Grin.Secp256k1Proxy
 {

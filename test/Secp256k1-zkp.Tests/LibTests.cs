@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Linq;
 using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
-using Grin.Util;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-using Xunit;
 using Grin.Secp256k1Proxy;
-using Message = Grin.Secp256k1Proxy.Message;
-using PublicKey = Grin.Secp256k1Proxy.PublicKey;
+using Xunit;
 
-namespace Grin.Tests.Secp256k1Proxy
+
+namespace Secp256k1Proxy.Tests
 {
     public class LibTests
     {

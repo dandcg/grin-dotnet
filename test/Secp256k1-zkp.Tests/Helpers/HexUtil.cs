@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace Grin.Util
+namespace Secp256k1Proxy.Tests
 {
     public static class HexUtil
     {
