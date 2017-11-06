@@ -19,8 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Secp256k1-zkp\Secp256k1-zkp.csproj" />
     <ProjectReference Include="..\..\src\Grin\Grin.csproj" />
+    <ProjectReference Include="..\..\src\Secp256k1-zkp\Secp256k1-zkp.csproj" />
   </ItemGroup>
 
 </Project>

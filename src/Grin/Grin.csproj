@@ -22,6 +22,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Secp256k1-zkp\Secp256k1-zkp.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="secp256k1.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
