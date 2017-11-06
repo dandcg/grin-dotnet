@@ -74,46 +74,45 @@ namespace Grin.Secp256k1Proxy
         // pub fn secp256k1_ec_pubkey_serialize(cx: *const Context, output: *const c_uchar, out_len: *mut size_t, pk: *const PublicKey, compressed: c_uint) -> c_int;
         public static extern int secp256k1_ec_pubkey_serialize(IntPtr ctx, byte[] ret, [In, Out] ref Int64 retLength, [In] byte[] pubkey, uint compressed);
 
-        // Signatures
+        // [ Signatures ]
+
+        [DllImport(LibName)]
+        // pub fn secp256k1_ecdsa_signature_parse_compact(cx: *const Context, sig: *mut Signature, input64: *const c_uchar) -> c_int;
+        public static extern int secp256k1_ecdsa_signature_parse_compact(IntPtr secpCtx, byte[] ret, byte[] data);
+        
+        [DllImport(LibName)]
+        // pub fn secp256k1_ecdsa_recoverable_signature_parse_compact(cx: *const Context, sig: *mut RecoverableSignature, input64: *const c_uchar, recid: c_int) -> c_int;
+        public static extern int secp256k1_ecdsa_recoverable_signature_parse_compact(IntPtr secpCtx, byte[] ret, byte[] data, int recidValue);
+
+        [DllImport(LibName)]
+        // pub fn ecdsa_signature_parse_der_lax(cx: *const Context, sig: *mut Signature, input: *const c_uchar, in_len: size_t) -> c_int;
+        public static extern int ecdsa_signature_parse_der_lax(IntPtr secpCtx, byte[] ret, byte[] data, int dataLength);
+
+        [DllImport(LibName)]
+        // pub fn secp256k1_ecdsa_signature_serialize_der(cx: *const Context, output: *const c_uchar, out_len: *mut size_t, sig: *const Signature) -> c_int;
+        public static extern int secp256k1_ecdsa_signature_serialize_der(IntPtr secpCtx, byte[] ret, ref long retLen, byte[] value);
+        
+        [DllImport(LibName)]
+        // pub fn secp256k1_ecdsa_signature_serialize_compact(cx: *const Context, output64: *const c_uchar, sig: *const Signature) -> c_int;
+        public static extern int secp256k1_ecdsa_signature_serialize_compact(IntPtr secpCtx, byte[] ret, byte[] value);
 
         [DllImport(LibName)]
         // pub fn secp256k1_ecdsa_signature_parse_der(cx: *const Context, sig: *mut Signature, input: *const c_uchar, in_len: size_t)  -> c_int;
         public static extern int secp256k1_ecdsa_signature_parse_der(IntPtr ctx, byte[] ret, byte[] data, int dataLength);
-
+        
         [DllImport(LibName)]
-        // pub fn secp256k1_ecdsa_signature_parse_compact(cx: *const Context, sig: *mut Signature, input64: *const c_uchar) -> c_int;
-        public static extern int secp256k1_ecdsa_recoverable_signature_parse_compact(IntPtr secpCtx, byte[] ret, byte[] data, int recidValue);
-
-        //    pub fn ecdsa_signature_parse_der_lax(cx: *const Context, sig: *mut Signature,
-        //                                         input: *const c_uchar, in_len: size_t)
-        //                                         -> c_int;
-
-        //    pub fn secp256k1_ecdsa_signature_serialize_der(cx: *const Context, output: *const c_uchar,
-        //                                                   out_len: *mut size_t, sig: *const Signature)
-        //                                                   -> c_int;
-
-        //    pub fn secp256k1_ecdsa_signature_serialize_compact(cx: *const Context, output64: *const c_uchar,
-        //                                                       sig: *const Signature)
-        //                                                       -> c_int;
-
-        //    pub fn secp256k1_ecdsa_recoverable_signature_parse_compact(cx: *const Context, sig: *mut RecoverableSignature,
-        //                                                               input64: *const c_uchar, recid: c_int)
-        //                                                               -> c_int;
-
-        //    pub fn secp256k1_ecdsa_recoverable_signature_serialize_compact(cx: *const Context, output64: *const c_uchar,
-        //                                                                   recid: *mut c_int, sig: *const RecoverableSignature)
-        //                                                                   -> c_int;
-
+        // pub fn secp256k1_ecdsa_recoverable_signature_serialize_compact(cx: *const Context, output64: *const c_uchar, recid: *mut c_int, sig: *const RecoverableSignature) -> c_int;
+        public static extern int secp256k1_ecdsa_recoverable_signature_serialize_compact(IntPtr secpCtx, byte[] ret, ref int recid, byte[] value);
+        
         [DllImport(LibName)]
         // pub fn secp256k1_ecdsa_recoverable_signature_convert(cx: *const Context, sig: *mut Signature, input: *const RecoverableSignature) -> c_int;
         public static extern int secp256k1_ecdsa_recoverable_signature_convert(IntPtr secpCtx, byte[] ret, byte[] value);
-   
 
-        //    pub fn secp256k1_ecdsa_signature_normalize(cx: *const Context, out_sig: *mut Signature,
-        //                                               in_sig: *const Signature)
-        //                                               -> c_int;
+        [DllImport(LibName)]
+        // pub fn secp256k1_ecdsa_signature_normalize(cx: *const Context, out_sig: *mut Signature, in_sig: *const Signature) -> c_int;
+        public static extern void secp256k1_ecdsa_signature_normalize(IntPtr secpCtx, byte[] value, byte[] bytes);
 
-        //    // ECDSA
+        // [ ECDSA ]
 
         [DllImport(LibName)]
         // pub fn secp256k1_ecdsa_verify(cx: *const Context, sig: *const Signature, msg32: *const c_uchar, pk: *const PublicKey) -> c_int;
@@ -126,14 +125,13 @@ namespace Grin.Secp256k1Proxy
         [DllImport(LibName)]
         // pub fn secp256k1_ecdsa_sign_recoverable(cx: *const Context, sig: *mut RecoverableSignature, msg32: *const c_uchar, sk: *const c_uchar, noncefn: NonceFn, noncedata: *const c_void) -> c_int;
         public static extern int secp256k1_ecdsa_sign_recoverable(IntPtr ctx, byte[] ret, byte[] msgValue, byte[] skValue, IntPtr nonce, IntPtr zero);
-
-
+        
         [DllImport(LibName)]
         // pub fn secp256k1_ecdsa_recover(cx: *const Context, pk: *mut PublicKey, sig: *const RecoverableSignature, msg32: *const c_uchar) -> c_int;
         public static extern int secp256k1_ecdsa_recover(IntPtr ctx, byte[] pkBytes, byte[] sigValue, byte[] msgValue);
  
+        // [ EC ]
 
-        // EC
         [DllImport(LibName)]
         // pub fn secp256k1_ec_seckey_verify(cx: *const Context, sk: *const c_uchar) -> c_int;
         public static extern int secp256k1_ec_seckey_verify(IntPtr ctx, byte[] seckey);
@@ -142,8 +140,6 @@ namespace Grin.Secp256k1Proxy
         // pub fn secp256k1_ec_pubkey_create(cx: *const Context, pk: *mut PublicKey, sk: *const c_uchar) -> c_int;
         public static extern int secp256k1_ec_pubkey_create(IntPtr ctx, byte[] pkBytes, byte[] sk);
      
-
-
         ////TODO secp256k1_ec_privkey_export
         ////TODO secp256k1_ec_privkey_import
 
@@ -292,20 +288,11 @@ namespace Grin.Secp256k1Proxy
 
  
 
-        public static int secp256k1_ecdsa_signature_parse_compact(IntPtr secpCtx, byte[] ret, byte[] data)
-        {
-            throw new NotImplementedException();
-        }
 
-        public static int ecdsa_signature_parse_der_lax(IntPtr secpCtx, byte[] ret, byte[] data, int dataLength)
-        {
-            throw new NotImplementedException();
-        }
 
-        public static void secp256k1_ecdsa_signature_normalize(IntPtr secpCtx, byte[] value, byte[] bytes)
-        {
-            throw new NotImplementedException();
-        }
+
+
+
 
         public static int secp256k1_ec_privkey_tweak_add(IntPtr secpCtx, byte[] value, byte[] otherValue)
         {
@@ -318,6 +305,6 @@ namespace Grin.Secp256k1Proxy
         }
 
 
-   
+
     }
 }

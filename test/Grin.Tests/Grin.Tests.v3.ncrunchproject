@@ -46,6 +46,45 @@
       <NamedTestSelector>
         <TestName>Grin.Tests.Secp256k1Proxy.LibTests.invalid_pubkey</TestName>
       </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Grin.Tests.Secp256k1Proxy.LibTests.sign</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Grin.Tests.Secp256k1Proxy.LibTests.sign_and_verify</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Grin.Tests.Secp256k1Proxy.LibTests.test_low_s</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Grin.Tests.Secp256k1Proxy.LibTests.test_recov_id_conversion_between_i32</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Grin.Tests.Secp256k1Proxy.LibTests.test_recov_sig_serialize_compact</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Grin.Tests.Secp256k1Proxy.LibTests.sign_and_verify_fail</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Grin.Tests.Secp256k1Proxy.LibTests.sign_with_recovery</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Grin.Tests.Secp256k1Proxy.LibTests.signature_lax_der</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Grin.Tests.Secp256k1Proxy.LibTests.signature_serialize_roundtrip</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Grin.Tests.Secp256k1Proxy.LibTests.test_bad_slice</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Grin.Tests.Secp256k1Proxy.LibTests.test_debug_output</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Grin.Tests.Secp256k1Proxy.LibTests.sign_and_verify_extreme</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Grin.Tests.Secp256k1Proxy.LibTests.bad_recovery</TestName>
+      </NamedTestSelector>
     </IgnoredTests>
     <UseCPUArchitecture>AutoDetect</UseCPUArchitecture>
   </Settings>

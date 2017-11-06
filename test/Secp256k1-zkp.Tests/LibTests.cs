@@ -257,7 +257,7 @@ namespace Grin.Tests.Secp256k1Proxy
 
             //TODO: Finish here
             //use constants;
-            //wild_keys[1][..].copy_from_slice(Constants.CURVE_ORDER);
+            //wild_keys[1][..].copy_from_slice(&constants::CURVE_ORDER[..]);
             //wild_msgs[1][..].copy_from_slice(&constants::CURVE_ORDER[..]);
             //wild_msgs[2][..].copy_from_slice(&constants::CURVE_ORDER[..]);
 
@@ -319,7 +319,7 @@ namespace Grin.Tests.Secp256k1Proxy
             var s = Secp256k1.New();
             s.Randomize(RandomNumberGenerator.Create());
 
-            var msgBytes = KeyUtils.get_bytes(0x55, 32);
+            var msgBytes = KeyUtils.get_bytes(0x55, 3);
             var msg = Message.from_slice(msgBytes);
 
             // Zero is not a valid sig
@@ -367,15 +367,14 @@ namespace Grin.Tests.Secp256k1Proxy
                 0xff, 0x20, 0x80, 0xc4, 0xa3, 0x9a, 0xae, 0x06,
                 0x8d, 0x12, 0xee, 0xd0, 0x09, 0xb6, 0x8c, 0x89},
                 RecoveryId.from_i32(1));
-            //TODO:
-          //Assert.Equal("RecoverableSignature(98882e09f4ed6dc3659e43fc771e0cafa60b1f926f2b77041f744721adff7366898cb609d0ee128d06ae9aa3c48020ff9f705e02f80e1280a8ade05216971a4c01)", $"{sig}");
+
+          Assert.Equal("RecoverableSignature(98882e09f4ed6dc3659e43fc771e0cafa60b1f926f2b77041f744721adff7366898cb609d0ee128d06ae9aa3c48020ff9f705e02f80e1280a8ade05216971a4c01)", $"{sig}");
 
             var msg = Message.from_slice(new Byte[]{1, 2, 3, 4, 5, 6, 7, 8,
                                9, 10, 11, 12, 13, 14, 15, 16,
                                17, 18, 19, 20, 21, 22, 23, 24,
                                25, 26, 27, 28, 29, 30, 31, 255});
-            //TODO:
-            //Assert.Equal("Message(0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1fff)", $"{msg}");
+            Assert.Equal("Message(0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1fff)", $"{msg}");
         }
 
         [Fact]

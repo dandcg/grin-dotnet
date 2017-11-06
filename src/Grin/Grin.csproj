@@ -22,12 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Libs\x64\secp256k1.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Libs\x86\secp256k1.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="secp256k1.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

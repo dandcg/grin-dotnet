@@ -134,7 +134,36 @@ namespace Grin.Secp256k1Proxy
         }
 
 
+        public byte[] serialize_der(Secp256k1 secp)
+        {
+            var ret = new byte[72];
+            Int64 ret_len = ret.Length;
 
+             var err = Proxy.secp256k1_ecdsa_signature_serialize_der(secp.Ctx, ret,ref ret_len,Value);
+
+            if (err == 1)
+            {
+
+         Array.Resize(ref ret,(int) ret_len);
+
+                return ret;
+
+            }
+            throw new Exception("Should never happen!");
+
+        }
+
+        public byte[] serialize_compact(Secp256k1 secp)
+        {
+            var ret = new byte[64];
+      
+             var err = Proxy.secp256k1_ecdsa_signature_serialize_compact(secp.Ctx, ret,Value);
+            if (err == 1)
+            {
+                return ret;
+            }
+            throw new Exception("Should never happen!");
+        }
     }
 
 
@@ -192,6 +221,20 @@ namespace Grin.Secp256k1Proxy
             throw new Exception("This should never happen!");
         }
 
+        public (RecoveryId, byte[]) serialize_compact(Secp256k1 secp)
+        {
+            var ret = new  byte[64];
+          Int32 recid = 0;
+    
+          var err = Proxy.secp256k1_ecdsa_recoverable_signature_serialize_compact(secp.Ctx, ret,ref recid,Value);
+        
+            if (err == 1)
+            {
+                return (RecoveryId.from_i32(recid), ret);
+            }
+
+            throw new Exception("This should never happen!");
+        }
     }
 
     public class Message
@@ -435,9 +478,5 @@ namespace Grin.Secp256k1Proxy
             }
         }
 
-        public void sign(SecretKey sk)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

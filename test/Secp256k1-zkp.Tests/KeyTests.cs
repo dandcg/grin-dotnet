@@ -1,6 +1,5 @@
-using Grin.Secp256k1Proxy;
 using System;
-
+using Grin.Secp256k1Proxy;
 using Xunit;
 
 namespace Grin.Tests.Secp256k1Proxy
