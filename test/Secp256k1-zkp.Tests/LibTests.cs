@@ -319,7 +319,7 @@ namespace Secp256k1Proxy.Tests
             var s = Secp256k1.New();
             s.Randomize(RandomNumberGenerator.Create());
 
-            var msgBytes = KeyUtils.get_bytes(0x55, 3);
+            var msgBytes = KeyUtils.get_bytes(0x55, 32);
             var msg = Message.from_slice(msgBytes);
 
             // Zero is not a valid sig
