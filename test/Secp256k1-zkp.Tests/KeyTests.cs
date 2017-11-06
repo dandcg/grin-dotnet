@@ -72,5 +72,44 @@ namespace Secp256k1Proxy.Tests
         }
 
 
+        [Fact]
+        public void invalid_secret_key()
+        {
+            var s = Secp256k1.New();
+
+            Exception ex;
+
+            // Zero
+            ex = Assert.Throws<Exception>(() => { SecretKey.from_slice(s, KeyUtils.get_bytes(0, 32)); });
+            Assert.Equal("InvalidSecretKey", ex.Message);
+            // -1
+            ex = Assert.Throws<Exception>(() => { SecretKey.from_slice(s, KeyUtils.get_bytes(0xff, 32)); });
+            Assert.Equal("InvalidSecretKey", ex.Message);
+
+            // Top of range
+            var sk1 = SecretKey.from_slice(s, new byte[]
+            {
+                0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+                0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFE,
+                0xBA, 0xAE, 0xDC, 0xE6, 0xAF, 0x48, 0xA0, 0x3B,
+                0xBF, 0xD2, 0x5E, 0x8C, 0xD0, 0x36, 0x41, 0x40
+            });
+
+            Assert.NotEmpty(sk1.Value);
+
+            // One past top of range
+            ex = Assert.Throws<Exception>(() =>
+            {
+
+                SecretKey.from_slice(s, new byte[]
+                {
+                    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+                    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFE,
+                    0xBA, 0xAE, 0xDC, 0xE6, 0xAF, 0x48, 0xA0, 0x3B,
+                    0xBF, 0xD2, 0x5E, 0x8C, 0xD0, 0x36, 0x41, 0x41
+                });
+            });
+        }
+
     }
 }
