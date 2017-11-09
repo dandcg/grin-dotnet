@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
-using Grin.Secp256k1Proxy;
 using Xunit;
 
 namespace Secp256k1Proxy.Tests
@@ -345,17 +344,17 @@ namespace Secp256k1Proxy.Tests
 
             Assert.Throws<Exception>(() =>
             {
-                PublicKey.from_slice(s, KeyUtils.get_bytes(0, Constants.PUBLIC_KEY_SIZE +1));
+                PublicKey.from_slice(s, KeyUtils.get_bytes(0, Constants.PUBLIC_KEY_SIZE + 1));
             });
 
             Assert.Throws<Exception>(() =>
             {
-                PublicKey.from_slice(s, KeyUtils.get_bytes(0, Constants.COMPRESSED_PUBLIC_KEY_SIZE+1));
+                PublicKey.from_slice(s, KeyUtils.get_bytes(0, Constants.COMPRESSED_PUBLIC_KEY_SIZE + 1));
             });
 
             Assert.Throws<Exception>(() =>
             {
-                PublicKey.from_slice(s, KeyUtils.get_bytes(0, Constants.UNCOMPRESSED_PUBLIC_KEY_SIZE-1));
+                PublicKey.from_slice(s, KeyUtils.get_bytes(0, Constants.UNCOMPRESSED_PUBLIC_KEY_SIZE - 1));
             });
 
             Assert.Throws<Exception>(() =>
@@ -364,7 +363,7 @@ namespace Secp256k1Proxy.Tests
             });
 
             //// Bad parse
-            
+
             Assert.Throws<Exception>(() =>
             {
                 PublicKey.from_slice(s, KeyUtils.get_bytes(0xff, Constants.UNCOMPRESSED_PUBLIC_KEY_SIZE));
@@ -462,7 +461,7 @@ namespace Secp256k1Proxy.Tests
         [Fact]
         public void pubkey_hash()
         {
-        
+
             var s = Secp256k1.New();
             var set = new HashSet<byte[]>();
 
@@ -477,7 +476,7 @@ namespace Secp256k1Proxy.Tests
 
                 set.Add(hash);
             }
- 
+
         }
 
         private byte[] Hash(byte[] data)
@@ -489,10 +488,11 @@ namespace Secp256k1Proxy.Tests
 
                 return md5Hash.ComputeHash(data);
 
-      
+
 
             }
 
         }
+
     }
 }

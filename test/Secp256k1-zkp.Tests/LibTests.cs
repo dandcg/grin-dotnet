@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Security.Cryptography;
-using Grin.Secp256k1Proxy;
+using Secp256k1Proxy.Tests.Helpers;
 using Xunit;
 
 

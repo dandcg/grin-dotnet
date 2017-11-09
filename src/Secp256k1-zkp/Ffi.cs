@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 
-namespace Grin.Secp256k1Proxy
+namespace Secp256k1Proxy
 {
 
 
@@ -168,11 +164,10 @@ namespace Grin.Secp256k1Proxy
         //                                       n: c_int)
         //                                       -> c_int;
 
-        //    pub fn secp256k1_ecdh(cx: *const Context,
-        //                          out: *mut SharedSecret,
-        //                          point: *const PublicKey,
-        //                          scalar: *const c_uchar)
-        //                          -> c_int;
+        [DllImport(LibName)]
+        // pub fn secp256k1_ecdh(cx: *const Context, out: *mut SharedSecret, point: *const PublicKey, scalar: *const c_uchar) -> c_int;
+        public static extern int secp256k1_ecdh(IntPtr secpCtx, byte[] sharedSecretBytes, byte[] pointValue, byte[] scalarValue);
+
 
         //    // Generates a switch commitment: *commit = blind * J
         //    // The commitment is 33 bytes, the blinding factor is 32 bytes.
@@ -284,6 +279,6 @@ namespace Grin.Secp256k1Proxy
         //	) -> c_int;
 
 
- 
+
     }
 }
