@@ -139,29 +139,28 @@ namespace Grin.Secp256k1Proxy
         [DllImport(LibName)]
         // pub fn secp256k1_ec_pubkey_create(cx: *const Context, pk: *mut PublicKey, sk: *const c_uchar) -> c_int;
         public static extern int secp256k1_ec_pubkey_create(IntPtr ctx, byte[] pkBytes, byte[] sk);
-     
+
         ////TODO secp256k1_ec_privkey_export
         ////TODO secp256k1_ec_privkey_import
 
-        //    pub fn secp256k1_ec_privkey_tweak_add(cx: *const Context,
-        //                                          sk: *mut c_uchar,
-        //                                          tweak: *const c_uchar)
-        //                                          -> c_int;
+        [DllImport(LibName)]
+        // pub fn secp256k1_ec_privkey_tweak_add(cx: *const Context, sk: *mut c_uchar, tweak: *const c_uchar) -> c_int;
+        public static extern int secp256k1_ec_privkey_tweak_add(IntPtr secpCtx, byte[] value, byte[] otherValue);
 
-        //    pub fn secp256k1_ec_pubkey_tweak_add(cx: *const Context,
-        //                                         pk: *mut PublicKey,
-        //                                         tweak: *const c_uchar)
-        //                                         -> c_int;
 
-        //    pub fn secp256k1_ec_privkey_tweak_mul(cx: *const Context,
-        //                                          sk: *mut c_uchar,
-        //                                          tweak: *const c_uchar)
-        //                                          -> c_int;
+        [DllImport(LibName)]
+        // pub fn secp256k1_ec_pubkey_tweak_add(cx: *const Context, pk: *mut PublicKey, tweak: *const c_uchar) -> c_int;
+        public static extern int secp256k1_ec_pubkey_tweak_add(IntPtr secpCtx, byte[] value, byte[] otherValue);
+ 
+        [DllImport(LibName)]
+        // pub fn secp256k1_ec_privkey_tweak_mul(cx: *const Context, sk: *mut c_uchar, tweak: *const c_uchar) -> c_int;
+        public static extern int secp256k1_ec_privkey_tweak_mul(IntPtr secpCtx, byte[] value, byte[] otherValue);
 
-        //    pub fn secp256k1_ec_pubkey_tweak_mul(cx: *const Context,
-        //                                         pk: *mut PublicKey,
-        //                                         tweak: *const c_uchar)
-        //                                         -> c_int;
+        [DllImport(LibName)]
+        // pub fn secp256k1_ec_pubkey_tweak_mul(cx: *const Context, pk: *mut PublicKey, tweak: *const c_uchar) -> c_int;
+        public static extern int secp256k1_ec_pubkey_tweak_mul(IntPtr secpCtx, byte[] value, byte[] otherValue);
+
+
 
         //    pub fn secp256k1_ec_pubkey_combine(cx: *const Context,
         //                                       out: *mut PublicKey,
@@ -285,26 +284,6 @@ namespace Grin.Secp256k1Proxy
         //	) -> c_int;
 
 
-
  
-
-
-
-
-
-
-
-        public static int secp256k1_ec_privkey_tweak_add(IntPtr secpCtx, byte[] value, byte[] otherValue)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static int secp256k1_ec_privkey_tweak_mul(IntPtr secpCtx, byte[] value, byte[] otherValue)
-        {
-            throw new NotImplementedException();
-        }
-
-
-
     }
 }

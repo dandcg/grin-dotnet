@@ -132,6 +132,39 @@ namespace Grin.Secp256k1Proxy
             return ret;
 
         }
+
+        public void add_exp_assign(Secp256k1 secp, SecretKey other)
+        {
+            if (secp.Caps == ContextFlag.SignOnly || secp.Caps == ContextFlag.None)
+            {
+                throw new Exception("IncapableContext");
+            }
+
+            if (Proxy.secp256k1_ec_pubkey_tweak_add(secp.Ctx, Value, other.Value) == 1)
+            {
+                return;
+            }
+
+            throw new Exception("InvalidSecretKey");
+
+
+        }
+
+        public void mul_assign(Secp256k1 secp, SecretKey other)
+        {
+             if (secp.Caps == ContextFlag.SignOnly || secp.Caps == ContextFlag.None)
+            {
+              throw new Exception("IncapableContext");
+            }
+   
+                if (Proxy.secp256k1_ec_pubkey_tweak_mul(secp.Ctx, Value , other.Value) == 1) {
+                return;
+            }
+
+            throw new Exception("InvalidSecretKey");
+
+
+        }
     }
 
     public class SecretKey

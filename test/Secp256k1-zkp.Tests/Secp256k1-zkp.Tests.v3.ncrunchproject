@@ -1,9 +1,21 @@
 ﻿<ProjectConfiguration>
   <Settings>
+    <HiddenComponentWarnings>
+      <Value>LongTestTimesWithoutParallelExecution</Value>
+    </HiddenComponentWarnings>
     <IgnoredTests>
       <FixtureTestSelector>
         <FixtureName>Secp256k1Proxy.Tests.LibTests</FixtureName>
       </FixtureTestSelector>
+      <NamedTestSelector>
+        <TestName>Secp256k1Proxy.Tests.KeyTests.test_multiplication</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Secp256k1Proxy.Tests.KeyTests.test_addition</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Secp256k1Proxy.Tests.KeyTests.test_add_exp_bad_context</TestName>
+      </NamedTestSelector>
     </IgnoredTests>
   </Settings>
 </ProjectConfiguration>
