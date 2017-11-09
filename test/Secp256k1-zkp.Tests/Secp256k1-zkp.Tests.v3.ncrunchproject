@@ -16,6 +16,12 @@
       <NamedTestSelector>
         <TestName>Secp256k1Proxy.Tests.KeyTests.test_add_exp_bad_context</TestName>
       </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Secp256k1Proxy.Tests.KeyTests.test_pubkey_from_bad_slice</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Secp256k1Proxy.Tests.KeyTests.pubkey_hash</TestName>
+      </NamedTestSelector>
     </IgnoredTests>
   </Settings>
 </ProjectConfiguration>

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Security.Cryptography;
 using Grin.Secp256k1Proxy;
 using Xunit;
@@ -334,28 +335,46 @@ namespace Secp256k1Proxy.Tests
         [Fact]
         public void test_pubkey_from_bad_slice()
         {
-            //var s = Secp256k1.New();
-            //// Bad sizes
-            //assert_eq!(PublicKey.from_slice(&s, &[0;
-            //constants.COMPRESSED_PUBLIC_KEY_SIZE - 1]),
-            //Err(InvalidPublicKey));
-            //assert_eq!(PublicKey.from_slice(&s, &[0;
-            //constants.COMPRESSED_PUBLIC_KEY_SIZE + 1]),
-            //Err(InvalidPublicKey));
-            //assert_eq!(PublicKey.from_slice(&s, &[0;
-            //constants.UNCOMPRESSED_PUBLIC_KEY_SIZE - 1]),
-            //Err(InvalidPublicKey));
-            //assert_eq!(PublicKey.from_slice(&s, &[0;
-            //constants.UNCOMPRESSED_PUBLIC_KEY_SIZE + 1]),
-            //Err(InvalidPublicKey));
+            var s = Secp256k1.New();
+
+            // Bad sizes
+            Assert.Throws<Exception>(() =>
+            {
+                PublicKey.from_slice(s, KeyUtils.get_bytes(0, Constants.PUBLIC_KEY_SIZE - 1));
+            });
+
+            Assert.Throws<Exception>(() =>
+            {
+                PublicKey.from_slice(s, KeyUtils.get_bytes(0, Constants.PUBLIC_KEY_SIZE +1));
+            });
+
+            Assert.Throws<Exception>(() =>
+            {
+                PublicKey.from_slice(s, KeyUtils.get_bytes(0, Constants.COMPRESSED_PUBLIC_KEY_SIZE+1));
+            });
+
+            Assert.Throws<Exception>(() =>
+            {
+                PublicKey.from_slice(s, KeyUtils.get_bytes(0, Constants.UNCOMPRESSED_PUBLIC_KEY_SIZE-1));
+            });
+
+            Assert.Throws<Exception>(() =>
+            {
+                PublicKey.from_slice(s, KeyUtils.get_bytes(0, Constants.UNCOMPRESSED_PUBLIC_KEY_SIZE + 1));
+            });
 
             //// Bad parse
-            //assert_eq!(PublicKey.from_slice(&s, &[0xff;
-            //constants.UNCOMPRESSED_PUBLIC_KEY_SIZE]),
-            //Err(InvalidPublicKey));
-            //assert_eq!(PublicKey.from_slice(&s, &[0x55;
-            //constants.COMPRESSED_PUBLIC_KEY_SIZE]),
-            //Err(InvalidPublicKey));
+            
+            Assert.Throws<Exception>(() =>
+            {
+                PublicKey.from_slice(s, KeyUtils.get_bytes(0xff, Constants.UNCOMPRESSED_PUBLIC_KEY_SIZE));
+            });
+
+            Assert.Throws<Exception>(() =>
+            {
+                PublicKey.from_slice(s, KeyUtils.get_bytes(0x55, Constants.COMPRESSED_PUBLIC_KEY_SIZE));
+            });
+
         }
 
         [Fact]
@@ -443,33 +462,37 @@ namespace Secp256k1Proxy.Tests
         [Fact]
         public void pubkey_hash()
         {
-            //use std.collections.hash_map.DefaultHasher;
-            //use std.hash.{
-            //    Hash, Hasher
-            //}
-            ;
-            //use std.collections.HashSet;
+        
+            var s = Secp256k1.New();
+            var set = new HashSet<byte[]>();
 
+            var usize = 1024;
+            for (var i = 0; i <= usize; i++)
+            {
+                var kp = s.generate_keypair(RandomNumberGenerator.Create());
 
-            //var s = Secp256k1.new();
-            //var set = HashSet<>.new();
-            //const COUNT  : usize = 1024;
-            //var count = 0..COUNT.map( | _ | {
-            //    var(_, pk) = s.generate_keypair(&thread_rng()).unwrap();
-            //    var hash = hash(&pk);
-            //    assert!!set.contains(&hash);
-            //    set.insert(hash);
-            //}).count();
-            //assert_eq!(count, COUNT);
+                var hash = Hash(kp.publicKey.Value);
+
+                Assert.False(set.Contains(hash));
+
+                set.Add(hash);
+            }
+ 
         }
 
-        private ulong Hash()
+        private byte[] Hash(byte[] data)
 
         {
-            //var s = DefaultHasher.new();
-            //t.hash(&s);
-            //s.finish();
-            return 0;
+            using (MD5 md5Hash = MD5.Create())
+            {
+
+
+                return md5Hash.ComputeHash(data);
+
+      
+
+            }
+
         }
     }
 }
