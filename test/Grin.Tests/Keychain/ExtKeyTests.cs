@@ -69,11 +69,10 @@ namespace Grin.Tests.Keychain
             uint n_child = 0;
 
             Assert.Equal(extk.key.Value, secret_key.Value);
-            Assert.Equal(extk.identifier(s), Identifier.from_bytes(identifier)
-            );
+            Assert.Equal(extk.identifier(s).Bytes, Identifier.from_bytes(identifier).Bytes);
             Assert.Equal(
-                extk.root_key_id,
-                Identifier.from_bytes(identifier)
+                extk.root_key_id.Bytes,
+                Identifier.from_bytes(identifier).Bytes
             );
             Assert.Equal(extk.chaincode, chaincode);
             Assert.Equal(extk.depth, depth);

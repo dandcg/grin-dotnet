@@ -45,10 +45,11 @@ namespace Grin.Keychain
         }
 
 
-        public static Identifier from_key_id(byte[] pubKey)
+        public static Identifier from_key_id(Secp256k1 secp, PublicKey pubKey)
         {
-            var hashAlgorithm = new HMACBlake2B(new byte[]{}, IDENTIFIER_SIZE*8);
-            var key = hashAlgorithm.ComputeHash(pubKey);
+            var bytes = pubKey.serialize_vec(secp, true);
+            var hashAlgorithm = new HMACBlake2B(null, IDENTIFIER_SIZE*8);
+            var key = hashAlgorithm.ComputeHash(bytes);
             return Identifier.from_bytes(key);
         }
 
@@ -168,9 +169,9 @@ namespace Grin.Keychain
         public Identifier identifier(Secp256k1 secp)
         {
             // get public key from private
-            var key_id = key;
+            var key_id = PublicKey.from_secret_key(secp, key);
             
-            return Identifier.from_key_id(key_id.Value);
+            return Identifier.from_key_id(secp, key_id);
 
      
         }
