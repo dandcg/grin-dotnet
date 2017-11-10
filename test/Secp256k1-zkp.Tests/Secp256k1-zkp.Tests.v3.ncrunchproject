@@ -22,6 +22,30 @@
       <NamedTestSelector>
         <TestName>Secp256k1Proxy.Tests.KeyTests.pubkey_hash</TestName>
       </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Secp256k1Proxy.Tests.EcdhTests.Ecdh</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Secp256k1Proxy.Tests.PedersenTests.test_verify_commit_sum_zero_keys</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Secp256k1Proxy.Tests.PedersenTests.test_to_pubkey</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Secp256k1Proxy.Tests.PedersenTests.test_to_two_pubkeys</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Secp256k1Proxy.Tests.PedersenTests.test_verify_commit_sum_one_keys</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Secp256k1Proxy.Tests.PedersenTests.test_verify_commit_sum_random_keys</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Secp256k1Proxy.Tests.PedersenTests.test_sign_with_pubkey_from_commitment</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Secp256k1Proxy.Tests.PedersenTests.test_commit_sum</TestName>
+      </NamedTestSelector>
     </IgnoredTests>
   </Settings>
 </ProjectConfiguration>

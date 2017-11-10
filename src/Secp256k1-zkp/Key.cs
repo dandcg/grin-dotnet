@@ -173,6 +173,7 @@ namespace Secp256k1Proxy
         public static SecretKey ONE_KEY = new SecretKey(new byte[]
             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1});
 
+      
         private SecretKey(byte[] value)
         {
             Value = value;
@@ -191,6 +192,12 @@ namespace Secp256k1Proxy
             }
             return new SecretKey(data);
         }
+
+        public SecretKey clone()
+        {
+            return new SecretKey(Value);
+        }
+
 
 
         /// Converts a `SECRET_KEY_SIZE`-byte slice to a secret key

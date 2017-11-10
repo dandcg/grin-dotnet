@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using Secp256k1Proxy.Helpers;
 
 namespace Secp256k1Proxy
 {
@@ -169,6 +170,7 @@ namespace Secp256k1Proxy
         public static extern int secp256k1_ecdh(IntPtr secpCtx, byte[] sharedSecretBytes, byte[] pointValue, byte[] scalarValue);
 
 
+        [DllImport(LibName)]
         //    // Generates a switch commitment: *commit = blind * J
         //    // The commitment is 33 bytes, the blinding factor is 32 bytes.
         //    pub fn secp256k1_switch_commit(ctx: *const Context,
@@ -176,7 +178,10 @@ namespace Secp256k1Proxy
         //                                   blind: *const c_uchar,
         //                                   gen: *const c_uchar)
         //                                   -> c_int;
+        public static extern int secp256k1_switch_commit(IntPtr selfCtx, byte[] commit, SecretKey blind, byte[] generatorJ);
 
+
+        [DllImport(LibName)]
         //	// Generates a pedersen commitment: *commit = blind * G + value * G2.
         //	// The commitment is 33 bytes, the blinding factor is 32 bytes.
         //	pub fn secp256k1_pedersen_commit(
@@ -187,6 +192,9 @@ namespace Secp256k1Proxy
         //		gen: *const c_uchar
         //	) -> c_int;
 
+        public static extern int secp256k1_pedersen_commit(IntPtr selfCtx, byte[] commit, byte[] blind, ulong value, byte[] generatorH);
+
+        [DllImport(LibName)]
         //	// Takes a list of n pointers to 32 byte blinding values, the first negs
         //	// of which are treated with positive sign and the rest negative, then
         //	// calculates an additional blinding value that adds to zero.
@@ -197,7 +205,10 @@ namespace Secp256k1Proxy
         //        n: size_t,
         //		npositive: size_t
         //	) -> c_int;
+        public static extern int secp256k1_pedersen_blind_sum(IntPtr selfCtx, byte[] ret, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(JaggedArrayMarshaler))] byte[][] all, int allLength,int positiveLength);
 
+
+        [DllImport(LibName)]
         //	// Takes two list of 33-byte commitments and sums the first set, subtracts
         //	// the second and returns the resulting commitment.
         //	pub fn secp256k1_pedersen_commit_sum(
@@ -208,7 +219,9 @@ namespace Secp256k1Proxy
         //		ncommits: *const *const c_uchar,
         //        ncnt: size_t
         //	) -> c_int;
+        public static extern int secp256k1_pedersen_commit_sum(IntPtr selfCtx, byte[] retValue, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(JaggedArrayMarshaler))] byte[][] pos, int posLength, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(JaggedArrayMarshaler))] byte[][] neg, int negLength);
 
+        [DllImport(LibName)]
         //	// Takes two list of 33-byte commitments and sums the first set and
         //	// subtracts the second and verifies that they sum to 0.
         //	pub fn secp256k1_pedersen_verify_tally(ctx: *const Context,
@@ -217,7 +230,10 @@ namespace Secp256k1Proxy
         //		ncommits: *const *const c_uchar,
         //        ncnt: size_t
         //	) -> c_int;
+        public static extern int secp256k1_pedersen_verify_tally(IntPtr selfCtx, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(JaggedArrayMarshaler))] byte[][] pos,  int  posLength, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(JaggedArrayMarshaler))] byte[][] neg,int negLength);
 
+
+        [DllImport(LibName)]
         //	pub fn secp256k1_rangeproof_info(
         //        ctx: *const Context,
         //        exp: *mut c_int,
@@ -230,7 +246,10 @@ namespace Secp256k1Proxy
         //        extra_commit_len: size_t,
         //		gen: *const c_uchar
         //	) -> c_int;
+        public static extern int secp256k1_rangeproof_info(IntPtr selfCtx, ref int exp, ref int mantissa, ref ulong min,
+            ref ulong max, byte[] proofProof, int proofPlen, byte[] extraCommit, int i, byte[] generatorH);
 
+        [DllImport(LibName)]
         //	pub fn secp256k1_rangeproof_rewind(
         //        ctx: *const Context,
         //        blind_out: *mut c_uchar,
@@ -247,7 +266,12 @@ namespace Secp256k1Proxy
         //        extra_commit_len: size_t,
         //		gen: *const c_uchar
         //	) -> c_int;
+        public static extern int secp256k1_rangeproof_rewind(IntPtr selfCtx, byte[] blind_out, ref UInt64 value,
+            byte[] message, ref int mlen, byte[] nonce, ref ulong min, ref ulong max, byte[] commit,
+            byte[] proofProof, int proofPlen, byte[] extra_commit, int i, byte[] generatorH);
+        
 
+        [DllImport(LibName)]
         //	pub fn secp256k1_rangeproof_verify(
         //        ctx: *const Context,
         //        min_value: &mut uint64_t,
@@ -259,7 +283,11 @@ namespace Secp256k1Proxy
         //        extra_commit_len: size_t,
         //		gen: *const c_uchar
         //	) -> c_int;
+        public static extern int secp256k1_rangeproof_verify(IntPtr ctx, ref UInt64 min_value, ref UInt64 max_value,
+            byte[] commit, byte[] proof, int plen, byte[] extra_commit, int extra_commit_len, byte[] gen);
+      
 
+        [DllImport(LibName)]
         //	pub fn secp256k1_rangeproof_sign(
         //        ctx: *const Context,
         //        proof: *mut c_uchar,
@@ -277,8 +305,11 @@ namespace Secp256k1Proxy
         //        extra_commit_len: size_t,
         //		gen: *const c_uchar
         //	) -> c_int;
+        public static extern int secp256k1_rangeproof_sign(IntPtr selfCtx,  IntPtr proof, ref int plen, ulong min_value,
+            byte[] commit, byte[] blind, byte[] nonce, int exp, int min_bits, UInt64 value, byte[] message,
+            int msg_len, byte[] extra_commit, int extra_commit_len, byte[] gen);
 
 
-
+ 
     }
 }
