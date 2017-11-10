@@ -1,9 +1,9 @@
-﻿
-using System;
+﻿using System;
 using System.Linq;
+using System.Text;
 using Grin.Util;
 using Konscious.Security.Cryptography;
-using Microsoft.Azure.KeyVault.Models;
+using Secp256k1Proxy;
 
 namespace Grin.Keychain
 {
@@ -17,7 +17,7 @@ namespace Grin.Keychain
         public Identifier()
         {
             zero();
-            }
+        }
 
         public Identifier(string hex)
         {
@@ -29,7 +29,7 @@ namespace Grin.Keychain
             from_bytes(bytes);
         }
 
-        
+
         // data 
         public byte[] Bytes { get; } = new byte[IDENTIFIER_SIZE];
 
@@ -45,11 +45,11 @@ namespace Grin.Keychain
         }
 
 
-        public void from_key_id(byte[] pubKey)
+        public static Identifier from_key_id(byte[] pubKey)
         {
-            var hashAlgorithm = new HMACBlake2B(pubKey, IDENTIFIER_SIZE);
-            from_bytes(hashAlgorithm.Key);
-
+            var hashAlgorithm = new HMACBlake2B(new byte[]{}, IDENTIFIER_SIZE*8);
+            var key = hashAlgorithm.ComputeHash(pubKey);
+            return Identifier.from_bytes(key);
         }
 
         public void from_hex(string hex)
@@ -58,16 +58,19 @@ namespace Grin.Keychain
             from_bytes(bytes);
         }
 
-        public void from_bytes(byte[] bytes)
+        public static Identifier from_bytes(byte[] bytes)
         {
-       
+            var identifier = new Identifier();
 
             var min = IDENTIFIER_SIZE < bytes.Length ? IDENTIFIER_SIZE : bytes.Length;
 
             for (var i = 0; i < min; i++)
-                Bytes[i] = bytes[i];
+               identifier.Bytes[i] = bytes[i];
 
-            Hex = Hex ?? HexUtil.to_hex(Bytes);
+            identifier.Hex =  HexUtil.to_hex(identifier.Bytes);
+
+            return identifier;
+
 
         }
     }
@@ -81,52 +84,49 @@ namespace Grin.Keychain
     {
         /// Depth of the extended key
         public byte depth { get; set; }
+
         /// Child number of the key
-        public Int32 n_child { get; set; }
+        public uint n_child { get; set; }
+
         /// Root key identifier
         public Identifier root_key_id { get; set; }
+
         /// Code of the derivation chain
         public byte[] chaincode { get; set; }
+
         /// Actual private key
-        public byte[] key { get; set; }
+        public SecretKey key { get; set; }
 
 
-    public void from_slice( byte[] slice)
-        { 
-
-        // TODO change when ser. ext. size is fixed
+        public static ExtendedKey from_slice(Secp256k1 secp, byte[] slice)
+        {
+            // TODO change when ser. ext. size is fixed
             if (slice.Length != 79)
-            {
                 throw new Exception("InvalidSliceSize");
 
-            }
- 
-           depth = slice[0];
+            var ext = new ExtendedKey();
+            ext.depth = slice[0];
 
-           var rootKeyBytes= slice.Skip(1).Take(10).ToArray();
-           root_key_id = new Identifier(rootKeyBytes);
+            var rootKeyBytes = slice.Skip(1).Take(10).ToArray();
+            ext.root_key_id = new Identifier(rootKeyBytes);
 
             var nchildBytes = slice.Skip(11).Take(4).ToArray();
             Array.Reverse(nchildBytes);
-            n_child = BitConverter.ToInt32(nchildBytes,0);
+            ext.n_child = BitConverter.ToUInt32(nchildBytes, 0);
 
-            chaincode = slice.Skip(15).Take(32).ToArray();
+            ext.chaincode = slice.Skip(15).Take(32).ToArray();
 
             var keyBytes = slice.Skip(47).Take(32).ToArray();
 
-            // crypto bit here
 
-            key = keyBytes;
-            //let key = match SecretKey::from_slice(secp, &slice[47..79]) {
-            //    Ok(key) => key,
-            //    Err(_) => return Err(Error::InvalidExtendedKey),
+            ext.key = SecretKey.from_slice(secp, keyBytes);
 
-	}
+            return ext;
+        }
 
         /// Creates a new extended master key from a seed
-        public void from_seed( byte[] seed)
+        public static ExtendedKey from_seed(Secp256k1 secp, byte[] seed)
         {
-
             switch (seed.Length)
             {
                 case 16:
@@ -136,86 +136,78 @@ namespace Grin.Keychain
                     break;
 
                 default:
-                     throw new Exception("InvalidSeedSize");
-
+                    throw new Exception("InvalidSeedSize");
             }
 
+            var ext = new ExtendedKey
+            {
+                depth = 0,
+                root_key_id = new Identifier(),
+                n_child = 0
+            };
 
-            depth = 0;
-            root_key_id = new Identifier();
-            n_child = 0;
+            var keyData= Encoding.ASCII.GetBytes("Mimble seed");
+            var blake2B = new HMACBlake2B(keyData, 512);
+            
+            var derived = blake2B.ComputeHash(seed);
 
-            var blake2b = new  HMACBlake2B(seed, 64);
-            
-            var derived = blake2b.ComputeHash(seed);
-            
-            chaincode = derived.Skip(32).Take(32).ToArray();
+            ext.chaincode = derived.Skip(32).Take(32).ToArray();
 
             var keyBytes = derived.Take(32).ToArray();
 
-            // crypto bit here
+            ext.key = SecretKey.from_slice(secp, keyBytes);
 
-            key = keyBytes;
+            ext.root_key_id = ext.identifier(secp);
 
-            root_key_id = identifier() ;
-
-    }
+            return ext;
+        }
 
         /// Return the identifier of the key
         /// which is the blake2b (10 byte) digest of the PublicKey
         // corresponding to the underlying SecretKey
-        public Identifier identifier()
-        { 
-        // get public key from private
-		var key_id =key;
+        public Identifier identifier(Secp256k1 secp)
+        {
+            // get public key from private
+            var key_id = key;
+            
+            return Identifier.from_key_id(key_id.Value);
 
-           var identifier = new Identifier();
-            identifier.from_key_id(key_id);
-
-            return identifier;
-
-
+     
         }
 
         /// Derive an extended key from an extended key
-        public void derive(Int32 n)
+        public ExtendedKey derive(Secp256k1 secp, uint n)
 
         {
-    var	 n_bytes = BitConverter.GetBytes(n);
+            var n_bytes = BitConverter.GetBytes(n);
             Array.Reverse(n_bytes);
 
             var seed = key;
+            seed.extend_from_slice(n_bytes);
+
+            var blake2b = new HMACBlake2B(chaincode, 64);
+
+            var derived = blake2b.ComputeHash(seed.Value);
+
+            var secret_key = SecretKey.from_slice(secp, derived);
+
+            secret_key.add_assign(secp, key);
+            //.expect("Error deriving key")
 
 
-            //seed.extend_from_slice(&n_bytes);
-            var blake2b = new HMACBlake2B(seed, 64);
-
-            var derived = blake2b.ComputeHash(seed);
-
-       // let mut secret_key = SecretKey::from_slice(&secp, &derived.as_bytes()[0..32])
-    			//.expect("Error deriving key");
-       // secret_key.add_assign(secp, &self.key).expect("Error deriving key",
-    
-
- 
-        // TODO check if key != 0 ?
+            // TODO check if key != 0 ?
 
 
- 
             chaincode = derived.Skip(32).Take(32).ToArray();
 
-
-    	}
-
-
-
-
-}
-
-
-
-
-
-
-
+            return new ExtendedKey
+            {
+                depth = depth,
+                root_key_id = identifier(secp),
+                n_child = n,
+                chaincode = chaincode,
+                key = secret_key
+            };
+        }
+    }
 }

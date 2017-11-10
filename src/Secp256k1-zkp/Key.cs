@@ -240,5 +240,10 @@ namespace Secp256k1Proxy
                 throw new Exception("InvalidSecretKey");
             }
         }
+
+        public void extend_from_slice(byte[] bytes)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

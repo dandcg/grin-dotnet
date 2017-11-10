@@ -46,6 +46,9 @@
       <NamedTestSelector>
         <TestName>Secp256k1Proxy.Tests.PedersenTests.test_commit_sum</TestName>
       </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Secp256k1Proxy.Tests.PedersenTests.test_range_proof</TestName>
+      </NamedTestSelector>
     </IgnoredTests>
   </Settings>
 </ProjectConfiguration>

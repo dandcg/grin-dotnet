@@ -25,9 +25,6 @@
       <FixtureTestSelector>
         <FixtureName>Grin.Tests.ExtKeyTests</FixtureName>
       </FixtureTestSelector>
-      <FixtureTestSelector>
-        <FixtureName>Grin.Tests.Keychain.ExtKeyTests</FixtureName>
-      </FixtureTestSelector>
       <NamedTestSelector>
         <TestName>Grin.Tests.Secp256k1.KeyTests.skey_from_slice</TestName>
       </NamedTestSelector>
@@ -84,6 +81,12 @@
       </NamedTestSelector>
       <NamedTestSelector>
         <TestName>Grin.Tests.Secp256k1Proxy.LibTests.bad_recovery</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Grin.Tests.Keychain.ExtKeyTests.extkey_derivation</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Grin.Tests.Keychain.ExtKeyTests.test_identifier_json_ser_deser</TestName>
       </NamedTestSelector>
     </IgnoredTests>
     <UseCPUArchitecture>AutoDetect</UseCPUArchitecture>
