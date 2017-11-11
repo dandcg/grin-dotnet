@@ -14,65 +14,53 @@ namespace Grin.Keychain
 
 
         // contructor
-        public Identifier()
+        private Identifier(string hex)
         {
-            zero();
+            Hex = hex;
+            Bytes = HexUtil.from_hex(hex);
         }
 
-        public Identifier(string hex)
+        private Identifier(byte[] bytes)
         {
-            from_hex(hex);
-        }
-
-        public Identifier(byte[] bytes)
-        {
-            from_bytes(bytes);
+            Bytes = bytes;
+            Hex = HexUtil.to_hex(bytes);
         }
 
 
         // data 
-        public byte[] Bytes { get; } = new byte[IDENTIFIER_SIZE];
+        public byte[] Bytes { get; }
 
-        public string Hex { get; private set; }
+        public string Hex { get; }
 
         // functions
-        public void zero()
+        public static Identifier zero()
         {
-            for (var i = 0; i < Bytes.Length; i++)
-                Bytes[i] = 0;
-
-            HexUtil.to_hex(Bytes);
+            return new Identifier(new byte[IDENTIFIER_SIZE]);
         }
 
 
         public static Identifier from_key_id(Secp256k1 secp, PublicKey pubKey)
         {
             var bytes = pubKey.serialize_vec(secp, true);
-            var hashAlgorithm = new HMACBlake2B(null, IDENTIFIER_SIZE*8);
+            var hashAlgorithm = new HMACBlake2B(null, IDENTIFIER_SIZE * 8);
             var key = hashAlgorithm.ComputeHash(bytes);
-            return Identifier.from_bytes(key);
+            return new Identifier(key);
         }
 
-        public void from_hex(string hex)
+        public static Identifier from_hex(string hex)
         {
-            var bytes = HexUtil.from_hex(hex);
-            from_bytes(bytes);
+            return new Identifier(hex);
         }
 
         public static Identifier from_bytes(byte[] bytes)
         {
-            var identifier = new Identifier();
-
             var min = IDENTIFIER_SIZE < bytes.Length ? IDENTIFIER_SIZE : bytes.Length;
 
+            var identifierBytes = new byte[min];
             for (var i = 0; i < min; i++)
-               identifier.Bytes[i] = bytes[i];
+                identifierBytes[i] = bytes[i];
 
-            identifier.Hex =  HexUtil.to_hex(identifier.Bytes);
-
-            return identifier;
-
-
+            return new Identifier(identifierBytes);
         }
     }
 
@@ -109,7 +97,7 @@ namespace Grin.Keychain
             ext.depth = slice[0];
 
             var rootKeyBytes = slice.Skip(1).Take(10).ToArray();
-            ext.root_key_id = new Identifier(rootKeyBytes);
+            ext.root_key_id = Identifier.from_bytes(rootKeyBytes);
 
             var nchildBytes = slice.Skip(11).Take(4).ToArray();
             Array.Reverse(nchildBytes);
@@ -143,13 +131,13 @@ namespace Grin.Keychain
             var ext = new ExtendedKey
             {
                 depth = 0,
-                root_key_id = new Identifier(),
+                root_key_id = Identifier.zero(),
                 n_child = 0
             };
 
-            var keyData= Encoding.ASCII.GetBytes("Mimble seed");
+            var keyData = Encoding.ASCII.GetBytes("Mimble seed");
             var blake2B = new HMACBlake2B(keyData, 512);
-            
+
             var derived = blake2B.ComputeHash(seed);
 
             ext.chaincode = derived.Skip(32).Take(32).ToArray();
@@ -170,10 +158,8 @@ namespace Grin.Keychain
         {
             // get public key from private
             var key_id = PublicKey.from_secret_key(secp, key);
-            
-            return Identifier.from_key_id(secp, key_id);
 
-     
+            return Identifier.from_key_id(secp, key_id);
         }
 
         /// Derive an extended key from an extended key

@@ -83,10 +83,10 @@
         <TestName>Grin.Tests.Secp256k1Proxy.LibTests.bad_recovery</TestName>
       </NamedTestSelector>
       <NamedTestSelector>
-        <TestName>Grin.Tests.Keychain.ExtKeyTests.extkey_derivation</TestName>
+        <TestName>Grin.Tests.Keychain.ExtKeyTests.extkey_from_seed</TestName>
       </NamedTestSelector>
       <NamedTestSelector>
-        <TestName>Grin.Tests.Keychain.ExtKeyTests.test_identifier_json_ser_deser</TestName>
+        <TestName>Grin.Tests.Keychain.ExtKeyTests.extkey_derivation</TestName>
       </NamedTestSelector>
     </IgnoredTests>
     <UseCPUArchitecture>AutoDetect</UseCPUArchitecture>

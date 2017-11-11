@@ -40,7 +40,7 @@ namespace Grin.Tests.Keychain
 
             Console.WriteLine(hex.Length);
 
-            var identifier = new Identifier(hex);
+            var identifier = Identifier.from_hex(hex);
 
             var has_an_identifier = new HasAnIdentifier {Identifier = identifier.Hex};
 
