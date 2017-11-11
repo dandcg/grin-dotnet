@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Security.Cryptography;
-using Secp256k1Proxy.Tests.Helpers;
+using Common;
 using Xunit;
 
 
@@ -17,7 +17,7 @@ namespace Secp256k1Proxy.Tests
             var vrfy = Secp256k1.WithCaps(ContextFlag.VerifyOnly);
             var full = Secp256k1.WithCaps(ContextFlag.Full);
 
-            var msgBytes = KeyUtils.get_bytes(0, 32);
+            var msgBytes = ByteUtil.get_bytes(0, 32);
             var msg = Message.from_slice(msgBytes);
             var rng = RandomNumberGenerator.Create();
 
@@ -104,9 +104,9 @@ namespace Secp256k1Proxy.Tests
         public void invalid_pubkey()
         {
             var s = Secp256k1.New();
-            var sig = RecoverableSigniture.from_compact(s, KeyUtils.get_bytes(1, 64), RecoveryId.from_i32(0));
+            var sig = RecoverableSigniture.from_compact(s, ByteUtil.get_bytes(1, 64), RecoveryId.from_i32(0));
             var pk = PublicKey.New();
-            var msgBytes = KeyUtils.random_32_bytes(RandomNumberGenerator.Create());
+            var msgBytes = ByteUtil.get_random_bytes(RandomNumberGenerator.Create());
             var msg = Message.from_slice(msgBytes);
             var ex = Assert.Throws<Exception>(() => { s.Verify(msg, sig.to_standard(s), pk); });
             Assert.Equal("InvalidPublicKey", ex.Message);
@@ -154,7 +154,7 @@ namespace Secp256k1Proxy.Tests
 
             for (var i = 0; i <= 100; i++)
             {
-                var msgBytes = KeyUtils.random_32_bytes(RandomNumberGenerator.Create());
+                var msgBytes = ByteUtil.get_random_bytes(RandomNumberGenerator.Create());
                 var msg = Message.from_slice(msgBytes);
 
                 var kp = s.generate_keypair(RandomNumberGenerator.Create());
@@ -229,7 +229,7 @@ namespace Secp256k1Proxy.Tests
 
             for (var i = 0; i <= 100; i++)
             {
-                var msgBytes = KeyUtils.random_32_bytes(RandomNumberGenerator.Create());
+                var msgBytes = ByteUtil.get_random_bytes(RandomNumberGenerator.Create());
                 var msg = Message.from_slice(msgBytes);
 
                 var (sk, pk) = s.generate_keypair(RandomNumberGenerator.Create());
@@ -279,7 +279,7 @@ namespace Secp256k1Proxy.Tests
             var s = Secp256k1.New();
             s.Randomize(RandomNumberGenerator.Create());
 
-            var msgBytes = KeyUtils.random_32_bytes(RandomNumberGenerator.Create());
+            var msgBytes = ByteUtil.get_random_bytes(RandomNumberGenerator.Create());
             var msg = Message.from_slice(msgBytes);
 
             var (sk, pk) = s.generate_keypair(RandomNumberGenerator.Create());
@@ -287,7 +287,7 @@ namespace Secp256k1Proxy.Tests
             var sigr = s.sign_recoverable(msg, sk);
             var sig = sigr.to_standard(s);
 
-            var msgBytes2 = KeyUtils.random_32_bytes(RandomNumberGenerator.Create());
+            var msgBytes2 = ByteUtil.get_random_bytes(RandomNumberGenerator.Create());
             var msg2 = Message.from_slice(msgBytes2);
 
             var ex = Assert.Throws<Exception>(() => { s.Verify(msg2, sig, pk); });
@@ -303,7 +303,7 @@ namespace Secp256k1Proxy.Tests
             var s = Secp256k1.New();
             s.Randomize(RandomNumberGenerator.Create());
 
-            var msgBytes = KeyUtils.random_32_bytes(RandomNumberGenerator.Create());
+            var msgBytes = ByteUtil.get_random_bytes(RandomNumberGenerator.Create());
             var msg = Message.from_slice(msgBytes);
 
             var (sk, pk) = s.generate_keypair(RandomNumberGenerator.Create());
@@ -319,7 +319,7 @@ namespace Secp256k1Proxy.Tests
             var s = Secp256k1.New();
             s.Randomize(RandomNumberGenerator.Create());
 
-            var msgBytes = KeyUtils.get_bytes(0x55, 32);
+            var msgBytes = ByteUtil.get_bytes(0x55, 32);
             var msg = Message.from_slice(msgBytes);
 
             // Zero is not a valid sig
@@ -328,7 +328,7 @@ namespace Secp256k1Proxy.Tests
             Assert.Equal("InvalidSignature", ex.Message);
 
             // ...but 111..111 is
-            var sig2 = RecoverableSigniture.from_compact(s, KeyUtils.get_bytes(1,64), RecoveryId.from_i32(0));
+            var sig2 = RecoverableSigniture.from_compact(s, ByteUtil.get_bytes(1,64), RecoveryId.from_i32(0));
             s.Recover(msg, sig2);
         }
 

@@ -2,38 +2,13 @@
 using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Security.Cryptography;
+using Common;
 
 namespace Secp256k1Proxy
 {
 
 
-    public class KeyUtils
-    {
-
-
-        public static byte[] get_bytes(byte value, int length)
-        {
-            var bytes= new byte[length];
-
-
-            for (int i = 0; i < bytes.Length; i++)
-                bytes[i] = value;
-
-            return bytes;
-
-        }
-
-
-    public static byte[] random_32_bytes(RandomNumberGenerator rng)
-
-    {
-        var rw = new byte[32];
-        rng.GetBytes(rw);
-        return rw;
-    }
-
-
-    }
+ 
 
     public class PublicKey
     {
@@ -94,7 +69,7 @@ namespace Secp256k1Proxy
 
         public static PublicKey New()
         {
-            return new PublicKey(KeyUtils.get_bytes(0,64));
+            return new PublicKey(ByteUtil.get_bytes(0,64));
         }
 
 
@@ -184,10 +159,10 @@ namespace Secp256k1Proxy
         /// Creates a new random secret key
         public static SecretKey New(Secp256k1 secp, RandomNumberGenerator rng)
         {
-            var data = KeyUtils.random_32_bytes(rng);
+            var data = ByteUtil.get_random_bytes(rng);
             {
                 while (Proxy.secp256k1_ec_seckey_verify(secp.Ctx, data) == 0) {
-                    data = KeyUtils.random_32_bytes(rng);
+                    data = ByteUtil.get_random_bytes(rng);
                 }
             }
             return new SecretKey(data);

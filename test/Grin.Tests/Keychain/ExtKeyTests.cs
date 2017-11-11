@@ -1,6 +1,6 @@
 using System;
+using Common;
 using Grin.Keychain;
-using Grin.Util;
 using Newtonsoft.Json;
 using Secp256k1Proxy;
 using Xunit;
@@ -82,36 +82,31 @@ namespace Grin.Tests.Keychain
         [Fact]
         public void extkey_derivation()
         {
-            //// TODO More test vectors
-            //let s = Secp256k1::new();
-            //let seed = from_hex("000102030405060708090a0b0c0d0e0f");
-            //let extk = ExtendedKey::from_seed(&s, &seed.as_slice()).unwrap();
-            //let derived = extk.derive(&s, 0).unwrap();
-            //let sec = from_hex(
-            //    "d75f70beb2bd3b56f9b064087934bdedee98e4b5aae6280c58b4eff38847888f",
-
-            //);
-            //let secret_key = SecretKey::from_slice(&s, sec.as_slice()).unwrap();
-            //let chaincode = from_hex(
-            //    "243cb881e1549e714db31d23af45540b13ad07941f64a786bbf3313b4de1df52",
-
-            //);
-            //let root_key_id = from_hex("83e59c48297b78b34b73");
-            //let identifier = from_hex("0185adb4d8b730099c93");
-            //let depth = 1;
-            //let n_child = 0;
-            //assert_eq!(derived.key, secret_key);
-            //assert_eq!(
-            //    derived.identifier(&s).unwrap(),
-            //    Identifier::from_bytes(identifier.as_slice())
-            //);
-            //assert_eq!(
-            //    derived.root_key_id,
-            //    Identifier::from_bytes(root_key_id.as_slice())
-            //);
-            //assert_eq!(derived.chaincode, chaincode.as_slice());
-            //assert_eq!(derived.depth, depth);
-            //assert_eq!(derived.n_child, n_child);
+            // TODO More test vectors
+            var s = Secp256k1.New();
+            var seed = HexUtil.from_hex("000102030405060708090a0b0c0d0e0f");
+            var extk = ExtendedKey.from_seed(s, seed);
+            var derived = extk.derive(s, 0);
+            var sec = HexUtil.from_hex("d75f70beb2bd3b56f9b064087934bdedee98e4b5aae6280c58b4eff38847888f"
+            );
+            var secret_key = SecretKey.from_slice(s, sec);
+            var chaincode = HexUtil.from_hex("243cb881e1549e714db31d23af45540b13ad07941f64a786bbf3313b4de1df52");
+            var root_key_id = HexUtil.from_hex("83e59c48297b78b34b73");
+            var identifier = HexUtil.from_hex("0185adb4d8b730099c93");
+            var depth = 1;
+            uint n_child = 0;
+            Assert.Equal(derived.key, secret_key);
+            Assert.Equal(
+                derived.identifier(s).Bytes,
+                Identifier.from_bytes(identifier).Bytes
+            );
+            Assert.Equal(
+                derived.root_key_id.Bytes,
+                Identifier.from_bytes(root_key_id).Bytes
+            );
+            Assert.Equal(derived.chaincode, chaincode);
+            Assert.Equal(derived.depth, depth);
+            Assert.Equal(derived.n_child, n_child);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using Common;
 
 namespace Secp256k1Proxy
 {
@@ -356,7 +357,7 @@ namespace Secp256k1Proxy
             // with the same nonce
             var nonce = blind.clone();
 
-            var extra_commit = KeyUtils.get_bytes(0, 33);
+            var extra_commit = ByteUtil.get_bytes(0, 33);
 
             // TODO - confirm this reworked retry logic works as expected
             // pretty sure the original approach retried on success (so twice in total)
@@ -402,7 +403,7 @@ namespace Secp256k1Proxy
             ulong min = 0;
             ulong max = 0;
 
-            var extra_commit = KeyUtils.get_bytes(0, 33);
+            var extra_commit = ByteUtil.get_bytes(0, 33);
 
             var success =
                 Proxy.secp256k1_rangeproof_verify(

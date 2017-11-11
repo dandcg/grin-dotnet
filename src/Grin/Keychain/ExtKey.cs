@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
-using Grin.Util;
+using Common;
 using Konscious.Security.Cryptography;
 using Secp256k1Proxy;
 
@@ -166,15 +166,14 @@ namespace Grin.Keychain
         public ExtendedKey derive(Secp256k1 secp, uint n)
 
         {
-            var n_bytes = BitConverter.GetBytes(n);
+            var n_bytes = ByteUtil.get_bytes((byte)n, 4);
             Array.Reverse(n_bytes);
 
-            var seed = key;
-            seed.extend_from_slice(n_bytes);
+            var seed = ByteUtil.Combine(key.Value, n_bytes);
 
-            var blake2b = new HMACBlake2B(chaincode, 64);
+            var blake2b = new HMACBlake2B(chaincode, 64*8);
 
-            var derived = blake2b.ComputeHash(seed.Value);
+            var derived = blake2b.ComputeHash(seed);
 
             var secret_key = SecretKey.from_slice(secp, derived);
 

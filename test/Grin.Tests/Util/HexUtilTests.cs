@@ -1,4 +1,4 @@
-using Grin.Util;
+using Common;
 using Xunit;
 
 namespace Grin.Tests.Util

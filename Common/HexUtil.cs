@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace Secp256k1Proxy.Tests.Helpers
+namespace Common
 {
     public static class HexUtil
     {

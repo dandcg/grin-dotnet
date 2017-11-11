@@ -1,5 +1,6 @@
 using System;
 using System.Security.Cryptography;
+using Common;
 using Xunit;
 
 namespace Secp256k1Proxy.Tests
@@ -133,7 +134,7 @@ namespace Secp256k1Proxy.Tests
             var blinding = SecretKey.New(secp, RandomNumberGenerator.Create());
             var commit = secp.commit(0, blinding);
 
-            var msgBytes = KeyUtils.random_32_bytes(RandomNumberGenerator.Create());
+            var msgBytes = ByteUtil.get_random_bytes(RandomNumberGenerator.Create());
 
             var msg = Message.from_slice(msgBytes);
 
@@ -147,7 +148,7 @@ namespace Secp256k1Proxy.Tests
             {
                 secp.Verify(msg, sig, pubkeys[0]);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 secp.Verify(msg, sig, pubkeys[0]);
                 throw new Exception("this is not good");

@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Common\Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="Libs\x64\secp256k1.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

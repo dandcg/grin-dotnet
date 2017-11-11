@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Security.Cryptography;
+using Common;
 
 namespace Secp256k1Proxy
 {
@@ -348,7 +349,7 @@ namespace Secp256k1Proxy
         /// see comment in libsecp256k1 commit d2275795f by Gregory Maxwell
         public void Randomize(RandomNumberGenerator rng)
         {
-            var seed = KeyUtils.random_32_bytes(rng);
+            var seed = ByteUtil.get_random_bytes(rng);
 
             var err = Proxy.secp256k1_context_randomize(Ctx, seed);
 
