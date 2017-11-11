@@ -86,6 +86,9 @@
         <TestName>Grin.Tests.Keychain.ExtKeyTests.extkey_from_seed</TestName>
       </NamedTestSelector>
       <NamedTestSelector>
+        <TestName>Grin.Tests.Keychain.ExtKeyTests.extkey_derivation</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
         <TestName>Grin.Tests.Keychain.ExtKeyTests.test_identifier_json_ser_deser</TestName>
       </NamedTestSelector>
     </IgnoredTests>

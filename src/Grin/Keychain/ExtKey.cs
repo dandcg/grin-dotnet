@@ -14,13 +14,7 @@ namespace Grin.Keychain
 
 
         // contructor
-        private Identifier(string hex)
-        {
-            Hex = hex;
-            Bytes = HexUtil.from_hex(hex);
-        }
-
-        private Identifier(byte[] bytes)
+      private Identifier(byte[] bytes)
         {
             Bytes = bytes;
             Hex = HexUtil.to_hex(bytes);
@@ -49,7 +43,8 @@ namespace Grin.Keychain
 
         public static Identifier from_hex(string hex)
         {
-            return new Identifier(hex);
+            var bytes = HexUtil.from_hex(hex);
+                            return from_bytes(bytes);
         }
 
         public static Identifier from_bytes(byte[] bytes)
@@ -166,16 +161,15 @@ namespace Grin.Keychain
         public ExtendedKey derive(Secp256k1 secp, uint n)
 
         {
-            var n_bytes = ByteUtil.get_bytes((byte)n, 4);
-            Array.Reverse(n_bytes);
-
+            var n_bytes = new byte[4];
+         
             var seed = ByteUtil.Combine(key.Value, n_bytes);
 
             var blake2b = new HMACBlake2B(chaincode, 64*8);
 
             var derived = blake2b.ComputeHash(seed);
 
-            var secret_key = SecretKey.from_slice(secp, derived);
+            var secret_key = SecretKey.from_slice(secp, derived.Take(32).ToArray());
 
             secret_key.add_assign(secp, key);
             //.expect("Error deriving key")
@@ -188,7 +182,7 @@ namespace Grin.Keychain
 
             return new ExtendedKey
             {
-                depth = depth,
+                depth = (byte)(depth+1),
                 root_key_id = identifier(secp),
                 n_child = n,
                 chaincode = chaincode,

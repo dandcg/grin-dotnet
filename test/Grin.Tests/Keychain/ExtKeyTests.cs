@@ -1,31 +1,14 @@
-using System;
 using Common;
 using Grin.Keychain;
 using Newtonsoft.Json;
 using Secp256k1Proxy;
 using Xunit;
 
-
 namespace Grin.Tests.Keychain
 {
     public class ExtKeyTests
     {
-        //#[cfg(test)]
-        //        mod test
-        //        {
-        //            use serde_json;
-
-        //            use secp::Secp256k1;
-        //            use secp::key::SecretKey;
-        //            use super::{ ExtendedKey, Identifier};
-        //            use util;
-
-        //            fn from_hex(hex_str: &str) -> Vec<u8> {
-        //		util::from_hex(hex_str.to_string()).unwrap()
-
-        //    }
-
-
+ 
         public class HasAnIdentifier
         {
             [JsonProperty("identifier")]
@@ -37,8 +20,6 @@ namespace Grin.Tests.Keychain
         public void test_identifier_json_ser_deser()
         {
             var hex = "942b6c0bd43bdcb24f3edfe7fadbc77054ecc4f2";
-
-            Console.WriteLine(hex.Length);
 
             var identifier = Identifier.from_hex(hex);
 
@@ -95,7 +76,7 @@ namespace Grin.Tests.Keychain
             var identifier = HexUtil.from_hex("0185adb4d8b730099c93");
             var depth = 1;
             uint n_child = 0;
-            Assert.Equal(derived.key, secret_key);
+            Assert.Equal(derived.key.Value, secret_key.Value);
             Assert.Equal(
                 derived.identifier(s).Bytes,
                 Identifier.from_bytes(identifier).Bytes
