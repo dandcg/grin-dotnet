@@ -24,4 +24,8 @@
     <ProjectReference Include="..\..\src\Secp256k1-zkp\Secp256k1-zkp.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="CoreTests\" />
+  </ItemGroup>
+
 </Project>
