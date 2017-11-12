@@ -7,7 +7,6 @@ using Secp256k1Proxy;
 
 namespace Grin.Keychain
 {
-
     public class Keychain
     {
         public Secp256k1 Secp { get; }
@@ -32,9 +31,8 @@ namespace Grin.Keychain
         //
         public static Keychain Burn_enabled(Keychain keychain, Identifier burnKeyId)
         {
-            var keyOverridesNew = new Dictionary<string, SecretKey> {{burnKeyId.Hex, SecretKey.from_slice(keychain.Secp, new byte[32])}};
-
-
+            var keyOverridesNew =
+                new Dictionary<string, SecretKey> {{burnKeyId.Hex, SecretKey.from_slice(keychain.Secp, new byte[32])}};
             return new Keychain(keychain.Secp, keychain.Extkey.clone(), keyOverridesNew);
         }
 
@@ -74,7 +72,6 @@ namespace Grin.Keychain
 
         public SecretKey Derived_key(Identifier keyId)
         {
-
             KeyOverrides.TryGetValue(keyId.Hex, out var sk);
 
             if (sk != null)
@@ -88,7 +85,7 @@ namespace Grin.Keychain
                 var extkeyNew = Extkey.derive(Secp, i);
                 var ident = extkeyNew.identifier(Secp);
 
-                if (ident.Hex== keyId.Hex)
+                if (ident.Hex == keyId.Hex)
                 {
                     return extkeyNew.key;
                 }
@@ -98,23 +95,23 @@ namespace Grin.Keychain
             throw new Exception($"KeyDerivation - cannot find extkey for {keyId.Hex}");
         }
 
-        public Commitment Commit(ulong amount, Identifier key_id)
+        public Commitment Commit(ulong amount, Identifier keyId)
         {
-            var skey = Derived_key(key_id);
+            var skey = Derived_key(keyId);
             var commit = Secp.commit(amount, skey);
 
             return commit;
         }
 
-        public Commitment Switch_commit(Identifier key_id)
+        public Commitment Switch_commit(Identifier keyId)
         {
-            var skey = Derived_key(key_id);
+            var skey = Derived_key(keyId);
             var commit = Secp.switch_commit(skey);
 
             return commit;
         }
 
-        public RangeProof Range_proof(ulong amount,Identifier keyId,Commitment commit,ProofMessage msg)
+        public RangeProof Range_proof(ulong amount, Identifier keyId, Commitment commit, ProofMessage msg)
 
         {
             var skey = Derived_key(keyId);
@@ -123,7 +120,7 @@ namespace Grin.Keychain
             return rangeProof;
         }
 
-        public ProofInfo Rewind_range_proof(Identifier keyId,Commitment commit,RangeProof proof)
+        public ProofInfo Rewind_range_proof(Identifier keyId, Commitment commit, RangeProof proof)
         {
             var nonce = Derived_key(keyId);
             var proofInfo = Secp.rewind_range_proof(commit, proof, nonce);
@@ -134,10 +131,10 @@ namespace Grin.Keychain
         {
             var posKeys = blindSum.positive_key_ids.Select(Derived_key).ToList();
             var negKeys = blindSum.negative_key_ids.Select(Derived_key).ToList();
-            
+
             posKeys.AddRange(blindSum.positive_blinding_factors.Select(pbf => pbf.Key));
             negKeys.AddRange(blindSum.negative_blinding_factors.Select(nbf => nbf.Key));
-            
+
             var blinding = Secp.blind_sum(posKeys.ToArray(), negKeys.ToArray());
 
             return BlindingFactor.New(blinding);
