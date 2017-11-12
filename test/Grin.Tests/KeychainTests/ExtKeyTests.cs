@@ -49,15 +49,15 @@ namespace Grin.Tests.KeychainTests
             var depth = 0;
             uint n_child = 0;
 
-            Assert.Equal(extk.key.Value, secret_key.Value);
-            Assert.Equal(extk.identifier(s).Bytes, Identifier.from_bytes(identifier).Bytes);
+            Assert.Equal(extk.Key.Value, secret_key.Value);
+            Assert.Equal(extk.Identifier(s).Bytes, Identifier.from_bytes(identifier).Bytes);
             Assert.Equal(
-                extk.root_key_id.Bytes,
+                extk.RootKeyId.Bytes,
                 Identifier.from_bytes(identifier).Bytes
             );
-            Assert.Equal(extk.chaincode, chaincode);
-            Assert.Equal(extk.depth, depth);
-            Assert.Equal(extk.n_child, n_child);
+            Assert.Equal(extk.Chaincode, chaincode);
+            Assert.Equal(extk.Depth, depth);
+            Assert.Equal(extk.NChild, n_child);
         }
 
         [Fact]
@@ -67,7 +67,7 @@ namespace Grin.Tests.KeychainTests
             var s = Secp256k1.New();
             var seed = HexUtil.from_hex("000102030405060708090a0b0c0d0e0f");
             var extk = ExtendedKey.from_seed(s, seed);
-            var derived = extk.derive(s, 0);
+            var derived = extk.Derive(s, 0);
             var sec = HexUtil.from_hex("d75f70beb2bd3b56f9b064087934bdedee98e4b5aae6280c58b4eff38847888f"
             );
             var secret_key = SecretKey.from_slice(s, sec);
@@ -76,18 +76,18 @@ namespace Grin.Tests.KeychainTests
             var identifier = HexUtil.from_hex("0185adb4d8b730099c93");
             var depth = 1;
             uint n_child = 0;
-            Assert.Equal(derived.key.Value, secret_key.Value);
+            Assert.Equal(derived.Key.Value, secret_key.Value);
             Assert.Equal(
-                derived.identifier(s).Bytes,
+                derived.Identifier(s).Bytes,
                 Identifier.from_bytes(identifier).Bytes
             );
             Assert.Equal(
-                derived.root_key_id.Bytes,
+                derived.RootKeyId.Bytes,
                 Identifier.from_bytes(root_key_id).Bytes
             );
-            Assert.Equal(derived.chaincode, chaincode);
-            Assert.Equal(derived.depth, depth);
-            Assert.Equal(derived.n_child, n_child);
+            Assert.Equal(derived.Chaincode, chaincode);
+            Assert.Equal(derived.Depth, depth);
+            Assert.Equal(derived.NChild, n_child);
         }
     }
 }

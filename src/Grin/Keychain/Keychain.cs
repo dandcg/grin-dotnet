@@ -24,7 +24,7 @@ namespace Grin.Keychain
 
         public Identifier Root_key_id()
         {
-            return Extkey.root_key_id.clone();
+            return Extkey.RootKeyId.Clone();
         }
 
         // For tests and burn only, associate a key identifier with a known secret key.
@@ -33,7 +33,7 @@ namespace Grin.Keychain
         {
             var keyOverridesNew =
                 new Dictionary<string, SecretKey> {{burnKeyId.Hex, SecretKey.from_slice(keychain.Secp, new byte[32])}};
-            return new Keychain(keychain.Secp, keychain.Extkey.clone(), keyOverridesNew);
+            return new Keychain(keychain.Secp, keychain.Extkey.Clone(), keyOverridesNew);
         }
 
         public static Keychain From_seed(byte[] seed)
@@ -65,8 +65,8 @@ namespace Grin.Keychain
 
         public Identifier Derive_key_id(uint derivation)
         {
-            var extkeyNew = Extkey.derive(Secp, derivation);
-            var keyId = extkeyNew.identifier(Secp);
+            var extkeyNew = Extkey.Derive(Secp, derivation);
+            var keyId = extkeyNew.Identifier(Secp);
             return keyId;
         }
 
@@ -82,12 +82,12 @@ namespace Grin.Keychain
             for (uint i = 1; i <= 10000; i++)
 
             {
-                var extkeyNew = Extkey.derive(Secp, i);
-                var ident = extkeyNew.identifier(Secp);
+                var extkeyNew = Extkey.Derive(Secp, i);
+                var ident = extkeyNew.Identifier(Secp);
 
                 if (ident.Hex == keyId.Hex)
                 {
-                    return extkeyNew.key;
+                    return extkeyNew.Key;
                 }
             }
 

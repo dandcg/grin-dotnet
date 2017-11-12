@@ -12,7 +12,7 @@ namespace Grin.Keychain
 
 
         // const
-        public const int IDENTIFIER_SIZE = 10;
+        public const int IdentifierSize = 10;
 
 
         // contructor
@@ -29,16 +29,16 @@ namespace Grin.Keychain
         public string Hex { get; }
 
         // functions
-        public static Identifier zero()
+        public static Identifier Zero()
         {
-            return new Identifier(new byte[IDENTIFIER_SIZE]);
+            return new Identifier(new byte[IdentifierSize]);
         }
 
 
         public static Identifier from_key_id(Secp256k1 secp, PublicKey pubKey)
         {
             var bytes = pubKey.serialize_vec(secp, true);
-            var hashAlgorithm = new HMACBlake2B(null, IDENTIFIER_SIZE * 8);
+            var hashAlgorithm = new HMACBlake2B(null, IdentifierSize * 8);
             var key = hashAlgorithm.ComputeHash(bytes);
             return new Identifier(key);
         }
@@ -51,7 +51,7 @@ namespace Grin.Keychain
 
         public static Identifier from_bytes(byte[] bytes)
         {
-            var min = IDENTIFIER_SIZE < bytes.Length ? IDENTIFIER_SIZE : bytes.Length;
+            var min = IdentifierSize < bytes.Length ? IdentifierSize : bytes.Length;
 
             var identifierBytes = new byte[min];
             for (var i = 0; i < min; i++)
@@ -61,7 +61,7 @@ namespace Grin.Keychain
         }
 
 
-        public Identifier clone()
+        public Identifier Clone()
         {
             
             return from_bytes(Bytes);
@@ -82,19 +82,19 @@ namespace Grin.Keychain
     
 
         /// Depth of the extended key
-        public byte depth { get; set; }
+        public byte Depth { get; set; }
 
         /// Child number of the key
-        public uint n_child { get; set; }
+        public uint NChild { get; set; }
 
         /// Root key identifier
-        public Identifier root_key_id { get; set; }
+        public Identifier RootKeyId { get; set; }
 
         /// Code of the derivation chain
-        public byte[] chaincode { get; set; }
+        public byte[] Chaincode { get; set; }
 
         /// Actual private key
-        public SecretKey key { get; set; }
+        public SecretKey Key { get; set; }
 
 
         public static ExtendedKey from_slice(Secp256k1 secp, byte[] slice)
@@ -103,22 +103,21 @@ namespace Grin.Keychain
             if (slice.Length != 79)
                 throw new Exception("InvalidSliceSize");
 
-            var ext = new ExtendedKey();
-            ext.depth = slice[0];
+            var ext = new ExtendedKey {Depth = slice[0]};
 
             var rootKeyBytes = slice.Skip(1).Take(10).ToArray();
-            ext.root_key_id = Identifier.from_bytes(rootKeyBytes);
+            ext.RootKeyId = Grin.Keychain.Identifier.from_bytes(rootKeyBytes);
 
             var nchildBytes = slice.Skip(11).Take(4).ToArray();
             Array.Reverse(nchildBytes);
-            ext.n_child = BitConverter.ToUInt32(nchildBytes, 0);
+            ext.NChild = BitConverter.ToUInt32(nchildBytes, 0);
 
-            ext.chaincode = slice.Skip(15).Take(32).ToArray();
+            ext.Chaincode = slice.Skip(15).Take(32).ToArray();
 
             var keyBytes = slice.Skip(47).Take(32).ToArray();
 
 
-            ext.key = SecretKey.from_slice(secp, keyBytes);
+            ext.Key = SecretKey.from_slice(secp, keyBytes);
 
             return ext;
         }
@@ -140,9 +139,9 @@ namespace Grin.Keychain
 
             var ext = new ExtendedKey
             {
-                depth = 0,
-                root_key_id = Identifier.zero(),
-                n_child = 0
+                Depth = 0,
+                RootKeyId = Grin.Keychain.Identifier.Zero(),
+                NChild = 0
             };
 
             var keyData = Encoding.ASCII.GetBytes("Mimble seed");
@@ -150,13 +149,13 @@ namespace Grin.Keychain
 
             var derived = blake2B.ComputeHash(seed);
 
-            ext.chaincode = derived.Skip(32).Take(32).ToArray();
+            ext.Chaincode = derived.Skip(32).Take(32).ToArray();
 
             var keyBytes = derived.Take(32).ToArray();
 
-            ext.key = SecretKey.from_slice(secp, keyBytes);
+            ext.Key = SecretKey.from_slice(secp, keyBytes);
 
-            ext.root_key_id = ext.identifier(secp);
+            ext.RootKeyId = ext.Identifier(secp);
 
             return ext;
         }
@@ -164,64 +163,59 @@ namespace Grin.Keychain
         /// Return the identifier of the key
         /// which is the blake2b (10 byte) digest of the PublicKey
         // corresponding to the underlying SecretKey
-        public Identifier identifier(Secp256k1 secp)
+        public Identifier Identifier(Secp256k1 secp)
         {
             // get public key from private
-            var key_id = PublicKey.from_secret_key(secp, key);
+            var keyId = PublicKey.from_secret_key(secp, Key);
 
-            return Identifier.from_key_id(secp, key_id);
+            return Grin.Keychain.Identifier.from_key_id(secp, keyId);
         }
 
         /// Derive an extended key from an extended key
-        public ExtendedKey derive(Secp256k1 secp, uint n)
+        public ExtendedKey Derive(Secp256k1 secp, uint n)
 
         {
-            var n_bytes = new byte[4];
-
-            n_bytes = BitConverter.GetBytes(n);
+            var nBytes = BitConverter.GetBytes(n);
 
             if (BitConverter.IsLittleEndian)
             {
-                Array.Reverse(n_bytes);
+                Array.Reverse(nBytes);
             }
 
-            var seed = ByteUtil.Combine(key.Value, n_bytes);
+            var seed = ByteUtil.Combine(Key.Value, nBytes);
 
-            var blake2b = new HMACBlake2B(chaincode, 64*8);
+            var blake2B = new HMACBlake2B(Chaincode, 64*8);
 
-            var derived = blake2b.ComputeHash(seed);
+            var derived = blake2B.ComputeHash(seed);
 
-            var secret_key = SecretKey.from_slice(secp, derived.Take(32).ToArray());
+            var secretKey = SecretKey.from_slice(secp, derived.Take(32).ToArray());
 
-            secret_key.add_assign(secp, key);
-            //.expect("Error deriving key")
-
-
+            secretKey.add_assign(secp, Key);
+            
             // TODO check if key != 0 ?
-
-
-            var chain_code = derived.Skip(32).Take(32).ToArray();
+            
+            var chainCode = derived.Skip(32).Take(32).ToArray();
 
             return new ExtendedKey
             {
-                depth = (byte)(depth+1),
-                root_key_id = identifier(secp),
-                n_child = n,
-                chaincode = chain_code,
-                key = secret_key
+                Depth = (byte)(Depth+1),
+                RootKeyId = Identifier(secp),
+                NChild = n,
+                Chaincode = chainCode,
+                Key = secretKey
             };
         }
 
 
-        public ExtendedKey clone()
+        public ExtendedKey Clone()
         {
             return new ExtendedKey
             {
-                depth = depth,
-                root_key_id = root_key_id.clone(),
-                n_child = n_child,
-                chaincode = chaincode,
-                key = key.clone()
+                Depth = Depth,
+                RootKeyId = RootKeyId.Clone(),
+                NChild = NChild,
+                Chaincode = Chaincode,
+                Key = Key.clone()
             };
         }
 
