@@ -97,6 +97,9 @@
       <NamedTestSelector>
         <TestName>Grin.Tests.KeychainTests.KeychainTests.test_key_derivation</TestName>
       </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Grin.Tests.KeychainTests.KeychainTests.test_rewind_range_proof</TestName>
+      </NamedTestSelector>
     </IgnoredTests>
     <UseCPUArchitecture>AutoDetect</UseCPUArchitecture>
   </Settings>
