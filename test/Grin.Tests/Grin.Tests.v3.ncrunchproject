@@ -91,12 +91,12 @@
       <NamedTestSelector>
         <TestName>Grin.Tests.Keychain.ExtKeyTests.test_identifier_json_ser_deser</TestName>
       </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Grin.Tests.KeychainTests.KeychainTests.test_rewind_range_proof</TestName>
-      </NamedTestSelector>
       <FixtureTestSelector>
         <FixtureName>Grin.Tests.KeychainTests.ExtKeyTests</FixtureName>
       </FixtureTestSelector>
+      <NamedTestSelector>
+        <TestName>Grin.Tests.KeychainTests.KeychainTests.test_key_derivation</TestName>
+      </NamedTestSelector>
     </IgnoredTests>
     <UseCPUArchitecture>AutoDetect</UseCPUArchitecture>
   </Settings>

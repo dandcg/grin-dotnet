@@ -10,20 +10,20 @@ namespace Grin.Tests.KeychainTests
         {
             var secp = Secp256k1.WithCaps(ContextFlag.Commit);
 
-            var keychain = Keychain.Keychain.from_random_seed();
+            var keychain = Keychain.Keychain.From_random_seed();
 
             // use the keychain to derive a "key_id" based on the underlying seed
-            var key_id = keychain.derive_key_id(1);
+            var key_id = keychain.Derive_key_id(1);
 
             var msg_bytes = new byte[32];
             var msg = Message.from_slice(msg_bytes);
 
             // now New a zero commitment using the key on the keychain associated with
             // the key_id
-            var commit = keychain.commit(0, key_id);
+            var commit = keychain.Commit(0, key_id);
 
             // now check we can use our key to verify a signature from this zero commitment
-            var sig = keychain.sign(msg, key_id);
+            var sig = keychain.Sign(msg, key_id);
             secp.verify_from_commit(msg, sig, commit);
         }
 
@@ -31,48 +31,43 @@ namespace Grin.Tests.KeychainTests
         [Fact]
         public void test_rewind_range_proof()
         {
-            //      let keychain = Keychain::from_random_seed().unwrap();
-            //      let key_id = keychain.derive_key_id(1).unwrap();
-            //      let commit = keychain.commit(5, &key_id).unwrap();
-            //      let msg = ProofMessage::empty();
+            var keychain = Keychain.Keychain.From_random_seed();
+            var key_id = keychain.Derive_key_id(1);
+            var commit = keychain.Commit(5, key_id);
+            var msg = ProofMessage.empty();
 
-            //      let proof = keychain.range_proof(5, &key_id, commit, msg).unwrap();
-            //      let proof_info = keychain.rewind_range_proof(&key_id, commit, proof).unwrap();
+            var proof = keychain.Range_proof(5, key_id, commit, msg);
+            var proof_info = keychain.Rewind_range_proof(key_id, commit, proof);
 
-            //      assert_eq!(proof_info.success, true);
-            //      assert_eq!(proof_info.value, 5);
+            Assert.True(proof_info.success);
+            Assert.Equal<ulong>(5, proof_info.value);
 
-            //      // now check the recovered message is "empty" (but not truncated) i.e. all
-            //      // zeroes
-            //      assert_eq!(
-            //          proof_info.message,
-            //          secp::pedersen::ProofMessage::from_bytes(&[0; secp::constants::PROOF_MSG_SIZE])
-            //);
 
-            //      let key_id2 = keychain.derive_key_id(2).unwrap();
+            var pm1 = proof_info.message;
+            var pm2 = ProofMessage.from_bytes(new byte[Constants.PROOF_MSG_SIZE]);
 
-            //      // cannot rewind with a different nonce
-            //      let proof_info = keychain
-            //          .rewind_range_proof(&key_id2, commit, proof)
-            //          .unwrap();
-            //      assert_eq!(proof_info.success, false);
-            //      assert_eq!(proof_info.value, 0);
+            // now check the recovered message is "empty" (but not truncated) i.e. all zeroes
 
-            //      // cannot rewind with a commitment to the same value using a different key
-            //      let commit2 = keychain.commit(5, &key_id2).unwrap();
-            //      let proof_info = keychain
-            //          .rewind_range_proof(&key_id, commit2, proof)
-            //          .unwrap();
-            //      assert_eq!(proof_info.success, false);
-            //      assert_eq!(proof_info.value, 0);
+            Assert.Equal(pm1.Value, pm2.Value);
 
-            //      // cannot rewind with a commitment to a different value
-            //      let commit3 = keychain.commit(4, &key_id).unwrap();
-            //      let proof_info = keychain
-            //          .rewind_range_proof(&key_id, commit3, proof)
-            //          .unwrap();
-            //      assert_eq!(proof_info.success, false);
-            //      assert_eq!(proof_info.value, 0);
+            var key_id2 = keychain.Derive_key_id(2);
+
+            // cannot rewind with a different nonce
+            proof_info = keychain.Rewind_range_proof(key_id2, commit, proof);
+            Assert.False(proof_info.success);
+            Assert.Equal<ulong>(0, proof_info.value);
+
+            // cannot rewind with a commitment to the same value using a different key
+            var commit2 = keychain.Commit(5, key_id2);
+            proof_info = keychain.Rewind_range_proof(key_id, commit2, proof);
+            Assert.False(proof_info.success);
+            Assert.Equal<ulong>(0, proof_info.value);
+
+            // cannot rewind with a commitment to a different value
+            var commit3 = keychain.Commit(4, key_id);
+            proof_info = keychain.Rewind_range_proof(key_id, commit3, proof);
+            Assert.False(proof_info.success);
+            Assert.Equal<ulong>(0, proof_info.value);
         }
     }
 }

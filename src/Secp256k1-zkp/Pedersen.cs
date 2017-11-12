@@ -468,12 +468,15 @@ namespace Secp256k1Proxy
         {
             ulong value = 0;
             var blind = new byte[32];
+
             var message = new byte[Constants.PROOF_MSG_SIZE];
-            var mlen = Constants.PROOF_MSG_SIZE;
+            var mlen = (UInt64)Constants.PROOF_MSG_SIZE;
+            
             ulong min = 0;
             ulong max = 0;
 
             var extra_commit = new byte[33];
+
 
             var success = Proxy.secp256k1_rangeproof_rewind(
                               self.Ctx,
@@ -498,7 +501,7 @@ namespace Secp256k1Proxy
                 success = success,
                 value = value,
                 message = ProofMessage.from_bytes(message),
-                mlen = mlen,
+                mlen = (int)mlen,
                 min = min,
                 max = max,
                 exp = 0,

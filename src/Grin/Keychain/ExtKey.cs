@@ -177,7 +177,14 @@ namespace Grin.Keychain
 
         {
             var n_bytes = new byte[4];
-         
+
+            n_bytes = BitConverter.GetBytes(n);
+
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(n_bytes);
+            }
+
             var seed = ByteUtil.Combine(key.Value, n_bytes);
 
             var blake2b = new HMACBlake2B(chaincode, 64*8);
@@ -193,14 +200,14 @@ namespace Grin.Keychain
             // TODO check if key != 0 ?
 
 
-            chaincode = derived.Skip(32).Take(32).ToArray();
+            var chain_code = derived.Skip(32).Take(32).ToArray();
 
             return new ExtendedKey
             {
                 depth = (byte)(depth+1),
                 root_key_id = identifier(secp),
                 n_child = n,
-                chaincode = chaincode,
+                chaincode = chain_code,
                 key = secret_key
             };
         }

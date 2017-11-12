@@ -267,8 +267,8 @@ namespace Secp256k1Proxy
         //		gen: *const c_uchar
         //	) -> c_int;
         public static extern int secp256k1_rangeproof_rewind(IntPtr selfCtx, byte[] blind_out, ref UInt64 value,
-            byte[] message, ref int mlen, byte[] nonce, ref ulong min, ref ulong max, byte[] commit,
-            byte[] proofProof, int proofPlen, byte[] extra_commit, int i, byte[] generatorH);
+            byte[] message, ref UInt64 mlen, byte[] nonce, ref UInt64 min, ref UInt64 max, byte[] commit,
+            byte[] proofProof, int proofPlen, byte[] extra_commit, int extra_commit_len, byte[] generatorH);
         
 
         [DllImport(LibName)]
