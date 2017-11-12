@@ -49,6 +49,7 @@
       <NamedTestSelector>
         <TestName>Secp256k1Proxy.Tests.PedersenTests.test_range_proof</TestName>
       </NamedTestSelector>
+      <AllTestsSelector />
     </IgnoredTests>
   </Settings>
 </ProjectConfiguration>

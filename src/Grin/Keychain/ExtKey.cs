@@ -9,6 +9,8 @@ namespace Grin.Keychain
 {
     public class Identifier
     {
+
+
         // const
         public const int IDENTIFIER_SIZE = 10;
 
@@ -57,6 +59,17 @@ namespace Grin.Keychain
 
             return new Identifier(identifierBytes);
         }
+
+
+        public Identifier clone()
+        {
+            
+            return from_bytes(Bytes);
+
+
+        }
+
+
     }
 
     /// An ExtendedKey is a secret key which can be used to derive new
@@ -66,6 +79,8 @@ namespace Grin.Keychain
     /// given.
     public class ExtendedKey
     {
+    
+
         /// Depth of the extended key
         public byte depth { get; set; }
 
@@ -189,5 +204,19 @@ namespace Grin.Keychain
                 key = secret_key
             };
         }
+
+
+        public ExtendedKey clone()
+        {
+            return new ExtendedKey
+            {
+                depth = depth,
+                root_key_id = root_key_id.clone(),
+                n_child = n_child,
+                chaincode = chaincode,
+                key = key.clone()
+            };
+        }
+
     }
 }

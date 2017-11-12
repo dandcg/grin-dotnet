@@ -9,7 +9,7 @@ namespace Grin.Keychain
         public SecretKey Key { get; }
 
 
-        public SecretKey key { get; }
+      
 
         private BlindingFactor(SecretKey key)
         {
