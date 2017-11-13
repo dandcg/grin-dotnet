@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Secp256k1-zkp", "src\Secp25
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Secp256k1-zkp.Tests", "test\Secp256k1-zkp.Tests\Secp256k1-zkp.Tests.csproj", "{75DFB988-4BC5-45AB-947C-206922D69D2D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{6BE24E2A-636F-4551-A04A-BA0EFD65A9DC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common", "src\Common\Common.csproj", "{9FC543D6-2E96-4151-825D-669243D838B9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,10 +35,10 @@ Global
 		{75DFB988-4BC5-45AB-947C-206922D69D2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{75DFB988-4BC5-45AB-947C-206922D69D2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{75DFB988-4BC5-45AB-947C-206922D69D2D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6BE24E2A-636F-4551-A04A-BA0EFD65A9DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6BE24E2A-636F-4551-A04A-BA0EFD65A9DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6BE24E2A-636F-4551-A04A-BA0EFD65A9DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6BE24E2A-636F-4551-A04A-BA0EFD65A9DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9FC543D6-2E96-4151-825D-669243D838B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9FC543D6-2E96-4151-825D-669243D838B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9FC543D6-2E96-4151-825D-669243D838B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9FC543D6-2E96-4151-825D-669243D838B9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

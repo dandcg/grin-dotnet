@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Common\Common.csproj" />
+    <ProjectReference Include="..\..\src\Common\Common.csproj" />
     <ProjectReference Include="..\..\src\Grin\Grin.csproj" />
     <ProjectReference Include="..\..\src\Secp256k1-zkp\Secp256k1-zkp.csproj" />
   </ItemGroup>
