@@ -13,5 +13,15 @@ namespace Grin.Core.Model
         {
             throw new NotImplementedException();
         }
+
+        public static Difficulty Zero()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Clone()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

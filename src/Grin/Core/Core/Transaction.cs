@@ -115,7 +115,7 @@ namespace Grin.Core.Core
 
         /// The signature proving the excess is a valid public key, which signs
         /// the transaction fee.
-        public byte[] excess_sig { get; }
+        public byte[] excess_sig { get; set; }
 
         /// Creates a new empty transaction (no inputs or outputs, zero fee).
         public static Transaction Empty()

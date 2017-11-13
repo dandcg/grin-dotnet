@@ -1,5 +1,6 @@
 ﻿using System;
 using Grin.Core.Model;
+using Grin.Keychain;
 
 namespace Grin.Core.Core
 {
@@ -57,7 +58,7 @@ namespace Grin.Core.Core
         public Difficulty total_difficulty { get; }
 
 
-        public BlockHeader Default()
+        public static BlockHeader Default()
         {
             var proofSize = Global.proofsize();
             // ReSharper disable ArgumentsStyleLiteral
@@ -94,6 +95,10 @@ namespace Grin.Core.Core
     public TxKernel[] kernels { get; }
 
 
+        public static Block New(BlockHeader @default, Transaction[] txs, Keychain.Keychain keychain, Identifier keyId)
+        {
+            throw new NotImplementedException();
+        }
     }
 
 }
