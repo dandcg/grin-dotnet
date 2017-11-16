@@ -6,6 +6,8 @@
     <IsPackable>false</IsPackable>
 
     <RootNamespace>Secp256k1Proxy.Tests</RootNamespace>
+
+    <Configurations>Debug;Release;devnet</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

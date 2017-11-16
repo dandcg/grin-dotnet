@@ -42,6 +42,7 @@ namespace Grin
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
                 .UseSerilog()
+      .UseUrls("http://0.0.0.0:5000")
                 .Build();
     }
 }

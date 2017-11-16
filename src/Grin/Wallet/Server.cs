@@ -1,3 +1,4 @@
+using System;
 using Nancy;
 
 namespace Grin.Wallet
@@ -11,9 +12,16 @@ namespace Grin.Wallet
 
     public class WalletServerModule : NancyModule
     {
-        public WalletServerModule(WalletConfig wallet_config, Keychain.Keychain keychain)
+        public WalletServerModule()
         {
             Get("/", args => "-[ Grin Wallet On DotNetCore ]-");
+
+            Get("/test", args =>
+            {
+
+                Console.WriteLine("Hello!");
+                return "-[ Grin Wallet On DotNetCore ]-";
+            });
 
             Post("/v1/receive", arg=>"");
 

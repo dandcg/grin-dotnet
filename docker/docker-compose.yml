@@ -1,0 +1,39 @@
+version: '3.3'
+services:
+
+  grindotnet:
+    image: grindotnet
+    build:
+      context: ../src/Grin
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    networks:
+      testnet:
+        ipv4_address: 172.25.0.10
+
+
+  #Node 1: genesis and miner from build.md example
+  grin-genesis-miner:
+    build:
+      context: ../src/Grin/Grinmin
+      dockerfile: Dockerfile
+    image: grin-min
+    command: ["server", "--mine", "-w", "http://172.25.0.10:5000", "run"]
+    environment:
+      - RUST_BACKTRACE=1
+    ports:
+      - "13413:13413"
+      - "13414:13414"
+    networks:
+      testnet:
+        ipv4_address: 172.25.0.2
+    depends_on:
+      - grindotnet
+
+networks:
+  testnet:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 172.25.0.0/24

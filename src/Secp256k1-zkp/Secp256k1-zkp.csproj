@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>Secp256k1Proxy</RootNamespace>
+    <Configurations>Debug;Release;devnet</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
