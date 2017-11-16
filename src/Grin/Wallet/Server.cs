@@ -11,15 +11,15 @@ namespace Grin.Wallet
 
     public class WalletServerModule : NancyModule
     {
-        public WalletServerModule()
+        public WalletServerModule(WalletConfig wallet_config, Keychain.Keychain keychain)
         {
             Get("/", args => "-[ Grin Wallet On DotNetCore ]-");
 
-            Post("/v1/wallet/receive", arg=>"");
+            Post("/v1/receive", arg=>"");
 
-            Post("/v1/wallet/finalize", arg => "");
+            Post("/v1/finalize", arg => "");
 
-            Post("/v1/wallet/receive_coinbase", arg => "");
+            Post("/v1/receive_coinbase", arg => "");
 
 
 

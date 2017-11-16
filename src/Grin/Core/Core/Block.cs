@@ -1,5 +1,4 @@
 ﻿using System;
-using Grin.Core.Model;
 using Grin.Keychain;
 
 namespace Grin.Core.Core

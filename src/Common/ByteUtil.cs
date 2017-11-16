@@ -41,5 +41,15 @@ namespace Common
             return rv;
         }
 
+        public static void BigEndian(this byte[] bs)
+        {
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(bs);
+            }
+            
+        }
+
+
     }
 }

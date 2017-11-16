@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Grin.Core.Model
+﻿namespace Grin.Core.Core
 {
     public class Hash
     {
@@ -22,6 +17,16 @@ namespace Grin.Core.Model
         {
             return new Hash(new byte[32]);
         }
+    }
+
+    /// A trait for types that have a canonical hash
+    public interface IHashed
+    {
+
+        Hash hash();
+        /// Hash the object together with another writeable object
+        Hash hash_with(IWriteable other) ;
+
     }
 
 

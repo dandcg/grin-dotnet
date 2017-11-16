@@ -89,7 +89,7 @@ namespace Grin.Core.Core
     }
 
     /// A transaction
-    public class Transaction
+    public class Transaction : IWriteable
     {
         private Transaction(Input[] inputs, Output[] outputs, ulong fee, ulong lockHeight, byte[] excessSig)
         {
@@ -128,6 +128,15 @@ namespace Grin.Core.Core
         public static Transaction New()
         {
             return new Transaction(new Input[] { }, new Output[] { }, 0, 0, new byte[] { });
+        }
+
+        public void write(IWriter writer)
+        {
+            writer.write_u64(fee);
+            writer.write_u64(lock_height);
+            writer.write_bytes(excess_sig);
+            writer.write_u64((UInt64)inputs.Length);
+            writer.write_u64((UInt64)outputs.Length);
         }
     }
 

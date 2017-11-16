@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+  grin:
+    image: grin
+    build:
+      context: ./src/Grin
+      dockerfile: Dockerfile

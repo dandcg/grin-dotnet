@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Common;
+using Grin.Core;
+using Grin.Core.Core;
 using Grin.Keychain;
 using Newtonsoft.Json;
 using Polly;
@@ -101,7 +104,8 @@ namespace Grin.Wallet
         private int height1;
         private int lock_height1;
 
-        public OutputData(Identifier root_key_id, Identifier key_id, uint n_child, ulong value, OutputStatus status, int height, int lock_height, bool is_coinbase)
+        public OutputData(Identifier root_key_id, Identifier key_id, uint n_child, ulong value, OutputStatus status,
+            int height, int lock_height, bool is_coinbase)
         {
             this.root_key_id = root_key_id;
             this.key_id = key_id;
@@ -213,24 +217,22 @@ namespace Grin.Wallet
         public Dictionary<string, OutputData> outputs { get; }
 
         /// Allows for reading wallet data (without needing to acquire the write lock).
-        public static T read_wallet<T>(string data_file_dir, Func<WalletData,T> f)
+        public static T read_wallet<T>(string data_file_dir, Func<WalletData, T> f)
         {
             // open the wallet readonly and do what needs to be done with it
             var data_file_path = string.Format("{0}{1}{2}", data_file_dir, Path.PathSeparator, Types.DAT_FILE);
-            var wdat = WalletData.read_or_create(data_file_path);
-           return f(wdat);
-           
-
+            var wdat = read_or_create(data_file_path);
+            return f(wdat);
         }
 
 
-    /// Allows the reading and writing of the wallet data within a file lock.
-    /// Just provide a closure taking a mutable WalletData. The lock should
-    /// be held for as short a period as possible to avoid contention.
-    /// Note that due to the impossibility to do an actual file lock easily
-    /// across operating systems, this just creates a lock file with a "should
-    /// not exist" option.
-    public static T with_wallet<T>(string data_file_dir, Func<WalletData, T> f)
+        /// Allows the reading and writing of the wallet data within a file lock.
+        /// Just provide a closure taking a mutable WalletData. The lock should
+        /// be held for as short a period as possible to avoid contention.
+        /// Note that due to the impossibility to do an actual file lock easily
+        /// across operating systems, this just creates a lock file with a "should
+        /// not exist" option.
+        public static T with_wallet<T>(string data_file_dir, Func<WalletData, T> f)
 
         {
             //if (activated)
@@ -425,16 +427,70 @@ namespace Grin.Wallet
 
     public class JSONPartialTx
     {
-        public ulong amount { get; }
-        public string blind_sum { get; }
-        public string tx { get; }
+        public ulong amount { get; private set; }
+        public string blind_sum { get; private set; }
+        public string tx { get; private set; }
+
+        /// Encodes the information for a partial transaction (not yet completed by the
+        /// receiver) into JSON.
+        public static string partial_tx_to_json(ulong receive_amount,
+            BlindingFactor blind_sum,
+            Transaction tx)
+        {
+            var partial_tx = new JSONPartialTx
+            {
+                amount = receive_amount,
+                blind_sum = HexUtil.to_hex(blind_sum.Key.Value),
+                tx = HexUtil.to_hex(Ser.ser_vec(tx))
+            };
+
+            return"";
+
+//            partial_tx
+        }
+
+        /// Reads a partial transaction encoded as JSON into the amount, sum of blinding
+        /// factors and the transaction itself.
+        public (ulong, BlindingFactor, Transaction) partial_tx_from_json(Keychain.Keychain keychain, string json_str)
+        {
+            throw new NotImplementedException();
+
+//        JSONPartialTx partial_tx:  = serde_json::from_str(json_str)?;
+
+//        var blind_bin = util::from_hex(partial_tx.blind_sum) ?;
+
+//// TODO - turn some data into a blinding factor here somehow
+//// let blinding = SecretKey::from_slice(&secp, &blind_bin[..])?;
+//            var blinding = BlindingFactor::from_slice(keychain.secp(), &blind_bin[..]) ?;
+
+//            let tx_bin = util::from_hex(partial_tx.tx) ?;
+//            let tx = ser::deserialize(&mut & tx_bin[..])
+//                .map_err(| _ | {
+
+//                Error::Format("Could not deserialize transaction, invalid format.".to_string())
+//            })?;
+
+
+//        return (partial_tx.amount, blinding, tx);
+//    }
+        }
     }
+
+    /// Amount in request to build a coinbase output.
+    public enum WalletReceiveRequest
+    {
+        //Coinbase(BlockFees),
+        //PartialTransaction(String),
+        //Finalize(String),
+    }
+
+
 
     public class BlockFees
     {
         public ulong fees { get; }
         public ulong height { get; }
-        public Identifier KeyId { get;private set; }
+        public Identifier KeyId { get; private set; }
 
         public Identifier key_id()
         {
