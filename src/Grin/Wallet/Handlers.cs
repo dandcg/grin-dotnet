@@ -1,5 +1,4 @@
 using System;
-using Nancy.Responses;
 
 namespace Grin.Wallet
 {
@@ -35,10 +34,10 @@ namespace Grin.Wallet
 
            // })?;
 
-        //    let key_id_bin = match block_fees.key_id {
+        //    let key_id_bin = match block_fees.key_id_set {
 
-        //        Some(key_id) => {
-        //            ser::ser_vec(&key_id).map_err(|e| {
+        //        Some(key_id_set) => {
+        //            ser::ser_vec(&key_id_set).map_err(|e| {
         //                api::Error::Internal(
         //                    format!("Error serializing kernel: {:?}", e),
 
@@ -53,7 +52,7 @@ namespace Grin.Wallet
         //    Ok(CbData {
         //        output: util::to_hex(out_bin),
         //        kernel: util::to_hex(kern_bin),
-        //        key_id: util::to_hex(key_id_bin),
+        //        key_id_set: util::to_hex(key_id_bin),
         //    })
         //}
 

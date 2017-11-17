@@ -1,7 +1,7 @@
 ﻿using Secp256k1Proxy;
 using Xunit;
 
-namespace Grin.Tests.KeychainTests
+namespace Grin.Tests.Unit.KeychainTests
 {
     public class KeychainTests
     {
@@ -12,14 +12,14 @@ namespace Grin.Tests.KeychainTests
 
             var keychain = Keychain.Keychain.From_random_seed();
 
-            // use the keychain to derive a "key_id" based on the underlying seed
+            // use the keychain to derive a "key_id_set" based on the underlying seed
             var key_id = keychain.Derive_key_id(1);
 
             var msg_bytes = new byte[32];
             var msg = Message.from_slice(msg_bytes);
 
             // now New a zero commitment using the key on the keychain associated with
-            // the key_id
+            // the key_id_set
             var commit = keychain.Commit(0, key_id);
 
             // now check we can use our key to verify a signature from this zero commitment

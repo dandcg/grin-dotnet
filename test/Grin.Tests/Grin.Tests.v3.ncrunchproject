@@ -1,7 +1,10 @@
 ﻿<ProjectConfiguration>
   <Settings>
+    <AdditionalFilesToIncludeForProject />
+    <CopyReferencedAssembliesToWorkspace>False</CopyReferencedAssembliesToWorkspace>
     <HiddenComponentWarnings>
       <Value>LongTestTimesWithoutParallelExecution</Value>
+      <Value>AspNetTestHostCompatibility</Value>
     </HiddenComponentWarnings>
     <IgnoredTests>
       <FixtureTestSelector>
@@ -100,7 +103,14 @@
       <NamedTestSelector>
         <TestName>Grin.Tests.KeychainTests.KeychainTests.test_rewind_range_proof</TestName>
       </NamedTestSelector>
+      <FixtureTestSelector>
+        <FixtureName>Grin.Tests.CoreTests.Core.BlockTests</FixtureName>
+      </FixtureTestSelector>
+      <FixtureTestSelector>
+        <FixtureName>Grin.Tests.CoreTests.Core.TransactionTests</FixtureName>
+      </FixtureTestSelector>
     </IgnoredTests>
+    <ImplicitProjectDependencyPathsRelativeToSolutionDirectory />
     <UseCPUArchitecture>AutoDetect</UseCPUArchitecture>
   </Settings>
 </ProjectConfiguration>

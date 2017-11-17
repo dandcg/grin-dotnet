@@ -1,6 +1,7 @@
 ﻿<ProjectConfiguration>
   <Settings>
     <AdditionalFilesToIncludeForProject />
+    <CopyReferencedAssembliesToWorkspace>False</CopyReferencedAssembliesToWorkspace>
     <IgnoredTests>
       <AllTestsSelector />
     </IgnoredTests>

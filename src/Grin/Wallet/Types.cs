@@ -117,7 +117,7 @@ namespace Grin.Wallet
             this.is_coinbase = is_coinbase;
         }
 
-        /// Root key_id that the key for this output is derived from
+        /// Root key_id_set that the key for this output is derived from
         public Identifier root_key_id { get; }
 
         /// Derived key for this output
@@ -477,34 +477,42 @@ namespace Grin.Wallet
     }
 
     /// Amount in request to build a coinbase output.
-    public enum WalletReceiveRequest
+    public class WalletReceiveRequest
     {
-        //Coinbase(BlockFees),
-        //PartialTransaction(String),
-        //Finalize(String),
+        public BlockFees Coinbase { get; set; }
+        public string PartialTransaction { get; set; }
+        public string Finalize { get; set; }
     }
+
+
+
 
 
 
     public class BlockFees
     {
-        public ulong fees { get; }
-        public ulong height { get; }
-        public Identifier KeyId { get; private set; }
+        [JsonProperty]
+        public ulong fees { get; private set; }
+        [JsonProperty]
+        public ulong height { get; private set; }
+        [JsonProperty]
+        public Identifier key_id { get; private set; }
 
-        public Identifier key_id()
-        {
-            return KeyId.Clone();
-        }
+   
 
-        public void key_id(Identifier keyId)
+        public void key_id_set(Identifier keyId)
         {
-            KeyId = keyId;
+            key_id = keyId;
         }
 
         public BlockFees Clone()
         {
-            throw new NotImplementedException();
+            return new BlockFees() {fees = fees, height = height, key_id = key_id_clone()};
+        }
+
+        public Identifier key_id_clone()
+        {
+            return key_id.Clone();
         }
     }
 

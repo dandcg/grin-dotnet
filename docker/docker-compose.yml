@@ -30,6 +30,7 @@ services:
         ipv4_address: 172.25.0.2
     depends_on:
       - grindotnet
+    restart: always
 
 networks:
   testnet:

@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Grin.Core.Core;
 using Grin.Keychain;
 using Xunit;
 
-namespace Grin.Tests.CoreTests.Core
+namespace Grin.Tests.Unit.CoreTests.Core
 {
     public class BlockTests
     {

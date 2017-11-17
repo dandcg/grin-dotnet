@@ -104,8 +104,8 @@ namespace Grin.Core.Core
             throw new NotImplementedException();
             //    let secp = keychain.secp();
 
-            //    let commit = keychain.commit(reward(fees), key_id) ?;
-            //    let switch_commit = keychain.switch_commit(key_id) ?;
+            //    let commit = keychain.commit(reward(fees), key_id_set) ?;
+            //    let switch_commit = keychain.switch_commit(key_id_set) ?;
             //    let switch_commit_hash = SwitchCommitHash::from_switch_commit(switch_commit);
             //    trace!(
             //        LOGGER,
@@ -119,7 +119,7 @@ namespace Grin.Core.Core
             //        switch_commit_hash
             //        );
             //    let msg = secp::pedersen::ProofMessage::empty();
-            //    let rproof = keychain.range_proof(reward(fees), key_id, commit, msg) ?;
+            //    let rproof = keychain.range_proof(reward(fees), key_id_set, commit, msg) ?;
 
             //    let output = Output {
             //        features: COINBASE_OUTPUT,
@@ -133,7 +133,7 @@ namespace Grin.Core.Core
             //    let excess = secp.commit_sum(vec![out_commit], vec![over_commit]) ?;
 
             //    let msg = secp::Message::from_slice(&[0; secp::constants::MESSAGE_SIZE])?;
-            //    let sig = keychain.sign(&msg, &key_id) ?;
+            //    let sig = keychain.sign(&msg, &key_id_set) ?;
 
             //    let proof = TxKernel {
             //        features: COINBASE_KERNEL,

@@ -61,7 +61,7 @@ namespace Grin.Wallet
                         Ok(CbData {
                             output: String::from(""),
                             kernel: String::from(""),
-                            key_id: String::from(""),
+                            key_id_set: String::from(""),
                         })
                     }
                     _ => Err(api::Error::Argument(format!("Incorrect request data: {}", op))),
@@ -105,7 +105,7 @@ namespace Grin.Wallet
         )
         {
             var root_key_id = keychain.Root_key_id();
-            var key_id = block_fees.key_id();
+            var key_id = block_fees.key_id_clone();
 
 
             var (keyId2, derivation) = retrieve_existing_key(config, key_id);
@@ -134,7 +134,7 @@ namespace Grin.Wallet
             });
 
 
-            Log.Debug("Received coinbase and built candidate output - {root_key_id}, {key_id}, {derivation}",
+            Log.Debug("Received coinbase and built candidate output - {root_key_id}, {key_id_set}, {derivation}",
                 root_key_id.Clone(),
                 key_id.Clone(),
                 derivation
@@ -143,7 +143,7 @@ namespace Grin.Wallet
             Log.Debug("block_fees - {block_fees}", block_fees);
 
             var block_fees2 = block_fees.Clone();
-            block_fees2.key_id(key_id.Clone());
+            block_fees2.key_id_set(key_id.Clone());
 
             Log.Debug("block_fees updated - {block_fees}", block_fees);
 
@@ -176,13 +176,13 @@ namespace Grin.Wallet
             });
 
 
-            //    if let Some(existing) = wallet_data.get_output(&key_id) 
+            //    if let Some(existing) = wallet_data.get_output(&key_id_set) 
 
             //            {
 
-            //        let key_id = existing.key_id.clone();
+            //        let key_id_set = existing.key_id_set.clone();
             //        let derivation = existing.n_child;
-            //        (key_id, derivation)
+            //        (key_id_set, derivation)
             //    } else {
             //        panic!("should never happen");
             //    }

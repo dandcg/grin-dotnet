@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 using Secp256k1Proxy;
 using Xunit;
 
-namespace Grin.Tests.KeychainTests
+namespace Grin.Tests.Unit.KeychainTests
 {
     public class ExtKeyTests
     {

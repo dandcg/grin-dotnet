@@ -2,7 +2,7 @@
 using Secp256k1Proxy;
 using Xunit;
 
-namespace Grin.Tests.CoreTests.Core
+namespace Grin.Tests.Unit.CoreTests.Core
 {
     public class TransactionTests
     {
@@ -57,12 +57,12 @@ namespace Grin.Tests.CoreTests.Core
         public void test_output_ser_deser()
         {
             //var keychain = Keychain::from_random_seed().unwrap();
-            //var key_id = keychain.derive_key_id(1).unwrap();
-            //var commit = keychain.commit(5, &key_id).unwrap();
-            //var switch_commit = keychain.switch_commit(&key_id).unwrap();
+            //var key_id_set = keychain.derive_key_id(1).unwrap();
+            //var commit = keychain.commit(5, &key_id_set).unwrap();
+            //var switch_commit = keychain.switch_commit(&key_id_set).unwrap();
             //var switch_commit_hash = SwitchCommitHash::from_switch_commit(switch_commit);
             //var msg = secp::pedersen::ProofMessage::empty();
-            //var proof = keychain.range_proof(5, &key_id, commit, msg).unwrap();
+            //var proof = keychain.range_proof(5, &key_id_set, commit, msg).unwrap();
 
             //var out = Output {
             //    features: DEFAULT_OUTPUT,
