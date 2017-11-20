@@ -59,12 +59,15 @@ namespace Grin.Wallet
 //#[derive(Debug, Clone, Serialize, Deserialize)]
     public class WalletConfig
     {
-        public WalletConfig()
+        public static WalletConfig Default()
         {
-            enable_wallet = false;
-            api_http_addr = "0.0.0.0:13416";
-            check_node_api_http_addr = "http://127.0.0.1:13413";
-            data_file_dir = ".";
+            return new WalletConfig
+            {
+                enable_wallet = false,
+                api_http_addr = "0.0.0.0:13416",
+                check_node_api_http_addr = "http://127.0.0.1:13413",
+                data_file_dir = "."
+            };
         }
 
 
@@ -314,6 +317,14 @@ namespace Grin.Wallet
         }
     }
 
+    /// Wallet information tracking all our outputs. Based on HD derivation and
+    /// avoids storing any key data, only storing output amounts and child index.
+    /// This data structure is directly based on the JSON representation stored
+    /// on disk, so selection algorithms are fairly primitive and non optimized.
+    /// 
+    /// TODO optimization so everything isn't O(n) or even O(n^2)
+    /// TODO account for fees
+    /// TODO write locks so files don't get overwritten
     public class WalletData
     {
         public WalletData(Dictionary<string, OutputData> outputs)
@@ -560,26 +571,19 @@ namespace Grin.Wallet
         /// factors and the transaction itself.
         public (ulong, BlindingFactor, Transaction) partial_tx_from_json(Keychain.Keychain keychain, string json_str)
         {
-            throw new NotImplementedException();
+            var partial_tx = JsonConvert.DeserializeObject<JSONPartialTx>(json_str);
+            
+            var blind_bin = HexUtil.from_hex(partial_tx.blind_sum);
+            
+            // TODO - turn some data into a blinding factor here somehow
+            var blinding = BlindingFactor.from_slice(keychain.Secp, blind_bin);
+            
+            var tx_bin = HexUtil.from_hex(partial_tx.tx);
+            Stream stream = new MemoryStream(tx_bin);
+            
+            var tx = Ser.deserialize(stream, Transaction.Empty());
 
-//        JSONPartialTx partial_tx:  = serde_json::from_str(json_str)?;
-
-//        var blind_bin = util::from_hex(partial_tx.blind_sum) ?;
-
-//// TODO - turn some data into a blinding factor here somehow
-//// let blinding = SecretKey::from_slice(&secp, &blind_bin[..])?;
-//            var blinding = BlindingFactor::from_slice(keychain.secp(), &blind_bin[..]) ?;
-
-//            let tx_bin = util::from_hex(partial_tx.tx) ?;
-//            let tx = ser::deserialize(&mut & tx_bin[..])
-//                .map_err(| _ | {
-
-//                Error::Format("Could not deserialize transaction, invalid format.".to_string())
-//            })?;
-
-
-//        return (partial_tx.amount, blinding, tx);
-//    }
+            return (partial_tx.amount, blinding, tx);
         }
     }
 

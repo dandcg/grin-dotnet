@@ -227,7 +227,7 @@ namespace Grin.Core
     public interface IReadable
     {
         /// Reads the data necessary to this Readable from the provided reader
-        void read(IReader reader);
+        T read<T>(IReader reader);
     }
 
 
@@ -251,7 +251,7 @@ public static class Ser
             {
 
                 var t = new T();
-                t.read(reader);
+                t.read<T>(reader);
                 result.Add(t);
             }
 
@@ -267,12 +267,11 @@ public static class Ser
 
 
         /// Deserializes a Readeable from any std::io::Read implementation.
-        public static T deserialize<T>(Stream source) where T:IReadable, new()
+        public static T deserialize<T>(Stream source, T t) where T:IReadable
         {
             var reader = new BinReader(source);
 
-            var t = new T();
-            t.read(reader);
+            t.read<T>(reader);
 
             return t;
         }

@@ -89,7 +89,7 @@ namespace Grin.Core.Core
     }
 
     /// A transaction
-    public class Transaction : IWriteable
+    public class Transaction : IWriteable, IReadable
     {
         private Transaction(Input[] inputs, Output[] outputs, ulong fee, ulong lockHeight, byte[] excessSig)
         {
@@ -138,14 +138,55 @@ namespace Grin.Core.Core
             writer.write_u64((UInt64)inputs.Length);
             writer.write_u64((UInt64)outputs.Length);
         }
+
+        public static Transaction read(IReader reader)
+        {
+            var fee = reader.read_u64();
+           var lock_height = reader.read_u64();
+           var excess_sig = reader.read_vec();
+
+            var input_len = reader.read_u64();
+            var output_len =reader.read_u64();
+
+
+            var inputs = Ser.read_and_verify_sorted<Input>(reader, input_len);
+          var outputs = Ser.read_and_verify_sorted<Output>(reader, output_len);
+
+            var res = new Transaction(inputs, outputs, fee, lock_height, excess_sig);
+            return res;
+        }
+
+        public T read<T>(IReader reader)
+        {
+            throw new NotImplementedException();
+        }
     }
 
 
     /// A transaction input, mostly a reference to an output being spent by the
     /// transaction.
-    public class Input
+    public class Input :IReadable, IWriteable, IHashed
     {
         public Commitment Value { get; }
+        public T read<T>(IReader reader)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void write(IWriter writer)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Hash hash()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Hash hash_with(IWriteable other)
+        {
+            throw new NotImplementedException();
+        }
     }
 
 
@@ -193,7 +234,7 @@ namespace Grin.Core.Core
     /// The hash of an output only covers its features, lock_height, commitment,
     /// and switch commitment. The range proof is expected to have its own hash
     /// and is stored and committed to separately.
-    public class Output
+    public class Output:IReadable, IWriteable, IHashed
     {
         /// Options for an output's structure or use
         public OutputFeatures features { get; set; }
@@ -226,6 +267,26 @@ namespace Grin.Core.Core
             }
 
             return null;
+        }
+
+        public T read<T>(IReader reader)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void write(IWriter writer)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Hash hash()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Hash hash_with(IWriteable other)
+        {
+            throw new NotImplementedException();
         }
     }
 

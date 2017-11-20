@@ -4,7 +4,7 @@ using System.IO;
 using System.Net.Mime;
 using Common;
 using Microsoft.AspNetCore.Mvc;
-
+using Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure;
 using Newtonsoft.Json;
 
 namespace Grin.Wallet
@@ -12,6 +12,13 @@ namespace Grin.Wallet
 
     public class ServerController:Controller
     {
+        private readonly CoinbaseHandler coinbasehandler;
+
+        public ServerController(CoinbaseHandler coinbasehandler)
+        {
+            this.coinbasehandler = coinbasehandler;
+        }
+
 
         [Route("/")]
         [HttpGet]
@@ -26,8 +33,8 @@ namespace Grin.Wallet
         {
 
             var tt = Request.Body.ReadJson<WalletReceiveRequest>();
-            Console.WriteLine(JsonConvert.SerializeObject(tt));
-            return Ok();
+            var res = coinbasehandler.Handle(tt);
+            return res;
 
         }
 

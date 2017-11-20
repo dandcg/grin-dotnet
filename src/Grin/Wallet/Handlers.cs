@@ -1,9 +1,16 @@
 using System;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Grin.Wallet
 {
     public class CoinbaseHandler
     {
+        public CoinbaseHandler(WalletConfig config, Keychain.Keychain keychain)
+        {
+            this.config = config;
+            this.keychain = keychain;
+        }
+
         public WalletConfig config { get;  }
         public Keychain.Keychain keychain { get; }
 
@@ -59,6 +66,20 @@ namespace Grin.Wallet
             throw new NotImplementedException();
 
     }
+
+
+
+        public IActionResult Handle(WalletReceiveRequest receiveRequest)
+        {
+            if (receiveRequest.Coinbase != null)
+            {
+                var coinbase = build_coinbase(receiveRequest.Coinbase);
+                return new JsonResult(coinbase);
+
+            }
+            return new BadRequestResult();
+        }
+
 
 // TODO - error handling - what to return if we fail to get the wallet lock for some reason...
     //impl Handler for CoinbaseHandler {

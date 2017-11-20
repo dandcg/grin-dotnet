@@ -109,6 +109,12 @@
       <FixtureTestSelector>
         <FixtureName>Grin.Tests.CoreTests.Core.TransactionTests</FixtureName>
       </FixtureTestSelector>
+      <FixtureTestSelector>
+        <FixtureName>Grin.Tests.Unit.CoreTests.Core.TransactionTests</FixtureName>
+      </FixtureTestSelector>
+      <FixtureTestSelector>
+        <FixtureName>Grin.Tests.Unit.CoreTests.Core.BlockTests</FixtureName>
+      </FixtureTestSelector>
     </IgnoredTests>
     <ImplicitProjectDependencyPathsRelativeToSolutionDirectory />
     <UseCPUArchitecture>AutoDetect</UseCPUArchitecture>
