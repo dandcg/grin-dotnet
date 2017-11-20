@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text;
 using Common;
+using Grin.Core;
 using Konscious.Security.Cryptography;
 using Secp256k1Proxy;
 
@@ -16,6 +17,15 @@ namespace Grin.Keychain
 
 
         // contructor
+        public Identifier()
+        {
+            var bytes = new byte[IdentifierSize];
+            Bytes = bytes;
+            Hex = HexUtil.to_hex(bytes);
+
+        }
+
+
       private Identifier(byte[] bytes)
         {
             Bytes = bytes;
@@ -70,6 +80,7 @@ namespace Grin.Keychain
         }
 
 
+  
     }
 
     /// An ExtendedKey is a secret key which can be used to derive new

@@ -1,5 +1,7 @@
 ﻿using System;
 using Grin.Keychain;
+using Secp256k1Proxy;
+using Serilog;
 
 namespace Grin.Core.Core
 {
@@ -101,49 +103,49 @@ namespace Grin.Core.Core
 
         public static (Output, TxKernel) Reward_output(Keychain.Keychain keychain, Identifier keyId, ulong fees)
         {
-            throw new NotImplementedException();
-            //    let secp = keychain.secp();
 
-            //    let commit = keychain.commit(reward(fees), key_id_set) ?;
-            //    let switch_commit = keychain.switch_commit(key_id_set) ?;
-            //    let switch_commit_hash = SwitchCommitHash::from_switch_commit(switch_commit);
-            //    trace!(
-            //        LOGGER,
-            //        "Block reward - Pedersen Commit is: {:?}, Switch Commit is: {:?}",
-            //        commit,
-            //        switch_commit
-            //        );
-            //    trace!(
-            //        LOGGER,
-            //        "Block reward - Switch Commit Hash is: {:?}",
-            //        switch_commit_hash
-            //        );
-            //    let msg = secp::pedersen::ProofMessage::empty();
-            //    let rproof = keychain.range_proof(reward(fees), key_id_set, commit, msg) ?;
+     var secp = keychain.Secp;
 
-            //    let output = Output {
-            //        features: COINBASE_OUTPUT,
-            //        commit: commit,
-            //        switch_commit_hash: switch_commit_hash,
-            //        proof: rproof,
-            //    };
+            var commit = keychain.Commit(Consensus.reward(fees), keyId);
+            var switch_commit = keychain.Switch_commit(keyId);
+            var switch_commit_hash = SwitchCommitHash.From_switch_commit(switch_commit);
 
-            //    let over_commit = secp.commit_value(reward(fees)) ?;
-            //    let out_commit = output.commitment();
-            //    let excess = secp.commit_sum(vec![out_commit], vec![over_commit]) ?;
+            Log.Verbose(
+                "Block reward - Pedersen Commit is: {commit}, Switch Commit is: {switch_commit}",
+                commit,
+                switch_commit
+                );
 
-            //    let msg = secp::Message::from_slice(&[0; secp::constants::MESSAGE_SIZE])?;
-            //    let sig = keychain.sign(&msg, &key_id_set) ?;
+            Log.Verbose(
+              "Block reward - Switch Commit Hash is: {  switch_commit_hash}",
+                switch_commit_hash
+                );
 
-            //    let proof = TxKernel {
-            //        features: COINBASE_KERNEL,
-            //        excess: excess,
-            //        excess_sig: sig.serialize_der(&secp),
-            //        fee: 0,
-            //        lock_height: 0,
-            //    };
-            //    Ok((output, proof))
+            var msg = ProofMessage.empty();
+            var rproof = keychain.Range_proof(Consensus.reward(fees), keyId, commit, msg);
 
+            var output = new  Output {
+                features =  OutputFeatures.COINBASE_OUTPUT,
+                    commit= commit,
+                    switch_commit_hash= switch_commit_hash,
+                    proof= rproof
+                };
+
+            var over_commit = secp.commit_value(Consensus.reward(fees));
+            var out_commit = output.commit;
+            var excess = secp.commit_sum(new []{out_commit}, new[] { over_commit}) ;
+
+            var msg2 = Message.from_slice(new byte[Constants.MESSAGE_SIZE]);
+            var sig = keychain.Sign(msg2, keyId);
+
+            var proof = new TxKernel {
+                features= KernelFeatures.COINBASE_KERNEL,
+                    excess=excess,
+                    excess_sig= sig.serialize_der(secp),
+                    fee= 0,
+                    lock_height= 0
+                };
+            return (output, proof);
         }
     }
 

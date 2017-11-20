@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using Common;
 using Grin.Core.Core;
+using Grin.Keychain;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Secp256k1Proxy;
 
 namespace Grin.Core
 {
@@ -227,7 +229,7 @@ namespace Grin.Core
     public interface IReadable
     {
         /// Reads the data necessary to this Readable from the provided reader
-        T read<T>(IReader reader);
+        void read(IReader reader);
     }
 
 
@@ -249,15 +251,11 @@ public static class Ser
 
             for (UInt64 i = 0; i <= count; i++)
             {
-
                 var t = new T();
-                t.read<T>(reader);
+                t.read(reader);
                 result.Add(t);
             }
-
-
             
-
             //let result:
             //Vec < T > =  try
             //!((0..count).map( | _ | T::read(reader)).collect());
@@ -271,7 +269,7 @@ public static class Ser
         {
             var reader = new BinReader(source);
 
-            t.read<T>(reader);
+            t.read(reader);
 
             return t;
         }
@@ -295,6 +293,54 @@ public static class Ser
 
             return stream.ToArray();
         }
+
+
+
+
+
+
+        // Helper Utilities for secp classes
+
+        public static Commitment ReadCommitment(IReader reader)
+        {
+            var a = reader.read_fixed_bytes(Constants.PEDERSEN_COMMITMENT_SIZE);
+            return Commitment.from_vec(a);
+
+        }
+
+        public static void WriteCommitment(this Commitment commitment, IWriter writer )
+        {
+            writer.write_fixed_bytes(commitment.Value);
+
+        }
+
+
+        public static RangeProof ReadRangeProof(IReader reader)
+        {
+            var p = reader.read_limited_vec(Constants.MAX_PROOF_SIZE);
+            return new RangeProof(p, p.Length);
+
+        }
+
+        public static void WriteRangeProof(this RangeProof rangeProof, IWriter writer)
+        {
+            writer.write_fixed_bytes(rangeProof.Proof);
+
+        }
+
+        public static Identifier ReadIdentifier(IReader reader)
+        {
+            var bytes = reader.read_fixed_bytes(Identifier.IdentifierSize);
+            return Identifier.from_bytes(bytes);
+
+        }
+
+        public static void WriteIdentifier(this Identifier identifier, IWriter writer)
+        {
+            writer.write_fixed_bytes(identifier.Bytes);
+
+        }
+
     }
 
 

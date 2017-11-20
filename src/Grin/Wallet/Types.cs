@@ -9,6 +9,7 @@ using Grin.Core;
 using Grin.Core.Core;
 using Grin.Keychain;
 using Konscious.Security.Cryptography;
+using Microsoft.EntityFrameworkCore.ValueGeneration.Internal;
 using Newtonsoft.Json;
 using Polly;
 using Serilog;
@@ -106,20 +107,18 @@ namespace Grin.Wallet
     /// root private key is known.
     public class OutputData
     {
-        private object value1;
-        private int height1;
-        private int lock_height1;
+
 
         public OutputData(Identifier root_key_id, Identifier key_id, uint n_child, ulong value, OutputStatus status,
-            int height, int lock_height, bool is_coinbase)
+      ulong height, ulong lock_height, bool is_coinbase)
         {
             this.root_key_id = root_key_id;
             this.key_id = key_id;
             this.n_child = n_child;
-            value1 = value;
+            this.value = value;
             this.status = status;
-            height1 = height;
-            lock_height1 = lock_height;
+            this.height = height;
+            this.lock_height = lock_height;
             this.is_coinbase = is_coinbase;
         }
 
@@ -149,7 +148,7 @@ namespace Grin.Wallet
 
         public OutputData clone()
         {
-            throw new NotImplementedException();
+            return new OutputData(root_key_id.Clone(),key_id.Clone(),n_child,value,status,height, lock_height,is_coinbase);
         }
 
         /// Lock a given output to avoid conflicting use
@@ -327,12 +326,18 @@ namespace Grin.Wallet
     /// TODO write locks so files don't get overwritten
     public class WalletData
     {
+
+        public WalletData()
+        {
+            this.outputs = new Dictionary<string, OutputData>();
+        }
+
         public WalletData(Dictionary<string, OutputData> outputs)
         {
             this.outputs = outputs;
         }
 
-        public Dictionary<string, OutputData> outputs { get; }
+        public Dictionary<string, OutputData> outputs { get; } 
 
         /// Allows for reading wallet data (without needing to acquire the write lock).
         public static T read_wallet<T>(string data_file_dir, Func<WalletData, T> f)
@@ -598,6 +603,11 @@ namespace Grin.Wallet
 
     public class BlockFees
     {
+        public BlockFees()
+        {
+            
+        }
+
         [JsonProperty]
         public ulong fees { get; private set; }
 
@@ -620,12 +630,20 @@ namespace Grin.Wallet
 
         public Identifier key_id_clone()
         {
-            return key_id.Clone();
+            return key_id?.Clone();
         }
     }
 
+    /// Response to build a coinbase output.
     public class CbData
     {
+        public CbData(string output, string kernel, string keyId)
+        {
+            this.output = output;
+            this.kernel = kernel;
+            key_id = keyId;
+        }
+
         public string output { get; }
         public string kernel { get; }
         public string key_id { get; }

@@ -21,7 +21,7 @@ namespace Grin
 
             services.AddMvc();
 
-            var walletConfig = new WalletConfig();
+            var walletConfig = WalletConfig.Default();
             var keychain = Keychain.Keychain.From_random_seed();
                 
 

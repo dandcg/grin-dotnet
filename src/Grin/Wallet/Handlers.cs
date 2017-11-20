@@ -1,4 +1,7 @@
 using System;
+using Common;
+using Grin.Core;
+using Grin.Keychain;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Grin.Wallet
@@ -29,41 +32,43 @@ namespace Grin.Wallet
 
             //})?;
 
-           //var out_bin = ser::ser_vec(&out).map_err(| e | {
+            //var out_bin = ser::ser_vec(&out).map_err(| e | {
 
-           //     api::Error::Internal(format!("Error serializing output: {:?}", e))
+            //     api::Error::Internal(format!("Error serializing output: {:?}", e))
 
-           // })?;
+            // })?;
+            var out_bin = Ser.ser_vec(outp);
 
-           // let kern_bin = ser::ser_vec(&kern).map_err(| e | {
+            // let kern_bin = ser::ser_vec(&kern).map_err(| e | {
 
-           //     api::Error::Internal(format!("Error serializing kernel: {:?}", e))
+            //     api::Error::Internal(format!("Error serializing kernel: {:?}", e))
 
-           // })?;
+            // })?;
 
-        //    let key_id_bin = match block_fees.key_id_set {
+            var kern_bin = Ser.ser_vec(kern);
 
-        //        Some(key_id_set) => {
-        //            ser::ser_vec(&key_id_set).map_err(|e| {
-        //                api::Error::Internal(
-        //                    format!("Error serializing kernel: {:?}", e),
+            //    let key_id_bin = match block_fees.key_id_set {
 
-        //                    )
+            //        Some(key_id_set) => {
+            //            ser::ser_vec(&key_id_set).map_err(|e| {
+            //                api::Error::Internal(
+            //                    format!("Error serializing kernel: {:?}", e),
 
-        //            })?
-        //        }
-        //        None => vec![],
-        //    };
+            //                    )
+
+            //            })?
+            //        }
+            //        None => vec![],
+            //    };
 
 
-        //    Ok(CbData {
-        //        output: util::to_hex(out_bin),
-        //        kernel: util::to_hex(kern_bin),
-        //        key_id_set: util::to_hex(key_id_bin),
-        //    })
-        //}
+            var key_id_bin = block_fees.key_id != null ? block_fees.key_id.Bytes : new byte[Identifier.IdentifierSize];
 
-            throw new NotImplementedException();
+            return new CbData(HexUtil.to_hex(out_bin), HexUtil.to_hex(kern_bin), HexUtil.to_hex(key_id_bin));
+       
+        
+
+
 
     }
 

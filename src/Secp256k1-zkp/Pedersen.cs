@@ -79,7 +79,7 @@ namespace Secp256k1Proxy
         public byte[] Proof { get; }
         public int Plen { get; }
 
-        internal RangeProof(byte[] proof, int plen)
+        public RangeProof(byte[] proof, int plen)
         {
             Proof = proof;
             Plen = plen;

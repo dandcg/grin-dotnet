@@ -55,7 +55,7 @@ namespace Grin.Core.Core
     /// amount to zero.
     /// The signature signs the fee and the lock_height, which are retained for
     /// signature validation.
-    public class TxKernel
+    public class TxKernel:IWriteable, IReadable
     {
         /// Options for a kernel's structure or use
         public KernelFeatures features { get; set; }
@@ -86,32 +86,49 @@ namespace Grin.Core.Core
             var sig = Signiture.from_der(secp, excess_sig);
             secp.verify_from_commit(msg, sig, excess);
         }
+
+        public void write(IWriter writer)
+        {
+            writer.write_u8((byte)features);
+            writer.write_u64(fee);
+            writer.write_u64(lock_height);
+            excess.WriteCommitment(writer);
+            writer.write_fixed_bytes(excess_sig);
+    }
+
+        public void read(IReader reader)
+        {
+      features = (KernelFeatures) reader.read_u8();
+            fee = reader.read_u64();
+            lock_height= reader.read_u64();
+
+            excess = Ser.ReadCommitment(reader);
+            excess_sig = reader.read_vec();
+        
+           
+        }
     }
 
     /// A transaction
     public class Transaction : IWriteable, IReadable
     {
-        private Transaction(Input[] inputs, Output[] outputs, ulong fee, ulong lockHeight, byte[] excessSig)
+        private Transaction()
         {
-            this.inputs = inputs;
-            this.outputs = outputs;
-            this.fee = fee;
-            lock_height = lockHeight;
-            excess_sig = excessSig;
+            
         }
-
+        
         /// Set of inputs spent by the transaction.
-        public Input[] inputs { get; }
+        public Input[] inputs { get; private set; }
 
         /// Set of outputs the transaction produces.
-        public Output[] outputs { get; }
+        public Output[] outputs { get; private set; }
 
         /// Fee paid by the transaction.
-        public ulong fee { get; }
+        public ulong fee { get; private set; }
 
         /// Transaction is not valid before this block height.
         /// It is invalid for this to be less than the lock_height of any UTXO being spent.
-        public ulong lock_height { get; }
+        public ulong lock_height { get; private set; }
 
         /// The signature proving the excess is a valid public key, which signs
         /// the transaction fee.
@@ -120,14 +137,30 @@ namespace Grin.Core.Core
         /// Creates a new empty transaction (no inputs or outputs, zero fee).
         public static Transaction Empty()
         {
-            return new Transaction(new Input[] { }, new Output[] { }, 0, 0, new byte[] { });
+            return new Transaction
+            {
+                inputs=new Input[] { },
+                outputs =new Output[] { },
+                fee = 0,
+                lock_height = 0,
+                excess_sig = new byte[] { }
+                
+            };
         }
 
         /// Creates a new transaction initialized with
         /// the provided inputs, outputs, fee and lock_height.
         public static Transaction New()
         {
-            return new Transaction(new Input[] { }, new Output[] { }, 0, 0, new byte[] { });
+            return new Transaction
+            {
+                inputs = new Input[] { },
+                outputs = new Output[] { },
+                fee = 0,
+                lock_height = 0,
+                excess_sig = new byte[] { }
+
+            };
         }
 
         public void write(IWriter writer)
@@ -139,26 +172,26 @@ namespace Grin.Core.Core
             writer.write_u64((UInt64)outputs.Length);
         }
 
-        public static Transaction read(IReader reader)
+        public static Transaction readnew(IReader reader)
         {
-            var fee = reader.read_u64();
-           var lock_height = reader.read_u64();
-           var excess_sig = reader.read_vec();
-
-            var input_len = reader.read_u64();
-            var output_len =reader.read_u64();
-
-
-            var inputs = Ser.read_and_verify_sorted<Input>(reader, input_len);
-          var outputs = Ser.read_and_verify_sorted<Output>(reader, output_len);
-
-            var res = new Transaction(inputs, outputs, fee, lock_height, excess_sig);
+          var res=new Transaction();
             return res;
         }
 
-        public T read<T>(IReader reader)
+        public void read(IReader reader)
         {
-            throw new NotImplementedException();
+          fee = reader.read_u64();
+       lock_height = reader.read_u64();
+         excess_sig = reader.read_vec();
+
+            var input_len = reader.read_u64();
+            var output_len = reader.read_u64();
+
+
+          inputs = Ser.read_and_verify_sorted<Input>(reader, input_len);
+          outputs = Ser.read_and_verify_sorted<Output>(reader, output_len);
+
+     
         }
     }
 
@@ -168,7 +201,7 @@ namespace Grin.Core.Core
     public class Input :IReadable, IWriteable, IHashed
     {
         public Commitment Value { get; }
-        public T read<T>(IReader reader)
+        public void read(IReader reader)
         {
             throw new NotImplementedException();
         }
@@ -203,7 +236,7 @@ namespace Grin.Core.Core
 
 
     /// Definition of the switch commitment hash
-    public class SwitchCommitHash
+    public class SwitchCommitHash:IReadable, IWriteable
     {
         public byte[] hash { get; private set; } //: [u8; SWITCH_COMMIT_HASH_SIZE],
 
@@ -219,6 +252,25 @@ namespace Grin.Core.Core
                 h[i] = switch_commit_hash[i];
             }
             return new SwitchCommitHash {hash = h};
+        }
+
+        public static SwitchCommitHash readnew(IReader reader)
+
+        {
+            var sch = new SwitchCommitHash();
+            sch.read(reader);
+            return sch;
+        }
+
+
+        public void read(IReader reader) 
+        {
+            throw new NotImplementedException();
+        }
+
+        public void write(IWriter writer)
+        {
+            writer.write_fixed_bytes(hash);
         }
     }
 
@@ -269,14 +321,23 @@ namespace Grin.Core.Core
             return null;
         }
 
-        public T read<T>(IReader reader)
+        public void read(IReader reader)
         {
-            throw new NotImplementedException();
+
+            features = (OutputFeatures) reader.read_u8();
+            commit = Ser.ReadCommitment(reader);
+            switch_commit_hash = SwitchCommitHash.readnew(reader);
+            proof = Ser.ReadRangeProof(reader);
+
+            
         }
 
         public void write(IWriter writer)
         {
-            throw new NotImplementedException();
+            writer.write_u8((byte)features);
+            commit.WriteCommitment(writer);
+            switch_commit_hash.write(writer);
+            
         }
 
         public Hash hash()
@@ -288,6 +349,8 @@ namespace Grin.Core.Core
         {
             throw new NotImplementedException();
         }
+
+     
     }
 
 

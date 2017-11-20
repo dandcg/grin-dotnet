@@ -105,13 +105,18 @@ namespace Grin.Wallet
         )
         {
             var root_key_id = keychain.Root_key_id();
-            var key_id = block_fees.key_id_clone();
+            var key_id = block_fees.key_id;
 
 
-            var (keyId2, derivation) = retrieve_existing_key(config, key_id);
-            if (keyId2 == null)
+    
+            uint derivation;
+            if (key_id != null)
             {
-                (keyId2, derivation) = next_available_key(config, keychain);
+              (key_id, derivation) = retrieve_existing_key(config, key_id);
+            }
+            else 
+            {
+                (key_id, derivation) = next_available_key(config, keychain);
             }
 
             // Now acquire the wallet lock and write the new output.
@@ -120,7 +125,7 @@ namespace Grin.Wallet
                 // track the new output and return the stuff needed for reward
                 var opd = new OutputData(
                     root_key_id.Clone(),
-                    keyId2.Clone(),
+                    key_id.Clone(),
                     derivation,
                     Consensus.reward(block_fees.fees),
                     OutputStatus.Unconfirmed,
@@ -135,15 +140,15 @@ namespace Grin.Wallet
 
 
             Log.Debug("Received coinbase and built candidate output - {root_key_id}, {key_id_set}, {derivation}",
-                root_key_id.Clone(),
-                key_id.Clone(),
+                root_key_id,
+                key_id,
                 derivation
             );
 
             Log.Debug("block_fees - {block_fees}", block_fees);
 
-            var block_fees2 = block_fees.Clone();
-            block_fees2.key_id_set(key_id.Clone());
+             block_fees = block_fees.Clone();
+            block_fees.key_id_set(key_id.Clone());
 
             Log.Debug("block_fees updated - {block_fees}", block_fees);
 
