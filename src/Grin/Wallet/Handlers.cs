@@ -19,13 +19,13 @@ namespace Grin.Wallet
 
 
       
-     public CbData build_coinbase(BlockFees block_fees)
+     public CbData build_coinbase(BlockFees bf)
         {
 
-            var (outp, kern, bf) = Receiver.receive_coinbase(
+            var (outp, kern, block_fees) = Receiver.receive_coinbase(
                                              config,
                                              keychain,
-                                             block_fees);
+                                             bf);
 
             //                             ).map_err(|e| {
             //    api::Error::Internal(format!("Error building coinbase: {:?}", e))
