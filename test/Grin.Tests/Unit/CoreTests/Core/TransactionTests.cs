@@ -1,4 +1,8 @@
-﻿using Grin.Core.Core;
+﻿using System;
+using System.IO;
+using Common;
+using Grin.Core;
+using Grin.Core.Core;
 using Secp256k1Proxy;
 using Xunit;
 
@@ -25,59 +29,81 @@ namespace Grin.Tests.Unit.CoreTests.Core
                 fee = 10
             };
 
-            //var mut vec = vec![];
-            //ser::serialize(&mut vec, &kernel).expect("serialized failed");
-            //var kernel2: TxKernel = ser::deserialize(&mut & vec[..]).unwrap();
-            //assert_eq!(kernel2.features, DEFAULT_KERNEL);
-            //assert_eq!(kernel2.lock_height, 0);
-            //assert_eq!(kernel2.excess, commit);
-            //assert_eq!(kernel2.excess_sig, sig.clone());
-            //assert_eq!(kernel2.fee, 10);
+            var stream = new MemoryStream();
+            Ser.serialize(stream, kernel);
+
+            Console.WriteLine("-------");
+            stream.ToArray().Print();
+            Console.WriteLine("-------");
+
+            stream.Position = 0;
+
+            var kernel2 = Ser.deserialize(stream, new TxKernel());
+            Assert.Equal(KernelFeatures.DEFAULT_KERNEL, kernel2.features);
+            Assert.Equal<ulong>(0, kernel2.lock_height);
+            Assert.Equal(commit.Value, kernel2.excess.Value);
+            Assert.Equal(sig, kernel2.excess_sig);
+            Assert.Equal<ulong>(10, kernel2.fee);
 
             //// now check a kernel with lock_height serializes/deserializes correctly
-            //var kernel = TxKernel {
-            //    features: DEFAULT_KERNEL,
-            //    lock_height: 100,
-            //    excess: commit,
-            //    excess_sig: sig.clone(),
-            //    fee: 10,
-            //};
+            kernel = new TxKernel
+            {
+                features = KernelFeatures.DEFAULT_KERNEL,
+                lock_height = 100,
+                excess = commit,
+                excess_sig = sig,
+                fee = 10
+            };
+            
+            stream = new MemoryStream();
+            Ser.serialize(stream, kernel);
 
-            //var mut vec = vec![];
-            //ser::serialize(&mut vec, &kernel).expect("serialized failed");
-            //var kernel2: TxKernel = ser::deserialize(&mut & vec[..]).unwrap();
-            //assert_eq!(kernel2.features, DEFAULT_KERNEL);
-            //assert_eq!(kernel2.lock_height, 100);
-            //assert_eq!(kernel2.excess, commit);
-            //assert_eq!(kernel2.excess_sig, sig.clone());
-            //assert_eq!(kernel2.fee, 10);
+            Console.WriteLine("-------");
+            stream.ToArray().Print();
+            Console.WriteLine("-------");
+
+            stream.Position = 0;
+
+            kernel2 = Ser.deserialize(stream, new TxKernel());
+            Assert.Equal(KernelFeatures.DEFAULT_KERNEL, kernel2.features);
+            Assert.Equal<ulong>(100, kernel2.lock_height);
+            Assert.Equal(commit.Value, kernel2.excess.Value);
+            Assert.Equal(sig, kernel2.excess_sig);
+            Assert.Equal<ulong>(10, kernel2.fee);
         }
 
         [Fact]
         public void test_output_ser_deser()
         {
-            //var keychain = Keychain::from_random_seed().unwrap();
-            //var key_id_set = keychain.derive_key_id(1).unwrap();
-            //var commit = keychain.commit(5, &key_id_set).unwrap();
-            //var switch_commit = keychain.switch_commit(&key_id_set).unwrap();
-            //var switch_commit_hash = SwitchCommitHash::from_switch_commit(switch_commit);
-            //var msg = secp::pedersen::ProofMessage::empty();
-            //var proof = keychain.range_proof(5, &key_id_set, commit, msg).unwrap();
+            var keychain = Keychain.Keychain.From_random_seed();
+            var key_id_set = keychain.Derive_key_id(1);
+            var commit = keychain.Commit(5, key_id_set);
+            var switch_commit = keychain.Switch_commit(key_id_set);
+            var switch_commit_hash = SwitchCommitHash.From_switch_commit(switch_commit);
+            var msg = ProofMessage.empty();
+            var proof = keychain.Range_proof(5, key_id_set, commit, msg);
 
-            //var out = Output {
-            //    features: DEFAULT_OUTPUT,
-            //    commit: commit,
-            //    switch_commit_hash: switch_commit_hash,
-            //    proof: proof,
-            //};
+            var outp = new Output { 
+                features= OutputFeatures.DEFAULT_OUTPUT,
+                commit= commit,
+                switch_commit_hash= switch_commit_hash,
+                proof= proof
+            };
 
-            //var mut vec = vec![];
-            //ser::serialize(&mut vec, &out).expect("serialized failed");
-            //var dout: Output = ser::deserialize(&mut & vec[..]).unwrap();
+            var stream = new MemoryStream();
+            Ser.serialize(stream, outp);
 
-            //assert_eq!(dout.features, DEFAULT_OUTPUT);
-            //assert_eq!(dout.commit, out.commit);
-            //assert_eq!(dout.proof, out.proof);
+            Console.WriteLine("-------");
+            stream.ToArray().Print();
+            Console.WriteLine("-------");
+
+            stream.Position = 0;
+
+            var dout = Ser.deserialize(stream, new Output());
+
+            Assert.Equal(OutputFeatures.DEFAULT_OUTPUT, dout.features);
+            Assert.Equal(outp.commit.Value , dout.commit.Value);
+            Assert.Equal(outp.proof.Proof, dout.proof.Proof);
         }
 
         [Fact]

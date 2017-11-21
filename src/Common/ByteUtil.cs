@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Text;
 
 namespace Common
 {
@@ -48,6 +49,19 @@ namespace Common
                 Array.Reverse(bs);
             }
             
+        }
+
+
+
+        public static void Print(this byte[] bytes)
+        {
+            var sb = new StringBuilder("");
+            foreach (var b in bytes)
+            {
+                sb.Append(b + ", ");
+            }
+            sb.Remove(sb.Length - 2, 2);
+            Console.WriteLine(sb.ToString());
         }
 
 

@@ -8,7 +8,6 @@ namespace Grin
 {
     public class Program
     {
-        
         public static int Main(string[] args)
         {
             Log.Logger = new LoggerConfiguration()
@@ -17,32 +16,34 @@ namespace Grin
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
                 .CreateLogger();
-            
+
             try
             {
                 Log.Information("Starting web host");
 
                 BuildWebHost(args).Run();
 
-          
-            return 0;
-        }
-        catch (Exception ex)
-        {
-            Log.Fatal(ex, "Host terminated unexpectedly");
-            return 1;
-        }
-        finally
-        {
-            Log.CloseAndFlush();
-        }
+
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "Host terminated unexpectedly");
+                return 1;
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
 
-        public static IWebHost BuildWebHost(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
+        public static IWebHost BuildWebHost(string[] args)
+        {
+            return WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
                 .UseSerilog()
-      .UseUrls("http://0.0.0.0:5000")
+                .UseUrls("http://0.0.0.0:5000")
                 .Build();
+        }
     }
 }

@@ -19,7 +19,7 @@ namespace Secp256k1Proxy
         {
             var h = new byte[Constants.PEDERSEN_COMMITMENT_SIZE];
 
-            for (var i = 0; i <= Math.Min(v.Length, Constants.PEDERSEN_COMMITMENT_SIZE); i++)
+            for (var i = 0; i < Math.Min(v.Length, Constants.PEDERSEN_COMMITMENT_SIZE); i++)
                 h[i] = v[i];
             return new Commitment(h);
         }

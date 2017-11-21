@@ -109,12 +109,18 @@
       <FixtureTestSelector>
         <FixtureName>Grin.Tests.CoreTests.Core.TransactionTests</FixtureName>
       </FixtureTestSelector>
-      <FixtureTestSelector>
-        <FixtureName>Grin.Tests.Unit.CoreTests.Core.TransactionTests</FixtureName>
-      </FixtureTestSelector>
+      <NamedTestSelector>
+        <TestName>Grin.Tests.Unit.CoreTests.Core.TransactionTests.test_output_value_recovery</TestName>
+      </NamedTestSelector>
       <FixtureTestSelector>
         <FixtureName>Grin.Tests.Unit.CoreTests.Core.BlockTests</FixtureName>
       </FixtureTestSelector>
+      <NamedTestSelector>
+        <TestName>Grin.Tests.Integration.WalletTests.ReceiveCoinbase</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Grin.Tests.Unit.CoreTests.Core.TransactionTests.test_kernel_ser_deser</TestName>
+      </NamedTestSelector>
     </IgnoredTests>
     <ImplicitProjectDependencyPathsRelativeToSolutionDirectory />
     <UseCPUArchitecture>AutoDetect</UseCPUArchitecture>

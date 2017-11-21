@@ -1,4 +1,5 @@
 ﻿using System;
+using Common;
 using Grin.Keychain;
 using Konscious.Security.Cryptography;
 using Secp256k1Proxy;
@@ -89,11 +90,13 @@ namespace Grin.Core.Core
 
         public void write(IWriter writer)
         {
+
             writer.write_u8((byte) features);
-            writer.write_u64(fee);
+     writer.write_u64(fee);
             writer.write_u64(lock_height);
             excess.WriteCommitment(writer);
-            writer.write_fixed_bytes(excess_sig);
+            writer.write_bytes(excess_sig);
+    
         }
 
         public void read(IReader reader)
@@ -101,7 +104,6 @@ namespace Grin.Core.Core
             features = (KernelFeatures) reader.read_u8();
             fee = reader.read_u64();
             lock_height = reader.read_u64();
-
             excess = Ser.ReadCommitment(reader);
             excess_sig = reader.read_vec();
         }
@@ -258,7 +260,7 @@ namespace Grin.Core.Core
 
         public void read(IReader reader)
         {
-            throw new NotImplementedException();
+            hash = reader.read_fixed_bytes(TransactionHelper.SWITCH_COMMIT_HASH_SIZE);
         }
 
         public void write(IWriter writer)
@@ -327,6 +329,14 @@ namespace Grin.Core.Core
             writer.write_u8((byte) features);
             commit.WriteCommitment(writer);
             switch_commit_hash.write(writer);
+
+            if (writer.serialization_mode() == SerializationMode.Full)
+            {
+                writer.write_bytes(proof.Proof);
+
+            }
+
+
         }
 
         public Hash hash()

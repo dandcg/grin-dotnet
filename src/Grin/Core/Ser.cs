@@ -4,7 +4,6 @@ using System.IO;
 using Common;
 using Grin.Core.Core;
 using Grin.Keychain;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Secp256k1Proxy;
 
 namespace Grin.Core
@@ -159,10 +158,8 @@ namespace Grin.Core
         byte expect_u8(byte val);
     }
 
-    public abstract class ReaderBase:IReader
+    public abstract class ReaderBase : IReader
     {
-
-
         public byte read_u8()
         {
             var bs = read_fixed_bytes(1);
@@ -172,42 +169,60 @@ namespace Grin.Core
         public ushort read_u16()
         {
             var bs = read_fixed_bytes(2);
-         bs.BigEndian();
+            bs.BigEndian();
             return BitConverter.ToUInt16(bs, 0);
-
-
         }
 
         public uint read_u32()
         {
-            throw new NotImplementedException();
+            var bs = read_fixed_bytes(4);
+            bs.BigEndian();
+            return BitConverter.ToUInt32(bs, 0);
         }
 
         public ulong read_u64()
         {
-            throw new NotImplementedException();
+            var bs = read_fixed_bytes(8);
+            bs.BigEndian();
+            return BitConverter.ToUInt64(bs, 0);
         }
 
         public long read_i64()
         {
-            throw new NotImplementedException();
+            var bs = read_fixed_bytes(8);
+            bs.BigEndian();
+            return BitConverter.ToInt64(bs, 0);
         }
 
         public byte[] read_vec()
         {
-            throw new NotImplementedException();
+            var len = (uint) read_u64();
+            var bs = read_fixed_bytes(len);
+            return bs;
         }
 
         public byte[] read_limited_vec(uint max)
         {
-            throw new NotImplementedException();
+            var len = Math.Min(max, (uint) read_u64());
+            var bs = read_fixed_bytes(len);
+            return bs;
         }
 
         public abstract byte[] read_fixed_bytes(uint length);
 
         public byte expect_u8(byte val)
         {
-            throw new NotImplementedException();
+            var b = read_u8();
+            if (b == val)
+            {
+                return b;
+            }
+            throw new Exception("Unexpected data");
+
+            //Err(Error::UnexpectedData {
+            //    expected: vec![val],
+            //    received: vec![b],
+            //})
         }
     }
 
@@ -222,7 +237,6 @@ namespace Grin.Core
     }
 
 
-
     /// Trait that every type that can be deserialized from binary must implement.
     /// Reads directly to a Reader, a utility type thinly wrapping an
     /// underlying Read implementation.
@@ -233,29 +247,25 @@ namespace Grin.Core
     }
 
 
-
-public static class Ser
+    public static class Ser
     {
-
-
         /// Reads a collection of serialized items into a Vec
         /// and verifies they are lexicographically ordered.
-        ///
+        /// 
         /// A consensus rule requires everything is sorted lexicographically to avoid
         /// leaking any information through specific ordering of items.
-        public static T[] read_and_verify_sorted<T>(IReader reader, UInt64 count) 
-            where T: IReadable, IHashed , IWriteable, new()
+        public static T[] read_and_verify_sorted<T>(IReader reader, ulong count)
+            where T : IReadable, IHashed, IWriteable, new()
         {
-
             var result = new List<T>();
 
-            for (UInt64 i = 0; i <= count; i++)
+            for (ulong i = 0; i <= count; i++)
             {
                 var t = new T();
                 t.read(reader);
                 result.Add(t);
             }
-            
+
             //let result:
             //Vec < T > =  try
             //!((0..count).map( | _ | T::read(reader)).collect());
@@ -265,7 +275,7 @@ public static class Ser
 
 
         /// Deserializes a Readeable from any std::io::Read implementation.
-        public static T deserialize<T>(Stream source, T t) where T:IReadable
+        public static T deserialize<T>(Stream source, T t) where T : IReadable
         {
             var reader = new BinReader(source);
 
@@ -275,7 +285,7 @@ public static class Ser
         }
 
         /// Serializes a Writeable into any std::io::Write implementation.
-        public static void serialize<T>(Stream sink, T thing) where T:IWriteable
+        public static void serialize<T>(Stream sink, T thing) where T : IWriteable
         {
             var writer = new BinWriter(sink);
             thing.write(writer);
@@ -295,23 +305,17 @@ public static class Ser
         }
 
 
-
-
-
-
         // Helper Utilities for secp classes
 
         public static Commitment ReadCommitment(IReader reader)
         {
             var a = reader.read_fixed_bytes(Constants.PEDERSEN_COMMITMENT_SIZE);
             return Commitment.from_vec(a);
-
         }
 
-        public static void WriteCommitment(this Commitment commitment, IWriter writer )
+        public static void WriteCommitment(this Commitment commitment, IWriter writer)
         {
             writer.write_fixed_bytes(commitment.Value);
-
         }
 
 
@@ -319,28 +323,23 @@ public static class Ser
         {
             var p = reader.read_limited_vec(Constants.MAX_PROOF_SIZE);
             return new RangeProof(p, p.Length);
-
         }
 
         public static void WriteRangeProof(this RangeProof rangeProof, IWriter writer)
         {
             writer.write_fixed_bytes(rangeProof.Proof);
-
         }
 
         public static Identifier ReadIdentifier(IReader reader)
         {
             var bytes = reader.read_fixed_bytes(Identifier.IdentifierSize);
             return Identifier.from_bytes(bytes);
-
         }
 
         public static void WriteIdentifier(this Identifier identifier, IWriter writer)
         {
             writer.write_fixed_bytes(identifier.Bytes);
-
         }
-
     }
 
 
@@ -362,15 +361,15 @@ public static class Ser
 
         public override void write_fixed_bytes(byte[] bs)
         {
+            //bs.Print();
             Sink.Write(bs, 0, bs.Length);
         }
     }
 
 
-
     public class BinReader : ReaderBase
     {
-        private Stream source;
+        private readonly Stream source;
 
         public BinReader(Stream source)
         {
@@ -381,9 +380,9 @@ public static class Ser
         public override byte[] read_fixed_bytes(uint length)
         {
             var bs = new byte[length];
-            source.Read(bs,0,(int)length);
+            source.Read(bs, 0, (int) length);
+            //bs.Print();
             return bs;
         }
     }
-
 }

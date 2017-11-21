@@ -66,10 +66,6 @@ namespace Grin.Wallet
 
             return new CbData(HexUtil.to_hex(out_bin), HexUtil.to_hex(kern_bin), HexUtil.to_hex(key_id_bin));
        
-        
-
-
-
     }
 
 
