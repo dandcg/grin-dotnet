@@ -139,5 +139,14 @@ namespace Grin.Core.Core
         {
             return new Append(build.Tx.with_fee(fee),build.Sum);
         }
+
+        /// Sets the lock_height on the transaction being built.
+        public static Append with_lock_height(this Context build, UInt64 lock_height)
+        {
+            return new Append(build.Tx.with_lock_height(lock_height), build.Sum);
+        
+        }
+
+
     }
 }
