@@ -2,53 +2,72 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Common;
+using Microsoft.AspNetCore.Server.Kestrel.Internal.System.Collections.Sequences;
+using Secp256k1Proxy;
 
 namespace Grin.Core.Core
 {
 
-//    /// Implemented by types that hold inputs and outputs including Pedersen
-//    /// commitments. Handles the collection of the commitments as well as their
-//    /// summing, taking potential explicit overages of fees into account.
-//public static trait Committed {
-///// Gathers commitments and sum them.
-//fn sum_commitments(&self, secp: &Secp256k1) -> Result<Commitment, secp::Error> {
-//    // first, verify each range proof
-//    let ref outputs = self.outputs_committed();
-//    for output in * outputs
-//    {
-//        try!(output.verify_proof(secp))
-//    }
+    /// Implemented by types that hold inputs and outputs including Pedersen
+    /// commitments. Handles the collection of the commitments as well as their
+    /// summing, taking potential explicit overages of fees into account.
+    public static class Committed
+    {
 
-//    // then gather the commitments
-//    let mut input_commits = map_vec!(self.inputs_committed(), |inp| inp.commitment());
-//    let mut output_commits = map_vec!(self.outputs_committed(), |out| out.commitment());
+  
 
-//    // add the overage as output commitment if positive, as an input commitment if
-//    // negative
-//    let overage = self.overage();
-//    if overage != 0 {
-//        let over_commit = secp.commit_value(overage.abs() as u64).unwrap();
-//        if overage< 0 {
-//            input_commits.push(over_commit);
-//        } else {
-//            output_commits.push(over_commit);
-//        }
-//    }
+        /// Gathers commitments and sum them.
+       public static Commitment sum_commitments(Secp256k1 secp, Output[] outputs, Input[] inputs, Int64 overage)
+        {
 
-//    // sum all that stuff
-//    secp.commit_sum(output_commits, input_commits)
-//}
+            // first, verify each range proof
+          
+            foreach (var output in outputs)
+            {
+                output.Verify_proof(secp);
+            }
 
-///// Vector of committed inputs to verify
-//fn inputs_committed(&self) -> &Vec<Input>;
+            // then gather the commitments
 
-///// Vector of committed inputs to verify
-//fn outputs_committed(&self) -> &Vec<Output>;
+            var inputCommits = new List<Commitment>();
 
-///// The overage amount expected over the commitments. Can be negative (a
-///// fee) or positive (a reward).
-//fn overage(&self) -> i64;
-//}
+     
+            foreach (var input in inputs)
+            {
+               inputCommits.Add(input.Value);
+
+            }
+            var outputCommits = new List<Commitment>();
+            foreach (var output in outputs)
+            {
+              outputCommits.Add(output.commit);
+
+            }
+
+
+            // add the overage as output commitment if positive, as an input commitment if
+            // negative
+     
+            if (overage != 0)
+            {
+                var over_commit = secp.commit_value((UInt64)Math.Abs(overage));
+                if (overage < 0)
+                {
+                    inputCommits.Add(over_commit);
+                }
+                else
+                {
+                    outputCommits.Add(over_commit);
+                }
+            }
+
+            // sum all that stuff
+          return  secp.commit_sum(outputCommits.ToArray(), inputCommits.ToArray());
+        }
+
+  
+    }
 
 
     public class Proof
@@ -62,5 +81,10 @@ namespace Grin.Core.Core
         {
             throw new NotImplementedException();
         }
+
+
+
+
+
     }
 }

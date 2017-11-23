@@ -12,23 +12,25 @@
 //!   with_fee(1)])
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Grin.Keychain;
 using Secp256k1Proxy;
+using Serilog;
 
 namespace Grin.Core.Core
 {
     /// Context information available to transaction combinators.
     public class Context
     {
-
-        public Context(Keychain.Keychain keychain)
+        public Context(Keychain.Keychain keychain, Transaction tx, BlindSum sum)
         {
             Keychain = keychain;
+            Tx = tx;
+            Sum = sum;
         }
-      public Keychain.Keychain Keychain { get; }
+
+        public Keychain.Keychain Keychain { get; }
+        public Transaction Tx { get; set; }
+        public BlindSum Sum { get; set; }
     }
 
     /// Function type returned by the transaction combinators. Transforms a
@@ -43,63 +45,99 @@ namespace Grin.Core.Core
             Transaction = transaction;
             Blind = blind;
         }
-
-
     }
 
 
-
-
-    public class Build
+    public static class Build
     {
-
         /// Builds a new transaction by combining all the combinators provided in a
         /// Vector. Transactions can either be built "from scratch" with a list of
         /// inputs or outputs or from a pre-existing transaction that gets added to.
-        ///
+        /// 
         /// Example:
         /// let (tx1, sum) = build::transaction(vec![input_rand(4), output_rand(1),
-        ///   with_fee(1)], keychain).unwrap();
+        /// with_fee(1)], keychain).unwrap();
         /// let (tx2, _) = build::transaction(vec![initial_tx(tx1), with_excess(sum),
-        ///   output_rand(2)], keychain).unwrap();
-        ///
-        public static (Transaction, BlindingFactor) transaction(
-         Append[] elems,
-         Keychain.Keychain keychain
-        )
+        /// output_rand(2)], keychain).unwrap();
+        public static (Transaction, BlindingFactor) transaction(Func<Context,Append>[] elems,Keychain.Keychain keychain)
 
         {
-          var ctx =new  Context (keychain);
+            var tx = Transaction.Empty();
+            var sum = BlindSum.New();
+            var ctx = new Context(keychain,tx,sum);
 
-            //let(mut tx, sum) = elems.iter().fold(
-            //    (Transaction::empty(), BlindSum::new()),
-            //    |acc, elem| elem(&mut ctx, acc),
-            //    );
+            foreach (var elem in elems)
+            {
+                var append = elem(ctx);
+                tx = ctx.Tx = append.Transaction;
+                sum = ctx.Sum = append.Blind;
+            }
 
-            Transaction tx= Transaction.Empty();
-            BlindSum sum = BlindSum.New() ;
             var blind_sum = ctx.Keychain.Blind_sum(sum);
-            var msg = Message.from_slice(TransactionHelper.kernel_sig_msg(tx.fee, tx.lock_height)) ;
-            var sig = ctx.Keychain.Sign_with_blinding(msg, blind_sum) ;
+            var msg = Message.from_slice(TransactionHelper.kernel_sig_msg(tx.fee, tx.lock_height));
+            var sig = ctx.Keychain.Sign_with_blinding(msg, blind_sum);
             tx.excess_sig = sig.serialize_der(ctx.Keychain.Secp);
 
             return (tx, blind_sum);
         }
 
-
-        public static Append initial_tx(Transaction @partial)
+        /// Sets an initial transaction to add to when building a new transaction.
+        public static Append initial_tx(this Context build, Transaction partial)
         {
-            throw new NotImplementedException();
+            return new Append(build.Tx.clone(), build.Sum);
         }
 
-        public static Append with_excess(BlindingFactor blinding)
+        /// Sets a known excess value on the transaction being built. Usually used in
+        /// combination with the initial_tx function when a new transaction is built
+        /// by adding to a pre-existing one.
+        public static Append with_excess(this Context build, BlindingFactor excess)
         {
-            throw new NotImplementedException();
+            return new Append(build.Tx, build.Sum.add_blinding_factor(excess.clone()));
         }
 
-        public static Append output(ulong outAmount, Identifier clone)
+        /// Adds an output with the provided value and key identifier from the
+        /// keychain.
+        public static Append output(this Context build, ulong value, Identifier key_id)
         {
-            throw new NotImplementedException();
+            var commit = build.Keychain.Commit(value, key_id);
+            var switch_commit = build.Keychain.Switch_commit(key_id);
+            var switch_commit_hash = SwitchCommitHash.From_switch_commit(switch_commit);
+            Log.Verbose(
+                "Builder - Pedersen Commit is: {commit}, Switch Commit is: {switch_commit}",
+                commit,
+                switch_commit
+            );
+            Log.Verbose(
+                "Builder - Switch Commit Hash is: {switch_commit_hash}",
+                switch_commit_hash
+            );
+            var msg = ProofMessage.empty();
+            var rproof = build.Keychain.Range_proof(value, key_id, commit, msg);
+
+            return new Append(
+                build.Tx.with_output(new Output
+                {
+                    features = OutputFeatures.DEFAULT_OUTPUT,
+                    commit = commit,
+                    switch_commit_hash = switch_commit_hash,
+                    proof = rproof
+                })
+                ,
+                build.Sum.add_key_id(key_id.Clone()));
+        }
+
+        /// Adds an input with the provided value and blinding key to the transaction
+        /// being built.
+        public static Append input(this Context build, ulong value, Identifier key_id)
+        {
+          var commit = build.Keychain.Commit(value, key_id);
+            return new Append(build.Tx.with_input(new Input(commit)), build.Sum.sub_key_id(key_id.Clone()));
+        }
+
+        /// Sets the fee on the transaction being built.
+        public static Append with_fee(this Context build, ulong fee)
+        {
+            return new Append(build.Tx.with_fee(fee),build.Sum);
         }
     }
 }

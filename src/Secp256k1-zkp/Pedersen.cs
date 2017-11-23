@@ -13,6 +13,11 @@ namespace Secp256k1Proxy
             Value = value;
         }
 
+        public static Commitment from(byte[] value)
+        {
+            return new Commitment(value);
+        }
+        
         /// Builds a Hash from a byte vector. If the vector is too short, it will be
         /// completed by zeroes. If it's too long, it will be truncated.
         public static Commitment from_vec(byte[] v)

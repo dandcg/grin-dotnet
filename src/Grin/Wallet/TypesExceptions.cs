@@ -36,5 +36,10 @@ namespace Grin.Wallet
             this.recipient_fee = recipient_fee;
         }
     }
+
+    public class OddFeeException : ApplicationException
+    {
+        
+    }
 }
 

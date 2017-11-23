@@ -124,6 +124,9 @@
       <NamedTestSelector>
         <TestName>Grin.Tests.Unit.CoreTests.Core.TransactionTests.test_output_ser_deser</TestName>
       </NamedTestSelector>
+      <FixtureTestSelector>
+        <FixtureName>Grin.Tests.Unit.CoreTests.Core.BuildTests</FixtureName>
+      </FixtureTestSelector>
     </IgnoredTests>
     <ImplicitProjectDependencyPathsRelativeToSolutionDirectory />
     <UseCPUArchitecture>AutoDetect</UseCPUArchitecture>

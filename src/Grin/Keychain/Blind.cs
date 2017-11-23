@@ -25,6 +25,11 @@ namespace Grin.Keychain
         {
             return new BlindingFactor(SecretKey.from_slice(secp, data));
         }
+
+        public BlindingFactor clone()
+        {
+            return new BlindingFactor(Key.clone());
+        }
     }
 
     public class BlindSum

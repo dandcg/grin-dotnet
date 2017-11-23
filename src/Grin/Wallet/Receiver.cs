@@ -240,13 +240,15 @@ namespace Grin.Wallet
             var out_amount = amount - fee;
 
 
-            var (tx_final, _) = Build.transaction(
-                new[]
-                {
-                    Build.initial_tx(partial),
-                    Build.with_excess(blinding),
-                    Build.output(out_amount, key_id.Clone())
-                }, keychain);
+            var (tx_final, _) = Build.transaction(new Func<Context, Append>[]
+            {
+
+                c => c.initial_tx(partial),
+                c => c.with_excess(blinding),
+                c => c.output(out_amount, key_id.Clone())
+            }
+
+        , keychain);
 
             // make sure the resulting transaction is valid (could have been lied to on excess).
             tx_final.validate(keychain.Secp);

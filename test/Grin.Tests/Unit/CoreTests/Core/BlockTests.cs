@@ -28,7 +28,7 @@ namespace Grin.Tests.Unit.CoreTests.Core
 
             Append append=null;
 
-            var (tx, _) = Build.transaction(new Append[] {append}, keychain);
+            var (tx, _) = Build.transaction(new Func<Context, Append>[]{}, keychain);
 
             return tx;
 

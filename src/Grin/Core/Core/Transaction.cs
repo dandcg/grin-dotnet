@@ -1,7 +1,9 @@
 ﻿using System;
 using Grin.Keychain;
+using Grin.Wallet;
 using Konscious.Security.Cryptography;
 using Secp256k1Proxy;
+using Serilog;
 
 namespace Grin.Core.Core
 {
@@ -29,8 +31,8 @@ namespace Grin.Core.Core
             }
 
 
-            Array.Copy(feeBytes, 1, bytes, 16, 8);
-            Array.Copy(lockHeightBytes, 1, bytes, 24, 8);
+            Array.Copy(feeBytes, 0, bytes, 15, 8);
+            Array.Copy(lockHeightBytes, 0, bytes, 23, 8);
 
 
             return bytes;
@@ -169,6 +171,8 @@ namespace Grin.Core.Core
                 newIns[i] = inputs[i];
             }
 
+            newIns[newIns.Length - 1] = input;
+
             return new Transaction
             {
                 inputs = newIns,
@@ -186,11 +190,11 @@ namespace Grin.Core.Core
         {
             var newOuts = new Output[outputs.Length + 1];
 
-            for (var i = 0; i < inputs.Length; i++)
+            for (var i = 0; i < outputs.Length; i++)
             {
                 newOuts[i] = outputs[i];
             }
-
+            newOuts[newOuts.Length - 1] =output;
 
             return new Transaction
             {
@@ -231,9 +235,101 @@ namespace Grin.Core.Core
             outputs = Ser.read_and_verify_sorted<Output>(reader, output_len);
         }
 
-        public void validate(Secp256k1 keychainSecp)
+
+        /// Builds a new transaction with the provided fee.
+        public Transaction with_fee(ulong newfee)
         {
-            throw new NotImplementedException();
+            var res = new Transaction
+            {
+                inputs = inputs,
+                outputs = outputs,
+                fee = newfee,
+                lock_height = lock_height,
+                excess_sig = excess_sig
+            };
+            return res;
+        }
+
+        /// Builds a new transaction with the provided lock_height.
+        public Transaction with_lock_height(ulong new_lock_height)
+        {
+            var res = new Transaction
+            {
+                inputs = inputs,
+                outputs = outputs,
+                fee = fee,
+                lock_height = new_lock_height,
+                excess_sig = excess_sig
+            };
+            return res;
+        }
+
+        /// The verification for a MimbleWimble transaction involves getting the
+        /// excess of summing all commitments and using it as a public key
+        /// to verify the embedded signature. The rational is that if the values
+        /// sum to zero as they should in r.G + v.H then only k.G the excess
+        /// of the sum of r.G should be left. And r.G is the definition of a
+        /// public key generated using r as a private key.
+        public TxKernel verify_sig(Secp256k1 secp)
+
+        {
+            var rsum = Committed.sum_commitments(secp, outputs, inputs, (long) fee);
+
+            var msg = Message.from_slice(TransactionHelper.kernel_sig_msg(fee, lock_height));
+            var sig = Signiture.from_der(secp, excess_sig);
+
+            // pretend the sum is a public key (which it is, being of the form r.G) and
+            // verify the transaction sig with it
+            //
+            // we originally converted the commitment to a key_id here (commitment to zero)
+            // and then passed the key_id to secp.verify()
+            // the secp api no longer allows us to do this so we have wrapped the complexity
+            // of generating a public key from a commitment behind verify_from_commit
+
+            secp.verify_from_commit(msg, sig, rsum);
+
+            var kernel = new TxKernel
+            {
+                features = KernelFeatures.DEFAULT_KERNEL,
+                excess = rsum,
+                excess_sig = excess_sig,
+                fee = fee,
+                lock_height = lock_height
+            };
+            Log.Debug(
+                "tx verify_sig: fee - {fee}, lock_height - {lock_height}",
+                kernel.fee,
+                kernel.lock_height
+            );
+
+            return kernel;
+        }
+
+
+        public void validate(Secp256k1 secp)
+        {
+            if ((fee & 1) != 0)
+            {
+                throw new OddFeeException();
+            }
+            foreach (var outp in outputs)
+            {
+                outp.Verify_proof(secp);
+            }
+            verify_sig(secp);
+        }
+
+        public Transaction clone()
+        {
+            var res = new Transaction
+            {
+                inputs = inputs,
+                outputs = outputs,
+                fee = fee,
+                lock_height = lock_height,
+                excess_sig = excess_sig
+            };
+            return res;
         }
     }
 
@@ -242,6 +338,16 @@ namespace Grin.Core.Core
     /// transaction.
     public class Input : IReadable, IWriteable, IHashed
     {
+        public Input()
+        {
+            
+        }
+
+        public Input(Commitment value)
+        {
+            Value = value;
+        }
+ 
         public Commitment Value { get; private set; }
 
         public void read(IReader reader)
@@ -281,6 +387,8 @@ namespace Grin.Core.Core
     /// Definition of the switch commitment hash
     public class SwitchCommitHash : IReadable, IWriteable
     {
+
+
         public byte[] hash { get; private set; } //: [u8; SWITCH_COMMIT_HASH_SIZE],
 
         public static SwitchCommitHash From_switch_commit(Commitment switchCommit)
@@ -331,6 +439,12 @@ namespace Grin.Core.Core
     /// and is stored and committed to separately.
     public class Output : IReadable, IWriteable, IHashed
     {
+    
+        public Output()
+        {
+            
+        }
+
         /// Options for an output's structure or use
         public OutputFeatures features { get; set; }
 
