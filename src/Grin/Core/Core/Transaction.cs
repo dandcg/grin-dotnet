@@ -230,6 +230,11 @@ namespace Grin.Core.Core
             inputs = Ser.read_and_verify_sorted<Input>(reader, input_len);
             outputs = Ser.read_and_verify_sorted<Output>(reader, output_len);
         }
+
+        public void validate(Secp256k1 keychainSecp)
+        {
+            throw new NotImplementedException();
+        }
     }
 
 

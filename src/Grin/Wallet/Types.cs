@@ -23,6 +23,23 @@ namespace Grin.Wallet
         public const string SEED_FILE = "wallet.seed";
 
         public const ulong DEFAULT_BASE_FEE = 10;
+
+        /// Transaction fee calculation
+        public static UInt64 tx_fee(uint input_len, uint output_len, uint? base_fee)
+        {
+            var use_base_fee = base_fee ?? DEFAULT_BASE_FEE;
+
+
+
+           var tx_weight = -1 * ((int) input_len) + 4 * ((int)output_len) + 1;
+            if (tx_weight< 1) {
+                tx_weight = 1;
+            }
+
+            return ((UInt64) tx_weight) * use_base_fee;
+        }
+
+
     }
 
     /// Wallet errors, mostly wrappers around underlying crypto or I/O errors.

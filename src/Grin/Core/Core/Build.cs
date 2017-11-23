@@ -87,5 +87,19 @@ namespace Grin.Core.Core
         }
 
 
+        public static Append initial_tx(Transaction @partial)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static Append with_excess(BlindingFactor blinding)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static Append output(ulong outAmount, Identifier clone)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
