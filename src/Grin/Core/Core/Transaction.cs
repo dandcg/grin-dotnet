@@ -1,5 +1,4 @@
 ﻿using System;
-using Common;
 using Grin.Keychain;
 using Konscious.Security.Cryptography;
 using Secp256k1Proxy;
@@ -90,13 +89,11 @@ namespace Grin.Core.Core
 
         public void write(IWriter writer)
         {
-
             writer.write_u8((byte) features);
-     writer.write_u64(fee);
+            writer.write_u64(fee);
             writer.write_u64(lock_height);
             excess.WriteCommitment(writer);
             writer.write_bytes(excess_sig);
-    
         }
 
         public void read(IReader reader)
@@ -160,6 +157,52 @@ namespace Grin.Core.Core
             };
         }
 
+
+        /// Builds a new transaction with the provided inputs added. Existing
+        /// inputs, if any, are kept intact.
+        public Transaction with_input(Input input)
+        {
+            var newIns = new Input[inputs.Length + 1];
+
+            for (var i = 0; i < inputs.Length; i++)
+            {
+                newIns[i] = inputs[i];
+            }
+
+            return new Transaction
+            {
+                inputs = newIns,
+                outputs = outputs,
+                fee = fee,
+                lock_height = lock_height,
+                excess_sig = excess_sig
+            };
+        }
+
+        /// Builds a new transaction with the provided output added. Existing
+        /// outputs, if any, are kept intact.
+        public Transaction with_output(Output output)
+
+        {
+            var newOuts = new Output[outputs.Length + 1];
+
+            for (var i = 0; i < inputs.Length; i++)
+            {
+                newOuts[i] = outputs[i];
+            }
+
+
+            return new Transaction
+            {
+                inputs = inputs,
+                outputs = newOuts,
+                fee = fee,
+                lock_height = lock_height,
+                excess_sig = excess_sig
+            };
+        }
+
+
         public void write(IWriter writer)
         {
             writer.write_u64(fee);
@@ -183,7 +226,7 @@ namespace Grin.Core.Core
 
             var input_len = reader.read_u64();
             var output_len = reader.read_u64();
-            
+
             inputs = Ser.read_and_verify_sorted<Input>(reader, input_len);
             outputs = Ser.read_and_verify_sorted<Output>(reader, output_len);
         }
@@ -194,16 +237,16 @@ namespace Grin.Core.Core
     /// transaction.
     public class Input : IReadable, IWriteable, IHashed
     {
-        public Commitment Value { get; }
+        public Commitment Value { get; private set; }
 
         public void read(IReader reader)
         {
-            throw new NotImplementedException();
+            Value = Ser.ReadCommitment(reader);
         }
 
         public void write(IWriter writer)
         {
-            throw new NotImplementedException();
+            Value.WriteCommitment(writer);
         }
 
         public Hash hash()
@@ -333,10 +376,7 @@ namespace Grin.Core.Core
             if (writer.serialization_mode() == SerializationMode.Full)
             {
                 writer.write_bytes(proof.Proof);
-
             }
-
-
         }
 
         public Hash hash()
@@ -352,12 +392,31 @@ namespace Grin.Core.Core
 
 
     /// Wrapper to Output commitments to provide the Summable trait.
-    public class SumCommit
+    public class SumCommit : IWriteable, IReadable
     {
         /// Output commitment
-        public Commitment commit { get; }
+        public Commitment commit { get; private set; }
 
         /// Secp256k1 used to sum
-        public Secp256k1 secp { get; }
+        public Secp256k1 secp { get; private set; }
+
+
+        public void write(IWriter writer)
+        {
+            commit.WriteCommitment(writer);
+        }
+
+        public void read(IReader reader)
+        {
+            secp = Secp256k1.WithCaps(ContextFlag.Commit);
+            commit = Ser.ReadCommitment(reader);
+        }
+
+
+        public SumCommit add(SumCommit other)
+
+        {
+            throw new NotImplementedException();
+        }
     }
 }
