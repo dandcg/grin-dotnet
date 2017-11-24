@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Grin.Keychain;
 using Grin.Wallet;
 using Konscious.Security.Cryptography;
@@ -214,6 +215,19 @@ namespace Grin.Core.Core
             writer.write_bytes(excess_sig);
             writer.write_u64((ulong) inputs.Length);
             writer.write_u64((ulong) outputs.Length);
+
+            var inputsSorted = inputs.OrderBy(o => o.hash().Hex);
+            foreach (var input in inputsSorted)
+            {
+                input.write(writer);
+            }
+
+            var outputsSorted = outputs.OrderBy(o => o.hash().Hex);
+            foreach (var output in outputsSorted)
+            {
+                output.write(writer);
+            }
+
         }
 
         public static Transaction readnew(IReader reader)
@@ -336,7 +350,7 @@ namespace Grin.Core.Core
 
     /// A transaction input, mostly a reference to an output being spent by the
     /// transaction.
-    public class Input : IReadable, IWriteable, IHashed
+    public class Input : IReadable, IWriteable
     {
         public Input()
         {
@@ -360,15 +374,6 @@ namespace Grin.Core.Core
             Value.WriteCommitment(writer);
         }
 
-        public Hash hash()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Hash hash_with(IWriteable other)
-        {
-            throw new NotImplementedException();
-        }
     }
 
 
@@ -437,7 +442,7 @@ namespace Grin.Core.Core
     /// The hash of an output only covers its features, lock_height, commitment,
     /// and switch commitment. The range proof is expected to have its own hash
     /// and is stored and committed to separately.
-    public class Output : IReadable, IWriteable, IHashed
+    public class Output : IReadable, IWriteable
     {
     
         public Output()
@@ -498,15 +503,7 @@ namespace Grin.Core.Core
             }
         }
 
-        public Hash hash()
-        {
-            throw new NotImplementedException();
-        }
 
-        public Hash hash_with(IWriteable other)
-        {
-            throw new NotImplementedException();
-        }
     }
 
 

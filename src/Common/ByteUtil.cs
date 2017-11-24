@@ -53,7 +53,7 @@ namespace Common
 
 
 
-        public static void Print(this byte[] bytes)
+        public static string AsString(this byte[] bytes)
         {
             var sb = new StringBuilder("");
             foreach (var b in bytes)
@@ -61,7 +61,7 @@ namespace Common
                 sb.Append(b + ", ");
             }
             sb.Remove(sb.Length - 2, 2);
-            Console.WriteLine(sb.ToString());
+            return sb.ToString();
         }
 
 

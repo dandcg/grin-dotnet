@@ -33,7 +33,7 @@ namespace Grin.Tests.Unit.CoreTests.Core
             Ser.serialize(stream, kernel);
 
             Console.WriteLine("-------");
-            stream.ToArray().Print();
+            Console.WriteLine(stream.ToArray().AsString());
             Console.WriteLine("-------");
 
             stream.Position = 0;
@@ -59,7 +59,7 @@ namespace Grin.Tests.Unit.CoreTests.Core
             Ser.serialize(stream, kernel);
 
             Console.WriteLine("-------");
-            stream.ToArray().Print();
+            Console.WriteLine(stream.ToArray().AsString());
             Console.WriteLine("-------");
 
             stream.Position = 0;
@@ -94,7 +94,7 @@ namespace Grin.Tests.Unit.CoreTests.Core
             Ser.serialize(stream, outp);
 
             Console.WriteLine("-------");
-            stream.ToArray().Print();
+            Console.WriteLine(stream.ToArray().AsString());
             Console.WriteLine("-------");
 
             stream.Position = 0;

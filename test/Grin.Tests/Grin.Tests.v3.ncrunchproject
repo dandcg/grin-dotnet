@@ -127,6 +127,9 @@
       <FixtureTestSelector>
         <FixtureName>Grin.Tests.Unit.CoreTests.Core.BuildTests</FixtureName>
       </FixtureTestSelector>
+      <NamedTestSelector>
+        <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.test_zero_commit_fails</TestName>
+      </NamedTestSelector>
     </IgnoredTests>
     <ImplicitProjectDependencyPathsRelativeToSolutionDirectory />
     <UseCPUArchitecture>AutoDetect</UseCPUArchitecture>

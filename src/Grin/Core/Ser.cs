@@ -237,6 +237,8 @@ namespace Grin.Core
     }
 
 
+
+
     /// Trait that every type that can be deserialized from binary must implement.
     /// Reads directly to a Reader, a utility type thinly wrapping an
     /// underlying Read implementation.
@@ -255,7 +257,7 @@ namespace Grin.Core
         /// A consensus rule requires everything is sorted lexicographically to avoid
         /// leaking any information through specific ordering of items.
         public static T[] read_and_verify_sorted<T>(IReader reader, ulong count)
-            where T : IReadable, IHashed, IWriteable, new()
+            where T : IReadable, IWriteable, new()
         {
             var result = new List<T>();
 
@@ -340,7 +342,12 @@ namespace Grin.Core
         {
             writer.write_fixed_bytes(identifier.Bytes);
         }
-    }
+
+
+
+
+
+}
 
 
     /// Utility wrapper for an underlying byte Writer. Defines higher level methods
