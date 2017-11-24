@@ -6,6 +6,14 @@ namespace Secp256k1Proxy
 {
     public class Commitment
     {
+
+        public override string ToString()
+        {
+
+            return Value.AsString();
+
+        }
+
         public byte[] Value { get; }
 
         internal Commitment(byte[] value)
