@@ -7,27 +7,23 @@ namespace Grin.Tests.Unit.CoreTests.Core
 {
     public class BlockTests
     {
-
-  
-    
-            // utility to create a block without worrying about the key or previous
-            // header
-        private Block new_block(Transaction[]  txs, Keychain.Keychain keychain)
+        // utility to create a block without worrying about the key or previous
+        // header
+        private Block new_block(Transaction[] txs, Keychain.Keychain keychain)
         {
-		var key_id = keychain.Derive_key_id(1);
+            var key_id = keychain.Derive_key_id(1);
             return Block.New(BlockHeader.Default(), txs, keychain, key_id);
-
         }
 
-    // utility producing a transaction that spends an output with the provided
-    // value and blinding key
-        private Transaction txspend1i1o(UInt64 v, Keychain.Keychain keychain, Identifier key_id1, Identifier key_id2)
+        // utility producing a transaction that spends an output with the provided
+        // value and blinding key
+        private Transaction txspend1i1o(ulong v, Keychain.Keychain keychain, Identifier key_id1, Identifier key_id2)
         {
             var (tx, _) = Build.transaction(new Func<Context, Append>[]
             {
-                c=>c.input(v, key_id1),
-                c =>c.output(3, key_id2),
-                c =>c.with_fee(2)
+                c => c.input(v, key_id1),
+                c => c.output(3, key_id2),
+                c => c.with_fee(2)
             }, keychain);
 
             return tx;
@@ -61,39 +57,35 @@ namespace Grin.Tests.Unit.CoreTests.Core
         //    assert!(b.validate(&keychain.secp()).is_err());
         //}
 
-[Fact]
+        [Fact]
         // builds a block with a tx spending another and check if merging occurred
-   public void compactable_block()
-{
-    var keychain = Keychain.Keychain.From_random_seed();
-           var key_id1 = keychain.Derive_key_id(1);
-    var key_id2 = keychain.Derive_key_id(2);
-    var key_id3 = keychain.Derive_key_id(3);
+        public void compactable_block()
+        {
+            var keychain = Keychain.Keychain.From_random_seed();
+            var key_id1 = keychain.Derive_key_id(1);
+            var key_id2 = keychain.Derive_key_id(2);
+            var key_id3 = keychain.Derive_key_id(3);
 
             var btx1 = ModTests.tx2i1o();
             var(btx2, _) = Build.transaction(new Func<Context, Append>[]
                 {
-
-                  c=>c.input(7, key_id1), c=>c.output(5, key_id2.Clone()), c=>c.with_fee(2)
-
-
-                }, 
-                        
-                        keychain
-
-
-                    );
+                    c => c.input(7, key_id1),
+                    c => c.output(5, key_id2.Clone()),
+                    c => c.with_fee(2)
+                },
+                keychain
+            );
 
             // spending tx2 - reuse key_id2
 
             var btx3 = txspend1i1o(5, keychain, key_id2.Clone(), key_id3);
-           var b = new_block(new []{ btx1, btx2, btx3}, keychain);
+            var b = new_block(new[] {btx1, btx2, btx3}, keychain);
 
             // block should have been automatically compacted (including reward
             // output) and should still be valid
             b.validate(keychain.Secp);
-Assert.Equal(b.inputs.Length, 3);
-    Assert.Equal(b.outputs.Length, 3);
+            Assert.Equal(b.inputs.Length, 3);
+            Assert.Equal(b.outputs.Length, 3);
         }
 
         //#[test]

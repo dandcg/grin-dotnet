@@ -197,15 +197,15 @@ namespace Grin.Tests.Unit.CoreTests.Core
             tx_final.validate(keychain.Secp);
         }
 
-        //[Fact]
-        //public void reward_empty_block()
-        //{
-        //    var keychain = Keychain.Keychain.From_random_seed();
-        //    var key_id = keychain.Derive_key_id(1);
+        [Fact]
+        public void reward_empty_block()
+        {
+            var keychain = Keychain.Keychain.From_random_seed();
+            var key_id = keychain.Derive_key_id(1);
 
-        //    var b = Block.New(BlockHeader.Default(), new Transaction[0], keychain, key_id);
-        //    b.Compact().validate(keychain.Secp);
-        //}
+            var b = Block.New(BlockHeader.Default(), new Transaction[0], keychain, key_id);
+            b.compact().validate(keychain.Secp);
+        }
 
         //[Fact]
         //        public void reward_with_tx_block()

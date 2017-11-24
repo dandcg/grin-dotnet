@@ -83,7 +83,10 @@ namespace Grin.Core
         /// The proofsize
         public static uint proofsize()
         {
-            throw new NotImplementedException();
+
+            return AUTOMATED_TESTING_PROOF_SIZE;
+
+           // throw new NotImplementedException();
             //        let param_ref = MINING_PARAMETER_MODE.read().unwrap();
 
             //match* param_ref
