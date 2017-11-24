@@ -55,13 +55,17 @@ namespace Common
 
         public static string AsString(this byte[] bytes)
         {
-            var sb = new StringBuilder("");
-            foreach (var b in bytes)
-            {
-                sb.Append(b + ", ");
-            }
-            sb.Remove(sb.Length - 2, 2);
-            return sb.ToString();
+            //var sb = new StringBuilder("{");
+            //foreach (var b in bytes)
+            //{
+            //    sb.Append(b + ", ");
+            //}
+            //sb.Remove(sb.Length - 2, 2);
+            //sb.Append("}");
+            //return sb.ToString();
+
+            return HexUtil.to_hex(bytes);
+
         }
 
 

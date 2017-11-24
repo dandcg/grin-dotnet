@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Common;
 using Grin.Keychain;
 using Grin.Wallet;
 using Konscious.Security.Cryptography;
@@ -393,7 +394,12 @@ namespace Grin.Core.Core
     public class SwitchCommitHash : IReadable, IWriteable
     {
 
+        public override string ToString()
+        {
 
+            return hash.AsString();
+
+        }
         public byte[] hash { get; private set; } //: [u8; SWITCH_COMMIT_HASH_SIZE],
 
         public static SwitchCommitHash From_switch_commit(Commitment switchCommit)

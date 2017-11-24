@@ -59,7 +59,7 @@ namespace Grin.Core.Core
         /// with_fee(1)], keychain).unwrap();
         /// let (tx2, _) = build::transaction(vec![initial_tx(tx1), with_excess(sum),
         /// output_rand(2)], keychain).unwrap();
-        public static (Transaction, BlindingFactor) transaction(Func<Context,Append>[] elems,Keychain.Keychain keychain)
+        public static (Transaction transaction, BlindingFactor blindingFactor) transaction(Func<Context,Append>[] elems,Keychain.Keychain keychain)
 
         {
             var tx = Transaction.Empty();
@@ -69,7 +69,7 @@ namespace Grin.Core.Core
             foreach (var elem in elems)
             {
                 var append = elem(ctx);
-                tx = ctx.Tx = append.Transaction;
+                tx = ctx.Tx = append.Transaction.clone();
                 sum = ctx.Sum = append.Blind;
             }
 
@@ -82,9 +82,9 @@ namespace Grin.Core.Core
         }
 
         /// Sets an initial transaction to add to when building a new transaction.
-        public static Append initial_tx(this Context build, Transaction partial)
+        public static Append initial_tx(this Context build, Transaction tx)
         {
-            return new Append(build.Tx.clone(), build.Sum);
+            return new Append(tx.clone(), build.Sum);
         }
 
         /// Sets a known excess value on the transaction being built. Usually used in

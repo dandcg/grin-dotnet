@@ -261,7 +261,7 @@ namespace Grin.Core
         {
             var result = new List<T>();
 
-            for (ulong i = 0; i <= count; i++)
+            for (ulong i = 0; i < count; i++)
             {
                 var t = new T();
                 t.read(reader);

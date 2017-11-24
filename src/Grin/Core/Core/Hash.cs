@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using Common;
 using Konscious.Security.Cryptography;
@@ -40,6 +42,20 @@ namespace Grin.Core.Core
         public void write(IWriter writer)
         {
             writer.write_fixed_bytes(Value);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is Hash other))
+            {
+                return false;
+            }
+            return (this.Hex == other.Hex);
+        }
+
+        public override int GetHashCode()
+        {
+            return Hex.GetHashCode();
         }
     }
 

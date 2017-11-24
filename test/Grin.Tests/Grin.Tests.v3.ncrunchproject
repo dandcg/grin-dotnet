@@ -130,6 +130,24 @@
       <NamedTestSelector>
         <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.test_zero_commit_fails</TestName>
       </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.tx_double_ser_deser</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.simple_tx_ser_deser</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.simple_tx_ser</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.hash_output</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.blind_tx</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.tx_hash_diff</TestName>
+      </NamedTestSelector>
     </IgnoredTests>
     <ImplicitProjectDependencyPathsRelativeToSolutionDirectory />
     <UseCPUArchitecture>AutoDetect</UseCPUArchitecture>
