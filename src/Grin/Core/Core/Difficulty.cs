@@ -2,7 +2,7 @@
 
 namespace Grin.Core.Core
 {
-    public class Difficulty
+    public class Difficulty:IWriteable,IReadable
     {
         public UInt64 num { get; set; }
 
@@ -16,7 +16,29 @@ namespace Grin.Core.Core
             throw new NotImplementedException();
         }
 
-        public void Clone()
+        public Difficulty Clone()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void write(IWriter writer)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void read(IReader reader)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static Difficulty readnew(IReader reader)
+        {
+            throw new NotImplementedException();
+        }
+
+
+
+        public static Difficulty From_hash(Hash hash)
         {
             throw new NotImplementedException();
         }

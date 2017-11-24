@@ -70,7 +70,7 @@ namespace Grin.Core
         public const uint MAX_BLOCK_WEIGHT = 80_000;
 
         /// Whether a block exceeds the maximum acceptable weight
-        public bool exceeds_weight(uint input_len, uint output_len, uint kernel_len)
+        public static bool exceeds_weight(uint input_len, uint output_len, uint kernel_len)
 
         {
             return input_len * BLOCK_INPUT_WEIGHT + output_len * BLOCK_OUTPUT_WEIGHT +

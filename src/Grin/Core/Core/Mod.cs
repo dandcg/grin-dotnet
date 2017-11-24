@@ -18,12 +18,12 @@ namespace Grin.Core.Core
   
 
         /// Gathers commitments and sum them.
-       public static Commitment sum_commitments(Secp256k1 secp, Output[] outputs, Input[] inputs, Int64 overage)
+       public static Commitment sum_commitments(this ICommitted committed ,Secp256k1 secp)
         {
 
             // first, verify each range proof
           
-            foreach (var output in outputs)
+            foreach (var output in committed.outputs_committed())
             {
                 output.Verify_proof(secp);
             }
@@ -33,13 +33,13 @@ namespace Grin.Core.Core
             var inputCommits = new List<Commitment>();
 
      
-            foreach (var input in inputs)
+            foreach (var input in committed.inputs_commited())
             {
                inputCommits.Add(input.Value);
 
             }
             var outputCommits = new List<Commitment>();
-            foreach (var output in outputs)
+            foreach (var output in committed.outputs_committed())
             {
               outputCommits.Add(output.commit);
 
@@ -49,10 +49,10 @@ namespace Grin.Core.Core
             // add the overage as output commitment if positive, as an input commitment if
             // negative
      
-            if (overage != 0)
+            if (committed.overage() != 0)
             {
-                var over_commit = secp.commit_value((UInt64)Math.Abs(overage));
-                if (overage < 0)
+                var over_commit = secp.commit_value((UInt64)Math.Abs(committed.overage()));
+                if (committed.overage() < 0)
                 {
                     inputCommits.Add(over_commit);
                 }
@@ -70,21 +70,99 @@ namespace Grin.Core.Core
     }
 
 
-    public class Proof
+    public class Proof:IWriteable,IReadable
+        
     {
-        /// The nonces
-        public UInt32[] nonces { get; }
-        /// The proof size
-        public int proof_size { get; set; }
+        private Proof()
+        {
+            
+        }
 
+        /// The nonces
+        public UInt32[] nonces { get; private set; }
+        /// The proof size
+        public int proof_size { get; private set; }
+
+        /// Builds a proof with all bytes zeroed out
+        public static Proof New(uint proofSize)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// Builds a proof with all bytes zeroed out
         public static Proof Zero(uint proofSize)
         {
             throw new NotImplementedException();
         }
 
 
+        /// Converts the proof to a vector of u64s
+        public UInt64[] to_u64s()
+        {
+        var out_nonces = new UInt64[proof_size];
+
+            for (var n = 0; n < proof_size; n++)
+            {
+                out_nonces[n] = (UInt64) nonces[n];
+            }
+
+            return out_nonces;
+        }
+
+        /// Converts the proof to a vector of u32s
+        public UInt32[] to_u32s()
+        {
+            return Clone().nonces;
+        }
+
+        /// Converts the proof to a proof-of-work Target so they can be compared.
+        /// Hashes the Cuckoo Proof data.
+        public Difficulty to_difficulty()
+        {
+            return Difficulty.From_hash(this.hash());
+        }
 
 
 
+
+        public void write(IWriter writer)
+        {
+            for (var n=0; n<proof_size; n++)
+            {
+           writer.write_u32(nonces[n]);
+            }
+        }
+
+        public void read(IReader reader)
+        {
+            var proof_size =Global.proofsize();
+            var pow = new uint[ proof_size];
+
+            for (var n = 0; n < proof_size; n++)
+            {
+                pow[n] =reader.read_u32();
+            }
+        }
+
+        public static Proof readnew(IReader reader)
+        {
+            var proof = new Proof();
+            proof.read(reader);
+            return proof;
+        }
+
+
+        public Proof Clone()
+        {
+          var out_nonces = new List<uint>();
+
+            foreach (var n in nonces)
+            {
+                out_nonces.Add(n);
+            }
+
+            return new Proof() {nonces = out_nonces.ToArray(), proof_size = out_nonces.Count};
+
+        }
     }
 }

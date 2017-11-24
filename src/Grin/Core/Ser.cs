@@ -236,7 +236,16 @@ namespace Grin.Core
         void write_sorted(IWriter writer);
     }
 
+    public interface ICommitted
+    {
 
+        Input[] inputs_commited();
+
+        Output[] outputs_committed();
+
+        Int64 overage();
+
+    }
 
 
     /// Trait that every type that can be deserialized from binary must implement.
@@ -344,10 +353,8 @@ namespace Grin.Core
         }
 
 
-
-
-
-}
+  
+    }
 
 
     /// Utility wrapper for an underlying byte Writer. Defines higher level methods

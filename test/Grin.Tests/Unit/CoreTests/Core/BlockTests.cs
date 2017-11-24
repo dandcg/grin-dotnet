@@ -21,17 +21,16 @@ namespace Grin.Tests.Unit.CoreTests.Core
 
     // utility producing a transaction that spends an output with the provided
     // value and blinding key
-        private Transaction txspend1i1o(UInt64 v, Keychain.Keychain keychain, Identifier key_id1, Identifier key_id2
-
-        )
+        private Transaction txspend1i1o(UInt64 v, Keychain.Keychain keychain, Identifier key_id1, Identifier key_id2)
         {
-
-            Append append=null;
-
-            var (tx, _) = Build.transaction(new Func<Context, Append>[]{}, keychain);
+            var (tx, _) = Build.transaction(new Func<Context, Append>[]
+            {
+                c=>c.input(v, key_id1),
+                c =>c.output(3, key_id2),
+                c =>c.with_fee(2)
+            }, keychain);
 
             return tx;
-
         }
 
 
@@ -71,24 +70,30 @@ namespace Grin.Tests.Unit.CoreTests.Core
     var key_id2 = keychain.Derive_key_id(2);
     var key_id3 = keychain.Derive_key_id(3);
 
-    //var btx1 = tx2i1o();
-    //var (mut btx2, _) = Build.transaction(
-    //            vec![input(7, key_id1), output(5, key_id2.clone()), with_fee(2)],
-    //            keychain
-        
+            var btx1 = ModTests.tx2i1o();
+            var(btx2, _) = Build.transaction(new Func<Context, Append>[]
+                {
 
-    //        );
+                  c=>c.input(7, key_id1), c=>c.output(5, key_id2.Clone()), c=>c.with_fee(2)
 
-            //// spending tx2 - reuse key_id2
 
-            //let mut btx3 = txspend1i1o(5, &keychain, key_id2.clone(), key_id3);
-            //let b = new_block(vec![&mut btx1, &mut btx2, &mut btx3], &keychain);
+                }, 
+                        
+                        keychain
 
-            //// block should have been automatically compacted (including reward
-            //// output) and should still be valid
-            //b.validate(&keychain.secp()).unwrap();
-            //assert_eq!(b.inputs.len(), 3);
-            //assert_eq!(b.outputs.len(), 3);
+
+                    );
+
+            // spending tx2 - reuse key_id2
+
+            var btx3 = txspend1i1o(5, keychain, key_id2.Clone(), key_id3);
+           var b = new_block(new []{ btx1, btx2, btx3}, keychain);
+
+            // block should have been automatically compacted (including reward
+            // output) and should still be valid
+            b.validate(keychain.Secp);
+Assert.Equal(b.inputs.Length, 3);
+    Assert.Equal(b.outputs.Length, 3);
         }
 
         //#[test]

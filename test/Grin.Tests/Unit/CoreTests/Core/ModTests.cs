@@ -203,7 +203,7 @@ namespace Grin.Tests.Unit.CoreTests.Core
         //    var keychain = Keychain.Keychain.From_random_seed();
         //    var key_id = keychain.Derive_key_id(1);
 
-        //    var b = Block.New( BlockHeader.Default(), new Transaction[0], keychain, key_id);
+        //    var b = Block.New(BlockHeader.Default(), new Transaction[0], keychain, key_id);
         //    b.Compact().validate(keychain.Secp);
         //}
 
@@ -319,7 +319,7 @@ namespace Grin.Tests.Unit.CoreTests.Core
 
 
         // utility producing a transaction with 2 inputs and a single outputs
-        public Transaction tx2i1o()
+        public static Transaction tx2i1o()
         {
             var keychain = Keychain.Keychain.From_random_seed();
             var key_id1 = keychain.Derive_key_id(1);
@@ -341,7 +341,7 @@ namespace Grin.Tests.Unit.CoreTests.Core
         }
 
         // utility producing a transaction with a single input and output
-        public Transaction tx1i1o()
+        public static Transaction tx1i1o()
         {
             var keychain = Keychain.Keychain.From_random_seed();
             var key_id1 = keychain.Derive_key_id(1);

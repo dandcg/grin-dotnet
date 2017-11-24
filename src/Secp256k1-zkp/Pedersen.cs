@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 using Common;
 
@@ -16,9 +17,12 @@ namespace Secp256k1Proxy
 
         public byte[] Value { get; }
 
+        public string Hex { get; }
+
         internal Commitment(byte[] value)
         {
             Value = value;
+            Hex = HexUtil.to_hex(value);
         }
 
         public static Commitment from(byte[] value)
@@ -85,6 +89,13 @@ namespace Secp256k1Proxy
         {
             return PublicKey.from_slice(secp, Value);
         }
+
+
+        public Commitment Clone()
+        {
+            return new Commitment(Value.ToArray());
+        }
+
     }
 
     public class RangeProof
@@ -117,6 +128,11 @@ namespace Secp256k1Proxy
         public int Len()
         {
             return Plen;
+        }
+
+        public RangeProof Clone()
+        {
+           return new RangeProof(Proof.ToArray(),Plen);
         }
     }
 

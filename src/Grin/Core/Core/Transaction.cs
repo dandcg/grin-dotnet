@@ -108,10 +108,24 @@ namespace Grin.Core.Core
             excess = Ser.ReadCommitment(reader);
             excess_sig = reader.read_vec();
         }
+
+        public TxKernel Clone()
+        {
+            return new TxKernel()
+            {
+                excess =excess.Clone(),
+                excess_sig = excess_sig.ToArray(),
+                features = features,
+                fee=fee,
+                lock_height = lock_height
+
+
+            };
+        }
     }
 
     /// A transaction
-    public class Transaction : IWriteable, IReadable
+    public class Transaction : IWriteable, IReadable, ICommitted
     {
         private Transaction()
         {
@@ -288,7 +302,7 @@ namespace Grin.Core.Core
         public TxKernel verify_sig(Secp256k1 secp)
 
         {
-            var rsum = Committed.sum_commitments(secp, outputs, inputs, (long) fee);
+            var rsum = this.sum_commitments(secp);
 
             var msg = Message.from_slice(TransactionHelper.kernel_sig_msg(fee, lock_height));
             var sig = Signiture.from_der(secp, excess_sig);
@@ -346,6 +360,21 @@ namespace Grin.Core.Core
             };
             return res;
         }
+
+        public Input[] inputs_commited()
+        {
+            return inputs;
+        }
+
+        public Output[] outputs_committed()
+        {
+            return outputs;
+        }
+
+        public long overage()
+        {
+            return (long)fee;
+        }
     }
 
 
@@ -375,6 +404,10 @@ namespace Grin.Core.Core
             Value.WriteCommitment(writer);
         }
 
+        public Input Clone()
+        {
+            return new Input(Value.Clone());
+        }
     }
 
 
@@ -434,6 +467,12 @@ namespace Grin.Core.Core
         {
             writer.write_fixed_bytes(hash);
         }
+
+        public SwitchCommitHash Clone()
+        {
+            return new SwitchCommitHash(){hash=hash.ToArray()};
+        }
+
     }
 
 
@@ -510,6 +549,17 @@ namespace Grin.Core.Core
         }
 
 
+        public Output Clone()
+        {
+            return new Output()
+            {
+                features=features,
+                commit=commit.Clone(),
+                switch_commit_hash= switch_commit_hash.Clone(),
+                proof=proof.Clone()
+
+            };
+        }
     }
 
 

@@ -2,8 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Common;
 using Konscious.Security.Cryptography;
+using Microsoft.AspNetCore.Http;
 using Serilog;
 
 namespace Grin.Core.Core
@@ -20,6 +22,10 @@ namespace Grin.Core.Core
             Hex = HexUtil.to_hex(value);
         }
 
+        private Hash()
+        {
+        }
+
         public override string ToString()
         {
             return Value.AsString();
@@ -32,12 +38,24 @@ namespace Grin.Core.Core
             return new Hash(new byte[32]);
         }
 
+        public static Hash readNew(IReader reader)
+        {
+            var hash=new Hash();
+            hash.read(reader);
+            return hash;
+
+        }
+
+
         public void read(IReader reader)
         {
    var v = reader.read_fixed_bytes(32);
             Value = v;
             Hex = HexUtil.to_hex(v);
         }
+
+
+
 
         public void write(IWriter writer)
         {
@@ -57,6 +75,13 @@ namespace Grin.Core.Core
         {
             return Hex.GetHashCode();
         }
+
+
+        public Hash Clone()
+        {
+            return new Hash(Value.ToArray());
+        }
+
     }
 
     public class HashWriter : WriterBase

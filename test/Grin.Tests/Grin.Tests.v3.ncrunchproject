@@ -112,9 +112,6 @@
       <NamedTestSelector>
         <TestName>Grin.Tests.Unit.CoreTests.Core.TransactionTests.test_output_value_recovery</TestName>
       </NamedTestSelector>
-      <FixtureTestSelector>
-        <FixtureName>Grin.Tests.Unit.CoreTests.Core.BlockTests</FixtureName>
-      </FixtureTestSelector>
       <NamedTestSelector>
         <TestName>Grin.Tests.Integration.WalletTests.ReceiveCoinbase</TestName>
       </NamedTestSelector>
@@ -147,6 +144,15 @@
       </NamedTestSelector>
       <NamedTestSelector>
         <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.tx_hash_diff</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.tx_build_exchange</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.test_verify_2i1o_sig</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.test_verify_1i1o_sig</TestName>
       </NamedTestSelector>
     </IgnoredTests>
     <ImplicitProjectDependencyPathsRelativeToSolutionDirectory />
