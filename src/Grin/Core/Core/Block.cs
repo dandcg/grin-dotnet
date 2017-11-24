@@ -172,7 +172,16 @@ namespace Grin.Core.Core
         /// Only used in tests (to be confirmed, may be wrong here).
         public static Block New(BlockHeader prev, Transaction[] txs, Keychain.Keychain keychain, Identifier keyId)
         {
-            var fees = txs.Select(s => s.fee).Aggregate((t, t1) => t + t1);
+            var txfees = txs.Select(s => s.fee).ToArray();
+
+            ulong fees=0;
+
+            if (txfees.Any())
+            {
+                fees=txfees.Aggregate((t, t1) => t + t1);
+            }
+
+
 
             var (reward_out, reward_proof) = Reward_output(keychain, keyId, fees);
             var block = with_reward(prev, txs, reward_out, reward_proof);

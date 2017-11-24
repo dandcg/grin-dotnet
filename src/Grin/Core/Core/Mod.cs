@@ -81,18 +81,26 @@ namespace Grin.Core.Core
         /// The nonces
         public UInt32[] nonces { get; private set; }
         /// The proof size
-        public int proof_size { get; private set; }
+        public uint proof_size { get; private set; }
 
         /// Builds a proof with all bytes zeroed out
-        public static Proof New(uint proofSize)
+        public static Proof New(UInt32[] in_nonces)
         {
-            throw new NotImplementedException();
+            return new Proof
+            {
+                proof_size = (uint)in_nonces.Length,
+                nonces = in_nonces
+            };
         }
 
         /// Builds a proof with all bytes zeroed out
         public static Proof Zero(uint proofSize)
         {
-            throw new NotImplementedException();
+            return new Proof
+            {
+                proof_size = proofSize,
+                nonces = new UInt32[] {}
+            };
         }
 
 
@@ -161,7 +169,7 @@ namespace Grin.Core.Core
                 out_nonces.Add(n);
             }
 
-            return new Proof() {nonces = out_nonces.ToArray(), proof_size = out_nonces.Count};
+            return new Proof() {nonces = out_nonces.ToArray(), proof_size = (uint)out_nonces.Count};
 
         }
     }
