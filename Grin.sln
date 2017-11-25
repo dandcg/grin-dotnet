@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2008
+VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Grin", "src\Grin\Grin.csproj", "{0B68DC4E-0D06-4588-A920-E9F68697E1EC}"
 EndProject
@@ -12,8 +12,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Secp256k1-zkp.Tests", "test\Secp256k1-zkp.Tests\Secp256k1-zkp.Tests.csproj", "{75DFB988-4BC5-45AB-947C-206922D69D2D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common", "src\Common\Common.csproj", "{9FC543D6-2E96-4151-825D-669243D838B9}"
-EndProject
-Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker\docker-compose.dcproj", "{B3273BB1-E7F0-4002-A6AA-765D1C05EF70}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,10 +39,6 @@ Global
 		{9FC543D6-2E96-4151-825D-669243D838B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9FC543D6-2E96-4151-825D-669243D838B9}.Release|Any CPU.ActiveCfg = Debug|Any CPU
 		{9FC543D6-2E96-4151-825D-669243D838B9}.Release|Any CPU.Build.0 = Debug|Any CPU
-		{B3273BB1-E7F0-4002-A6AA-765D1C05EF70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B3273BB1-E7F0-4002-A6AA-765D1C05EF70}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B3273BB1-E7F0-4002-A6AA-765D1C05EF70}.Release|Any CPU.ActiveCfg = Debug|Any CPU
-		{B3273BB1-E7F0-4002-A6AA-765D1C05EF70}.Release|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
