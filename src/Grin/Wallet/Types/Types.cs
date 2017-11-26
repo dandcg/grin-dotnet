@@ -1,4 +1,5 @@
 using System;
+using Grin.Core;
 using Microsoft.EntityFrameworkCore.ValueGeneration.Internal;
 
 namespace Grin.Wallet
@@ -9,7 +10,7 @@ namespace Grin.Wallet
         public const string LOCK_FILE = "wallet.lock";
         public const string SEED_FILE = "wallet.seed";
 
-        public const ulong DEFAULT_BASE_FEE = 10;
+        public const ulong DEFAULT_BASE_FEE = Consensus.MILLI_GRIN;
 
         /// Transaction fee calculation
         public static UInt64 tx_fee(uint input_len, uint output_len, uint? base_fee)
@@ -30,5 +31,5 @@ namespace Grin.Wallet
     }
 
 
-//#[derive(Debug, Clone, Serialize, Deserialize)]
+
 }

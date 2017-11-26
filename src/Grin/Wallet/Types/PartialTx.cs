@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 namespace Grin.Wallet
 {
-    public class JSONPartialTx
+    public class PartialTx
     {
         public ulong amount { get; private set; }
         public string blind_sum { get; private set; }
@@ -19,7 +19,7 @@ namespace Grin.Wallet
             BlindingFactor blind_sum,
             Transaction tx)
         {
-            var partial_tx = new JSONPartialTx
+            var partial_tx = new PartialTx
             {
                 amount = receive_amount,
                 blind_sum = HexUtil.to_hex(blind_sum.Key.Value),
@@ -35,7 +35,7 @@ namespace Grin.Wallet
         /// factors and the transaction itself.
         public (ulong, BlindingFactor, Transaction) partial_tx_from_json(Keychain.Keychain keychain, string json_str)
         {
-            var partial_tx = JsonConvert.DeserializeObject<JSONPartialTx>(json_str);
+            var partial_tx = JsonConvert.DeserializeObject<PartialTx>(json_str);
             
             var blind_bin = HexUtil.from_hex(partial_tx.blind_sum);
             

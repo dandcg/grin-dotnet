@@ -59,8 +59,10 @@ namespace Grin.Wallet
         }
 
         /// How many confirmations has this output received?
-        /// If height == 0 then we are either Unconfirmed or the output was cut-through
-        /// so we do not actually know how many confirmations this output had (and never will).
+        /// If height == 0 then we are either Unconfirmed or the output was
+        /// cut-through
+        /// so we do not actually know how many confirmations this output had (and
+        /// never will).
         public ulong num_confirmations(ulong current_height)
         {
             if (status == OutputStatus.Unconfirmed)
@@ -71,10 +73,10 @@ namespace Grin.Wallet
             {
                 return 0;
             }
-            return current_height - height;
+            return 1+(current_height - height);
         }
 
-        /// Check if output is eligible for spending based on state and height.
+        /// Check if output is eligible to spend based on state and height and confirmations
         public bool eligible_to_spend(
             ulong current_height,
             ulong minimum_confirmations
@@ -96,7 +98,7 @@ namespace Grin.Wallet
             {
                 return false;
             }
-            if (status == OutputStatus.Unspent && height + minimum_confirmations <= current_height)
+            if (status == OutputStatus.Unspent && height + num_confirmations(current_height) >= minimum_confirmations)
             {
                 return true;
             }

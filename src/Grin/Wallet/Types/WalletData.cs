@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Common.Algo;
 using Grin.Keychain;
 using Newtonsoft.Json;
 using Polly;
@@ -19,10 +20,9 @@ namespace Grin.Wallet
     /// TODO write locks so files don't get overwritten
     public class WalletData
     {
-
         public WalletData()
         {
-            this.outputs = new Dictionary<string, OutputData>();
+            outputs = new Dictionary<string, OutputData>();
         }
 
         public WalletData(Dictionary<string, OutputData> outputs)
@@ -30,7 +30,7 @@ namespace Grin.Wallet
             this.outputs = outputs;
         }
 
-        public Dictionary<string, OutputData> outputs { get; } 
+        public Dictionary<string, OutputData> outputs { get; }
 
         /// Allows for reading wallet data (without needing to acquire the write lock).
         public static T read_wallet<T>(string data_file_dir, Func<WalletData, T> f)
@@ -193,6 +193,13 @@ namespace Grin.Wallet
             outputs.Add(outd.key_id.Hex, outd.clone());
         }
 
+        // TODO - careful with this, only for Unconfirmed (maybe Locked)?
+        public void delete_output(Identifier id)
+        {
+            outputs.Remove(id.Hex);
+        }
+
+
         /// Lock an output data.
         /// TODO - we should track identifier on these outputs (not just n_child)
         public void lock_output(OutputData outd)
@@ -212,18 +219,87 @@ namespace Grin.Wallet
             return outputs[key_id.Hex];
         }
 
-        /// Select spendable coins from the wallet
+        /// Select spendable coins from the wallet.
+        /// Default strategy is to spend the maximum number of outputs (up to max_outputs).
+        /// Alternative strategy is to spend smallest outputs first but only as many as necessary.
+        /// When we introduce additional strategies we should pass something other than a bool in.
         public OutputData[] select(
             Identifier root_key_id,
+            ulong amount,
             ulong current_height,
-            ulong minimum_confirmations
+            ulong minimum_confirmations,
+            uint max_outputs,
+            bool default_strategy
         )
         {
-            return outputs
-                .Values
-                .Where(o => o.root_key_id == root_key_id
-                            && o.eligible_to_spend(current_height, minimum_confirmations)).ToArray();
+            // first find all eligible outputs based on number of confirmations
+            // sort eligible outputs by increasing value
+
+            var eligible = outputs.Values
+                .Where(o => o.root_key_id == root_key_id && o.eligible_to_spend(current_height, minimum_confirmations))
+                .OrderBy(o => o.key_id.Hex)
+                .ToArray();
+
+
+            // use a sliding window to identify potential sets of possible outputs to spend
+            if (eligible.Length > max_outputs)
+            {
+                foreach (var window in eligible.Tuples((int) max_outputs))
+                {
+                    var eligible2 = window.ToArray();
+                    var outputs2 = select_from(amount, default_strategy, eligible2);
+
+                    if (outputs2.Any())
+                    {
+                        return outputs2;
+                    }
+                }
+            }
+            else
+            {
+                var outputs2 = select_from(amount, default_strategy, eligible.Select(s => s.clone()).ToArray());
+                if (outputs2.Any())
+                {
+                    return outputs2;
+                }
+            }
+
+            // we failed to find a suitable set of outputs to spend,
+            // so return the largest amount we can so we can provide guidance on what is possible
+            return eligible.Reverse().Take((int) max_outputs).ToArray();
         }
+
+
+        // Select the full list of outputs if we are using the default strategy.
+        // Otherwise select just enough outputs to cover the desired amount.
+        public OutputData[] select_from(ulong amount, bool select_all, OutputData[] outputs)
+        {
+            var total = outputs.Select(s => s.value).Aggregate((a, b) => a + b);
+
+            if (total >= amount)
+            {
+                if (select_all)
+                {
+                    return outputs;
+                }
+                ulong selected_amount = 0;
+                var output2 = new List<OutputData>();
+                foreach (var o in outputs)
+                {
+                    output2.Add(o);
+                    var res = selected_amount < amount;
+                    selected_amount += o.value;
+                    if (!res)
+                    {
+                        break;
+                    }
+                }
+
+                return output2.ToArray();
+            }
+            return new OutputData[] { };
+        }
+
 
         /// Next child index when we want to create a new output.
         public uint next_child(Identifier root_key_id)
