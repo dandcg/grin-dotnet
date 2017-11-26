@@ -84,8 +84,8 @@ namespace Grin.Tests.Unit.CoreTests.Core
             // block should have been automatically compacted (including reward
             // output) and should still be valid
             b.validate(keychain.Secp);
-            Assert.Equal(b.inputs.Length, 3);
-            Assert.Equal(b.outputs.Length, 3);
+            Assert.Equal(3, b.inputs.Length);
+            Assert.Equal(3, b.outputs.Length);
         }
 
         //#[test]

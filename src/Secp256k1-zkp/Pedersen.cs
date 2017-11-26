@@ -27,7 +27,7 @@ namespace Secp256k1Proxy
 
         public static Commitment from(byte[] value)
         {
-            return new Commitment(value);
+            return new Commitment(value.ToArray());
         }
         
         /// Builds a Hash from a byte vector. If the vector is too short, it will be

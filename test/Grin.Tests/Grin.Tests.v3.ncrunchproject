@@ -154,6 +154,9 @@
       <NamedTestSelector>
         <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.test_verify_1i1o_sig</TestName>
       </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.reward_empty_block</TestName>
+      </NamedTestSelector>
     </IgnoredTests>
     <ImplicitProjectDependencyPathsRelativeToSolutionDirectory />
     <UseCPUArchitecture>AutoDetect</UseCPUArchitecture>

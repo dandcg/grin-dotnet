@@ -380,7 +380,7 @@ namespace Grin.Core.Core
                 var proof_sum = secp.commit_sum(proof_commits, new Commitment[]{}  ) ;
 
                 // both should be the same
-                if (proof_sum != io_sum)
+                if (proof_sum.Hex != io_sum.Hex)
                 {
                     throw new Exception("KernelSumMismatch");
                 }
@@ -412,7 +412,7 @@ namespace Grin.Core.Core
             var out_adjust_sum = secp.commit_sum(cb_outs, new []{over_commit});
 
             var kerns_sum = secp.commit_sum(cb_kerns, new Commitment[] { });
-            if (kerns_sum != out_adjust_sum)
+            if (kerns_sum.Hex != out_adjust_sum.Hex)
             {
                 throw new Exception("CoinbaseSumMismatch");
             }
