@@ -1,4 +1,4 @@
-// Copyright 2016 The Grin Developers
+
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,8 +22,9 @@ use std::sync::Arc;
 
 use util::secp::pedersen::{RangeProof, Commitment};
 
-use core::core::{Block, Output, SumCommit, TxKernel};
+use core::core::{Block, SumCommit, TxKernel};
 use core::core::pmmr::{Backend, HashSum, NoSum, Summable, PMMR};
+use core::core::hash::Hashed;
 use grin_store;
 use grin_store::sumtree::PMMRBackend;
 use types::ChainStore;
@@ -92,7 +93,15 @@ impl SumTrees {
 	pub fn is_unspent(&self, commit: &Commitment) -> Result<bool, Error> {
 		let rpos = self.commit_index.get_output_pos(commit);
 		match rpos {
-			Ok(pos) => Ok(self.output_pmmr_h.backend.get(pos).is_some()),
+			Ok(pos) => {
+				// checking the position is within the MMR, the commit index could be
+				// returning rewound data
+				if pos > self.output_pmmr_h.last_pos {
+					Ok(false)
+				} else {
+					Ok(self.output_pmmr_h.backend.get(pos).is_some())
+				}
+			}
 			Err(grin_store::Error::NotFoundErr) => Ok(false),
 			Err(e) => Err(Error::StoreErr(e, "sumtree unspent check".to_owned())),
 		}
@@ -251,8 +260,12 @@ impl<'a> Extension<'a> {
 		}
 
 		for out in &b.outputs {
-			if let Ok(_) = self.commit_index.get_output_pos(&out.commitment()) {
-				return Err(Error::DuplicateCommitment(out.commitment()));
+			if let Ok(pos) = self.commit_index.get_output_pos(&out.commitment()) {
+				// checking the position is within the MMR, the commit index could be
+				// returning rewound data
+				if pos <= self.output_pmmr.unpruned_size() {
+					return Err(Error::DuplicateCommitment(out.commitment()));
+				}
 			}
 			// push new outputs commitments in their MMR and save them in the index
 			let pos = self.output_pmmr
@@ -273,8 +286,12 @@ impl<'a> Extension<'a> {
 		}
 
 		for kernel in &b.kernels {
-			if let Ok(_) = self.commit_index.get_kernel_pos(&kernel.excess) {
-				return Err(Error::DuplicateKernel(kernel.excess.clone()));
+			if let Ok(pos) = self.commit_index.get_kernel_pos(&kernel.excess) {
+				if pos <= self.kernel_pmmr.unpruned_size() {
+					// checking the position is within the MMR, the commit index could be
+					// returning rewound data
+					return Err(Error::DuplicateKernel(kernel.excess.clone()));
+				}
 			}
 			// push kernels in their MMR
 			let pos = self.kernel_pmmr
@@ -297,11 +314,33 @@ impl<'a> Extension<'a> {
 
 	/// Rewinds the MMRs to the provided position, given the last output and
 	/// last kernel of the block we want to rewind to.
-	pub fn rewind(&mut self, height: u64, output: &Output, kernel: &TxKernel) -> Result<(), Error> {
-		let out_pos_rew = self.commit_index.get_output_pos(&output.commitment())?;
-		let kern_pos_rew = self.commit_index.get_kernel_pos(&kernel.excess)?;
+	pub fn rewind(&mut self, block: &Block) -> Result<(), Error> {
+		debug!(
+			LOGGER,
+			"Rewind sumtrees to header {} at {}",
+			block.header.hash(),
+			block.header.height,
+		);
 
-		debug!(LOGGER, "Rewind sumtrees to {}", out_pos_rew);
+		let out_pos_rew = match block.outputs.last() {
+			Some(output) => self.commit_index.get_output_pos(&output.commitment())?,
+			None => 0,
+		};
+
+		let kern_pos_rew = match block.kernels.last() {
+			Some(kernel) => self.commit_index.get_kernel_pos(&kernel.excess)?,
+			None => 0,
+		};
+
+		debug!(
+			LOGGER,
+			"Rewind sumtrees to output pos: {}, kernel pos: {}",
+			out_pos_rew,
+			kern_pos_rew,
+		);
+
+		let height = block.header.height;
+
 		self.output_pmmr
 			.rewind(out_pos_rew, height as u32)
 			.map_err(&Error::SumTreeErr)?;
@@ -311,6 +350,7 @@ impl<'a> Extension<'a> {
 		self.kernel_pmmr
 			.rewind(kern_pos_rew, height as u32)
 			.map_err(&Error::SumTreeErr)?;
+
 		self.dump(true);
 		Ok(())
 	}

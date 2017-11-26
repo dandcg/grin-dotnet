@@ -28,7 +28,7 @@ use core::core::build;
 use core::core::transaction;
 use core::consensus;
 use core::global;
-use core::global::MiningParameterMode;
+use core::global::ChainTypes;
 
 use keychain::Keychain;
 
@@ -42,12 +42,10 @@ fn clean_output_dir(dir_name: &str) {
 fn test_coinbase_maturity() {
 	let _ = env_logger::init();
 	clean_output_dir(".grin");
-	global::set_mining_mode(MiningParameterMode::AutomatedTesting);
+	global::set_mining_mode(ChainTypes::AutomatedTesting);
 
-	let mut genesis_block = None;
-	if !chain::Chain::chain_exists(".grin".to_string()) {
-		genesis_block = pow::mine_genesis_block(None);
-	}
+	let genesis_block = pow::mine_genesis_block(None).unwrap();
+
 	let chain = chain::Chain::init(
 		".grin".to_string(),
 		Arc::new(NoopAdapter {}),
@@ -97,7 +95,7 @@ fn test_coinbase_maturity() {
 			.contains(transaction::COINBASE_OUTPUT,)
 	);
 
-	chain.process_block(block, chain::EASY_POW).unwrap();
+	chain.process_block(block, chain::NONE).unwrap();
 
 	let prev = chain.head_header().unwrap();
 
@@ -126,7 +124,7 @@ fn test_coinbase_maturity() {
 		global::sizeshift() as u32,
 	).unwrap();
 
-	let result = chain.process_block(block, chain::EASY_POW);
+	let result = chain.process_block(block, chain::NONE);
 	match result {
 		Err(Error::ImmatureCoinbase) => (),
 		_ => panic!("expected ImmatureCoinbase error here"),
@@ -154,7 +152,7 @@ fn test_coinbase_maturity() {
 			global::sizeshift() as u32,
 		).unwrap();
 
-		chain.process_block(block, chain::EASY_POW).unwrap();
+		chain.process_block(block, chain::NONE).unwrap();
 	}
 
 	let prev = chain.head_header().unwrap();
@@ -175,7 +173,7 @@ fn test_coinbase_maturity() {
 		global::sizeshift() as u32,
 	).unwrap();
 
-	let result = chain.process_block(block, chain::EASY_POW);
+	let result = chain.process_block(block, chain::NONE);
 	match result {
 		Ok(_) => (),
 		Err(Error::ImmatureCoinbase) => panic!("we should not get an ImmatureCoinbase here"),

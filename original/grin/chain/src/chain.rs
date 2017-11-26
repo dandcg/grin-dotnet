@@ -33,8 +33,6 @@ use sumtree;
 use types::*;
 use util::LOGGER;
 
-use core::global::{MiningParameterMode, MINING_PARAMETER_MODE};
-
 const MAX_ORPHANS: usize = 20;
 
 /// Facade to the blockchain block processing pipeline and storage. Provides
@@ -68,15 +66,13 @@ impl Chain {
 		}
 	}
 
-	/// Initializes the blockchain and returns a new Chain instance. Does a
-	/// check
+	/// Initializes the blockchain and returns a new Chain instance. Does a check
 	/// on the current chain head to make sure it exists and creates one based
-	/// on
-	/// the genesis block if necessary.
+	/// on the genesis block if necessary.
 	pub fn init(
 		db_root: String,
 		adapter: Arc<ChainAdapter>,
-		gen_block: Option<Block>,
+		genesis: Block,
 		pow_verifier: fn(&BlockHeader, u32) -> bool,
 	) -> Result<Chain, Error> {
 		let chain_store = store::ChainKVStore::new(db_root.clone())?;
@@ -85,22 +81,29 @@ impl Chain {
 		let head = match chain_store.head() {
 			Ok(tip) => tip,
 			Err(NotFoundErr) => {
-				if let None = gen_block {
-					return Err(Error::GenesisBlockRequired);
-				}
-
-				let gen = gen_block.unwrap();
-				chain_store.save_block(&gen)?;
-				chain_store.setup_height(&gen.header)?;
+				chain_store.save_block(&genesis)?;
+				chain_store.setup_height(&genesis.header)?;
 
 				// saving a new tip based on genesis
-				let tip = Tip::new(gen.hash());
+				let tip = Tip::new(genesis.hash());
 				chain_store.save_head(&tip)?;
-				info!(LOGGER, "Saved genesis block with hash {}", gen.hash());
+				info!(
+					LOGGER,
+					"Saved genesis block: {:?}, nonce: {:?}, pow: {:?}",
+					genesis.hash(),
+					genesis.header.nonce,
+					genesis.header.pow,
+				);
 				tip
 			}
 			Err(e) => return Err(Error::StoreErr(e, "chain init load head".to_owned())),
 		};
+
+		info!(
+			LOGGER,
+			"Chain init: {:?}",
+			head,
+		);
 
 		let store = Arc::new(chain_store);
 		let sumtrees = sumtree::SumTrees::open(db_root, store.clone())?;
@@ -150,6 +153,15 @@ impl Chain {
 				orphans.push_front((opts, b));
 				orphans.truncate(MAX_ORPHANS);
 			},
+			Err(Error::Unfit(ref msg)) => {
+				debug!(
+					LOGGER,
+					"Block {} at {} is unfit at this time: {}",
+					b.hash(),
+					b.header.height,
+					msg
+				);
+			}
 			Err(ref e) => {
 				info!(
 					LOGGER,
@@ -180,16 +192,8 @@ impl Chain {
 	}
 
 	fn ctx_from_head(&self, head: Tip, opts: Options) -> pipe::BlockContext {
-		let opts_in = opts;
-		let param_ref = MINING_PARAMETER_MODE.read().unwrap();
-		let opts_in = match *param_ref {
-			MiningParameterMode::AutomatedTesting => opts_in | EASY_POW,
-			MiningParameterMode::UserTesting => opts_in | EASY_POW,
-			MiningParameterMode::Production => opts_in,
-		};
-
 		pipe::BlockContext {
-			opts: opts_in,
+			opts: opts,
 			store: self.store.clone(),
 			head: head,
 			pow_verifier: self.pow_verifier,
@@ -234,6 +238,12 @@ impl Chain {
 		} else {
 			Err(Error::OutputNotFound)
 		}
+	}
+
+	/// Checks whether an output is unspent
+	pub fn is_unspent(&self, output_ref: &Commitment) -> Result<bool, Error> {
+		let sumtrees = self.sumtrees.read().unwrap();
+		sumtrees.is_unspent(output_ref)
 	}
 
 	/// Sets the sumtree roots on a brand new block by applying the block on the

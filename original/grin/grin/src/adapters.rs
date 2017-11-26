@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::collections::HashMap;
 use std::net::SocketAddr;
 use std::sync::{Arc, RwLock};
 use std::thread;
@@ -21,14 +22,13 @@ use core::core::{self, Output};
 use core::core::block::BlockHeader;
 use core::core::hash::{Hash, Hashed};
 use core::core::target::Difficulty;
-use p2p::{self, NetAdapter, PeerData, PeerStore, Server, State};
+use p2p::{self, NetAdapter, Peer, PeerData, PeerStore, Server, State};
 use pool;
 use util::secp::pedersen::Commitment;
 use util::OneTime;
 use store;
 use sync;
 use util::LOGGER;
-use core::global::{MiningParameterMode, MINING_PARAMETER_MODE};
 
 /// Implementation of the NetAdapter for the blockchain. Gets notified when new
 /// blocks and transactions are received and forwards to the chain and pool
@@ -36,8 +36,8 @@ use core::global::{MiningParameterMode, MINING_PARAMETER_MODE};
 pub struct NetToChainAdapter {
 	chain: Arc<chain::Chain>,
 	peer_store: Arc<PeerStore>,
+	connected_peers: Arc<RwLock<HashMap<SocketAddr, Arc<RwLock<Peer>>>>>,
 	tx_pool: Arc<RwLock<pool::TransactionPool<PoolToChainAdapter>>>,
-
 	syncer: OneTime<Arc<sync::Syncer>>,
 }
 
@@ -58,8 +58,9 @@ impl NetAdapter for NetToChainAdapter {
 			source.identifier,
 		);
 
+		let h = tx.hash();
 		if let Err(e) = self.tx_pool.write().unwrap().add_to_memory_pool(source, tx) {
-			error!(LOGGER, "Transaction rejected: {:?}", e);
+			debug!(LOGGER, "Transaction {} rejected: {:?}", h, e);
 		}
 	}
 
@@ -80,15 +81,20 @@ impl NetAdapter for NetToChainAdapter {
 		}
 
 		if self.syncing() {
-			match res {
-				Ok(_) => self.syncer.borrow().block_received(bhash),
-				Err(chain::Error::Unfit(_)) => self.syncer.borrow().block_received(bhash),
-				Err(_) => {}
-			}
+			// always notify the syncer we received a block
+			// otherwise we jam up the 8 download slots with orphans
+			debug!(LOGGER, "adapter: notifying syncer: received block {:?}", bhash);
+			self.syncer.borrow().block_received(bhash);
 		}
 	}
 
 	fn headers_received(&self, bhs: Vec<core::BlockHeader>) {
+		info!(
+			LOGGER,
+			"Received {} block headers",
+			bhs.len(),
+		);
+
 		// try to add each header to our header chain
 		let mut added_hs = vec![];
 		for bh in bhs {
@@ -134,11 +140,19 @@ impl NetAdapter for NetToChainAdapter {
 	}
 
 	fn locate_headers(&self, locator: Vec<Hash>) -> Vec<core::BlockHeader> {
+		debug!(
+			LOGGER,
+			"locate_headers: {:?}",
+			locator,
+		);
+
 		if locator.len() == 0 {
 			return vec![];
 		}
 
-		// go through the locator vector and check if we know any of these headers
+		// recursively go back through the locator vector
+		// and stop when we find a header that we recognize
+		// this will be a header shared in common between us and the peer
 		let known = self.chain.get_block_header(&locator[0]);
 		let header = match known {
 			Ok(header) => header,
@@ -150,6 +164,12 @@ impl NetAdapter for NetToChainAdapter {
 				return vec![];
 			}
 		};
+
+		debug!(
+			LOGGER,
+			"locate_headers: common header: {:?}",
+			header.hash(),
+		);
 
 		// looks like we know one, getting as many following headers as allowed
 		let hh = header.height;
@@ -165,6 +185,13 @@ impl NetAdapter for NetToChainAdapter {
 				}
 			}
 		}
+
+		debug!(
+			LOGGER,
+			"locate_headers: returning headers: {}",
+			headers.len(),
+		);
+
 		headers
 	}
 
@@ -220,6 +247,24 @@ impl NetAdapter for NetToChainAdapter {
 			error!(LOGGER, "Could not save connected peer: {:?}", e);
 		}
 	}
+
+	fn peer_difficulty(&self, addr: SocketAddr, diff: Difficulty) {
+		debug!(
+			LOGGER,
+			"peer total_diff (ping/pong): {}, {} vs us {}",
+			addr,
+			diff,
+			self.total_difficulty(),
+		);
+
+		if diff.into_num() > 0 {
+			let peers = self.connected_peers.read().unwrap();
+			if let Some(peer) = peers.get(&addr) {
+				let mut peer = peer.write().unwrap();
+				peer.info.total_difficulty = diff;
+			}
+		}
+	}
 }
 
 impl NetToChainAdapter {
@@ -227,10 +272,12 @@ impl NetToChainAdapter {
 		chain_ref: Arc<chain::Chain>,
 		tx_pool: Arc<RwLock<pool::TransactionPool<PoolToChainAdapter>>>,
 		peer_store: Arc<PeerStore>,
+		connected_peers: Arc<RwLock<HashMap<SocketAddr, Arc<RwLock<Peer>>>>>,
 	) -> NetToChainAdapter {
 		NetToChainAdapter {
 			chain: chain_ref,
 			peer_store: peer_store,
+			connected_peers: connected_peers,
 			tx_pool: tx_pool,
 			syncer: OneTime::new(),
 		}
@@ -244,7 +291,10 @@ impl NetToChainAdapter {
 		let _ = thread::Builder::new()
 			.name("syncer".to_string())
 			.spawn(move || {
-				let _ = arc_sync.run();
+				let res = arc_sync.run();
+				if let Err(e) = res {
+					panic!("Error during sync, aborting: {:?}", e);
+				}
 			});
 	}
 
@@ -258,12 +308,6 @@ impl NetToChainAdapter {
 			chain::SYNC
 		} else {
 			chain::NONE
-		};
-		let param_ref = MINING_PARAMETER_MODE.read().unwrap();
-		let opts = match *param_ref {
-			MiningParameterMode::AutomatedTesting => opts | chain::EASY_POW,
-			MiningParameterMode::UserTesting => opts | chain::EASY_POW,
-			MiningParameterMode::Production => opts,
 		};
 		opts
 	}

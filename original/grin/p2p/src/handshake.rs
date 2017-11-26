@@ -16,13 +16,13 @@ use std::collections::VecDeque;
 use std::net::SocketAddr;
 use std::sync::{Arc, RwLock};
 
-use futures::Future;
+use futures::{self, Future};
 use rand::Rng;
 use rand::os::OsRng;
 use tokio_core::net::TcpStream;
 
 use core::core::target::Difficulty;
-use core::ser;
+use core::core::hash::Hash;
 use msg::*;
 use types::*;
 use protocol::ProtocolV1;
@@ -36,6 +36,9 @@ pub struct Handshake {
 	/// Ring buffer of nonces sent to detect self connections without requiring
 	/// a node id.
 	nonces: Arc<RwLock<VecDeque<u64>>>,
+	/// The genesis block header of the chain seen by this node.
+	/// We only want to connect to other nodes seeing the same chain (forks are ok).
+	genesis: Hash,
 }
 
 unsafe impl Sync for Handshake {}
@@ -43,9 +46,10 @@ unsafe impl Send for Handshake {}
 
 impl Handshake {
 	/// Creates a new handshake handler
-	pub fn new() -> Handshake {
+	pub fn new(genesis: Hash) -> Handshake {
 		Handshake {
 			nonces: Arc::new(RwLock::new(VecDeque::with_capacity(NONCES_CAP))),
+			genesis: genesis,
 		}
 	}
 
@@ -57,38 +61,53 @@ impl Handshake {
 		self_addr: SocketAddr,
 		conn: TcpStream,
 	) -> Box<Future<Item = (TcpStream, ProtocolV1, PeerInfo), Error = Error>> {
-		// prepare the first part of the hanshake
+
+		// prepare the first part of the handshake
 		let nonce = self.next_nonce();
+		let peer_addr = match conn.peer_addr() {
+			Ok(pa) => pa,
+			Err(e) => return Box::new(futures::future::err(Error::Connection(e))),
+		};
+
 		let hand = Hand {
 			version: PROTOCOL_VERSION,
 			capabilities: capab,
 			nonce: nonce,
+			genesis: self.genesis,
 			total_difficulty: total_difficulty,
 			sender_addr: SockAddr(self_addr),
-			receiver_addr: SockAddr(conn.peer_addr().unwrap()),
+			receiver_addr: SockAddr(peer_addr),
 			user_agent: USER_AGENT.to_string(),
 		};
+
+		let genesis = self.genesis;
 
 		// write and read the handshake response
 		Box::new(
 			write_msg(conn, hand, Type::Hand)
 				.and_then(|conn| read_msg::<Shake>(conn))
-				.and_then(|(conn, shake)| {
-					if shake.version != 1 {
-						Err(Error::Serialization(ser::Error::UnexpectedData {
-							expected: vec![PROTOCOL_VERSION as u8],
-							received: vec![shake.version as u8],
-						}))
+				.and_then(move |(conn, shake)| {
+					if shake.version != PROTOCOL_VERSION {
+						Err(Error::ProtocolMismatch {
+							us: PROTOCOL_VERSION,
+							peer: shake.version,
+						})
+					} else if shake.genesis != genesis {
+						Err(Error::GenesisMismatch {
+							us: genesis,
+							peer: shake.genesis,
+						})
 					} else {
 						let peer_info = PeerInfo {
 							capabilities: shake.capabilities,
 							user_agent: shake.user_agent,
-							addr: conn.peer_addr().unwrap(),
+							addr: peer_addr,
 							version: shake.version,
 							total_difficulty: shake.total_difficulty,
 						};
 
 						info!(LOGGER, "Connected to peer {:?}", peer_info);
+
 						// when more than one protocol version is supported, choosing should go here
 						Ok((conn, ProtocolV1::new(), peer_info))
 					}
@@ -105,23 +124,25 @@ impl Handshake {
 		conn: TcpStream,
 	) -> Box<Future<Item = (TcpStream, ProtocolV1, PeerInfo), Error = Error>> {
 		let nonces = self.nonces.clone();
+		let genesis = self.genesis.clone();
 		Box::new(
 			read_msg::<Hand>(conn)
 				.and_then(move |(conn, hand)| {
-					if hand.version != 1 {
-						return Err(Error::Serialization(ser::Error::UnexpectedData {
-							expected: vec![PROTOCOL_VERSION as u8],
-							received: vec![hand.version as u8],
-						}));
-					}
-					{
-						// check the nonce to see if we could be trying to connect to ourselves
+					if hand.version != PROTOCOL_VERSION {
+						return Err(Error::ProtocolMismatch {
+							us: PROTOCOL_VERSION,
+							peer: hand.version,
+						});
+					} else if hand.genesis != genesis {
+						return Err(Error::GenesisMismatch {
+							us: genesis,
+							peer: hand.genesis,
+						});
+					} else {
+						// check the nonce to see if we are trying to connect to ourselves
 						let nonces = nonces.read().unwrap();
 						if nonces.contains(&hand.nonce) {
-							return Err(Error::Serialization(ser::Error::UnexpectedData {
-								expected: vec![],
-								received: vec![],
-							}));
+							return Err(Error::PeerWithSelf);
 						}
 					}
 
@@ -137,6 +158,7 @@ impl Handshake {
 					let shake = Shake {
 						version: PROTOCOL_VERSION,
 						capabilities: capab,
+						genesis: genesis,
 						total_difficulty: total_difficulty,
 						user_agent: USER_AGENT.to_string(),
 					};
@@ -145,7 +167,7 @@ impl Handshake {
 				.and_then(|(conn, shake, peer_info)| {
 					debug!(LOGGER, "Success handshake with {}.", peer_info.addr);
 					write_msg(conn, shake, Type::Shake)
-				  // when more than one protocol version is supported, choosing should go here
+					// when more than one protocol version is supported, choosing should go here
 					.map(|conn| (conn, ProtocolV1::new(), peer_info))
 				}),
 		)

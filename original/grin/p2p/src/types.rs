@@ -26,9 +26,6 @@ use core::core::hash::Hash;
 use core::core::target::Difficulty;
 use core::ser;
 
-/// Maximum number of hashes in a block header locator request
-pub const MAX_LOCATORS: u32 = 10;
-
 /// Maximum number of block headers a peer should ever send
 pub const MAX_BLOCK_HEADERS: u32 = 512;
 
@@ -45,6 +42,15 @@ pub enum Error {
 	Connection(io::Error),
 	ConnectionClose,
 	Timeout,
+	PeerWithSelf,
+	ProtocolMismatch {
+		us: u32,
+		peer: u32,
+	},
+	GenesisMismatch {
+		us: Hash,
+		peer: Hash,
+	},
 }
 
 impl From<ser::Error> for Error {
@@ -117,11 +123,11 @@ pub trait Protocol {
 	/// be  known already, usually passed during construction. Will typically
 	/// block so needs to be called withing a coroutine. Should also be called
 	/// only once.
-	fn handle(&self, conn: TcpStream, na: Arc<NetAdapter>)
+	fn handle(&self, conn: TcpStream, na: Arc<NetAdapter>, addr: SocketAddr)
 		-> Box<Future<Item = (), Error = Error>>;
 
 	/// Sends a ping message to the remote peer.
-	fn send_ping(&self) -> Result<(), Error>;
+	fn send_ping(&self, total_difficulty: Difficulty) -> Result<(), Error>;
 
 	/// Relays a block to the remote peer.
 	fn send_block(&self, b: &core::Block) -> Result<(), Error>;
@@ -180,4 +186,7 @@ pub trait NetAdapter: Sync + Send {
 
 	/// Network successfully connected to a peer.
 	fn peer_connected(&self, &PeerInfo);
+
+	/// Heard total_difficulty from a connected peer (via ping/pong).
+	fn peer_difficulty(&self, SocketAddr, Difficulty);
 }

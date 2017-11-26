@@ -30,7 +30,7 @@ use core::core::hash::Hashed;
 use core::core::target::Difficulty;
 use core::consensus;
 use core::global;
-use core::global::MiningParameterMode;
+use core::global::ChainTypes;
 
 use keychain::Keychain;
 
@@ -43,11 +43,8 @@ fn clean_output_dir(dir_name: &str) {
 fn setup(dir_name: &str) -> Chain {
 	let _ = env_logger::init();
 	clean_output_dir(dir_name);
-	global::set_mining_mode(MiningParameterMode::AutomatedTesting);
-	let mut genesis_block = None;
-	if !chain::Chain::chain_exists(dir_name.to_string()) {
-		genesis_block = pow::mine_genesis_block(None);
-	}
+	global::set_mining_mode(ChainTypes::AutomatedTesting);
+	let genesis_block = pow::mine_genesis_block(None).unwrap();
 	chain::Chain::init(
 		dir_name.to_string(),
 		Arc::new(NoopAdapter {}),
@@ -92,7 +89,7 @@ fn mine_empty_chain() {
 		).unwrap();
 
 		let bhash = b.hash();
-		chain.process_block(b, chain::EASY_POW).unwrap();
+		chain.process_block(b, chain::NONE).unwrap();
 
 		// checking our new head
 		let head = chain.head().unwrap();

@@ -16,6 +16,7 @@
 //! the peer-to-peer server, the blockchain and the transaction pool) and acts
 //! as a facade.
 
+use std::collections::HashMap;
 use std::net::SocketAddr;
 use std::sync::{Arc, RwLock};
 use std::thread;
@@ -28,6 +29,7 @@ use tokio_timer::Timer;
 use adapters::*;
 use api;
 use chain;
+use core::{global, genesis};
 use miner;
 use p2p;
 use pool;
@@ -37,7 +39,6 @@ use types::*;
 use pow;
 use util::LOGGER;
 
-use core::global;
 
 /// Grin server holding internal structures.
 pub struct Server {
@@ -89,31 +90,44 @@ impl Server {
 
 		let chain_adapter = Arc::new(ChainToPoolAndNetAdapter::new(tx_pool.clone()));
 
-		let mut genesis_block = None;
-		if !chain::Chain::chain_exists(config.db_root.clone()) {
-			genesis_block = pow::mine_genesis_block(config.mining_config.clone());
-		}
+		let genesis = match config.chain_type {
+			global::ChainTypes::Testnet1 => genesis::genesis_testnet1(),
+			_ => pow::mine_genesis_block(config.mining_config.clone())?,
+		};
+		info!(
+			LOGGER,
+			"Starting server, genesis block: {}",
+			genesis.hash(),
+		);
 
 		let shared_chain = Arc::new(chain::Chain::init(
 			config.db_root.clone(),
 			chain_adapter.clone(),
-			genesis_block,
+			genesis.clone(),
 			pow::verify_size,
 		)?);
 
 		pool_adapter.set_chain(shared_chain.clone());
+
+		// Currently connected peers. Used by both the net_adapter and the p2p_server.
+		let connected_peers = Arc::new(RwLock::new(HashMap::new()));
 
 		let peer_store = Arc::new(p2p::PeerStore::new(config.db_root.clone())?);
 		let net_adapter = Arc::new(NetToChainAdapter::new(
 			shared_chain.clone(),
 			tx_pool.clone(),
 			peer_store.clone(),
+			connected_peers.clone(),
 		));
+
 		let p2p_server = Arc::new(p2p::Server::new(
 			config.capabilities,
 			config.p2p_config.unwrap(),
+			connected_peers.clone(),
 			net_adapter.clone(),
+			genesis.hash(),
 		));
+
 		chain_adapter.init(p2p_server.clone());
 		pool_net_adapter.init(p2p_server.clone());
 
@@ -122,7 +136,11 @@ impl Server {
 			Seeding::None => {
 				warn!(
 					LOGGER,
-					"No seed configured, will stay solo until connected to"
+					"No seed(s) configured, will stay solo until connected to"
+				);
+				seed.connect_and_monitor(
+					evt_handle.clone(),
+					seed::predefined_seeds(vec![]),
 				);
 			}
 			Seeding::List => {
@@ -132,12 +150,16 @@ impl Server {
 				);
 			}
 			Seeding::WebStatic => {
-				seed.connect_and_monitor(evt_handle.clone(), seed::web_seeds(evt_handle.clone()));
+				seed.connect_and_monitor(
+					evt_handle.clone(),
+					seed::web_seeds(evt_handle.clone()),
+				);
 			}
 			_ => {}
 		}
 
-		if config.seeding_type != Seeding::None {
+		// If we have any known seeds or peers then attempt to sync.
+		if config.seeding_type != Seeding::None || peer_store.all_peers().len() > 0 {
 			let sync = sync::Syncer::new(shared_chain.clone(), p2p_server.clone());
 			net_adapter.start_sync(sync);
 		}

@@ -21,7 +21,7 @@ use pool;
 use store;
 use pow;
 use wallet;
-use core::global::MiningParameterMode;
+use core::global::ChainTypes;
 
 /// Error type wrapping underlying module errors.
 #[derive(Debug)]
@@ -36,6 +36,7 @@ pub enum Error {
 	API(api::Error),
 	/// Error originating from wallet API.
 	Wallet(wallet::Error),
+	Cuckoo(pow::cuckoo::Error),
 }
 
 impl From<chain::Error> for Error {
@@ -47,6 +48,12 @@ impl From<chain::Error> for Error {
 impl From<p2p::Error> for Error {
 	fn from(e: p2p::Error) -> Error {
 		Error::P2P(e)
+	}
+}
+
+impl From<pow::cuckoo::Error> for Error {
+	fn from(e: pow::cuckoo::Error) -> Error {
+		Error::Cuckoo(e)
 	}
 }
 
@@ -81,6 +88,12 @@ pub enum Seeding {
 	Programmatic,
 }
 
+impl Default for Seeding {
+	fn default() -> Seeding {
+		Seeding::None
+	}
+}
+
 /// Full server configuration, aggregating configurations required for the
 /// different components.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -91,10 +104,12 @@ pub struct ServerConfig {
 	/// Network address for the Rest API HTTP server.
 	pub api_http_addr: String,
 
-	/// Setup the server for tests and testnet
-	pub mining_parameter_mode: Option<MiningParameterMode>,
+	/// Setup the server for tests, testnet or mainnet
+	#[serde(default)]
+	pub chain_type: ChainTypes,
 
 	/// Method used to get the list of seed nodes for initial bootstrap.
+	#[serde(default)]
 	pub seeding_type: Seeding,
 
 	/// The list of seed nodes, if using Seeding as a seed type
@@ -121,11 +136,11 @@ impl Default for ServerConfig {
 			db_root: ".grin".to_string(),
 			api_http_addr: "0.0.0.0:13413".to_string(),
 			capabilities: p2p::FULL_NODE,
-			seeding_type: Seeding::None,
+			seeding_type: Seeding::default(),
 			seeds: None,
 			p2p_config: Some(p2p::P2PConfig::default()),
 			mining_config: Some(pow::types::MinerConfig::default()),
-			mining_parameter_mode: Some(MiningParameterMode::Production),
+			chain_type: ChainTypes::default(),
 			pool_config: pool::PoolConfig::default(),
 		}
 	}

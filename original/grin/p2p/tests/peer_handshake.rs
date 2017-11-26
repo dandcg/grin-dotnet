@@ -17,8 +17,9 @@ extern crate grin_core as core;
 extern crate grin_p2p as p2p;
 extern crate tokio_core;
 
+use std::collections::HashMap;
 use std::net::SocketAddr;
-use std::sync::Arc;
+use std::sync::{Arc, RwLock};
 use std::time;
 
 use futures::future::Future;
@@ -26,6 +27,7 @@ use tokio_core::net::TcpStream;
 use tokio_core::reactor::{self, Core};
 
 use core::core::target::Difficulty;
+use core::core::hash::Hash;
 use p2p::Peer;
 
 // Starts a server and connects a client peer to it to check handshake,
@@ -36,7 +38,14 @@ fn peer_handshake() {
 	let handle = evtlp.handle();
 	let p2p_conf = p2p::P2PConfig::default();
 	let net_adapter = Arc::new(p2p::DummyAdapter {});
-	let server = p2p::Server::new(p2p::UNKNOWN, p2p_conf, net_adapter.clone());
+	let connected_peers = Arc::new(RwLock::new(HashMap::new()));
+	let server = p2p::Server::new(
+		p2p::UNKNOWN,
+		p2p_conf,
+		connected_peers,
+		net_adapter.clone(),
+		Hash::from_vec(vec![]),
+	);
 	let run_server = server.start(handle.clone());
 	let my_addr = "127.0.0.1:5000".parse().unwrap();
 
@@ -59,7 +68,7 @@ fn peer_handshake() {
 							p2p::UNKNOWN,
 							Difficulty::one(),
 							my_addr,
-							&p2p::handshake::Handshake::new(),
+							Arc::new(p2p::handshake::Handshake::new(Hash::from_vec(vec![]))),
 							net_adapter.clone(),
 						)
 					})
@@ -67,7 +76,7 @@ fn peer_handshake() {
 						rhandle.spawn(peer.run(socket).map_err(|e| {
 							panic!("Client run failed: {:?}", e);
 						}));
-						peer.send_ping().unwrap();
+						peer.send_ping(Difficulty::one()).unwrap();
 						timeout_send.from_err().map(|_| peer)
 					})
 					.and_then(|peer| {

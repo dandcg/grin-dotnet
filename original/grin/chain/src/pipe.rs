@@ -21,6 +21,7 @@ use time;
 use core::consensus;
 use core::core::hash::{Hash, Hashed};
 use core::core::{Block, BlockHeader};
+use core::core::target::Difficulty;
 use core::core::transaction;
 use types::*;
 use store;
@@ -50,9 +51,9 @@ pub fn process_block(b: &Block, mut ctx: BlockContext) -> Result<Option<Tip>, Er
 	// TODO should just take a promise for a block with a full header so we don't
  // spend resources reading the full block when its header is invalid
 
-	info!(
+	debug!(
 		LOGGER,
-		"Starting validation pipeline for block {} at {} with {} inputs and {} outputs.",
+		"Processing block {} at {} with {} inputs and {} outputs.",
 		b.hash(),
 		b.header.height,
 		b.inputs.len(),
@@ -93,9 +94,9 @@ pub fn process_block(b: &Block, mut ctx: BlockContext) -> Result<Option<Tip>, Er
 
 /// Process the block header
 pub fn process_block_header(bh: &BlockHeader, mut ctx: BlockContext) -> Result<Option<Tip>, Error> {
-	info!(
+	debug!(
 		LOGGER,
-		"Starting validation pipeline for block header {} at {}.",
+		"Processing header {} at {}.",
 		bh.hash(),
 		bh.height
 	);
@@ -154,11 +155,8 @@ fn validate_header(header: &BlockHeader, ctx: &mut BlockContext) -> Result<(), E
 	}
 
 	if !ctx.opts.intersects(SKIP_POW) {
-		let cycle_size = if ctx.opts.intersects(EASY_POW) {
-			global::sizeshift()
-		} else {
-			consensus::DEFAULT_SIZESHIFT
-		};
+		let cycle_size = global::sizeshift();
+
 		debug!(LOGGER, "Validating block with cuckoo size {}", cycle_size);
 		if !(ctx.pow_verifier)(header, cycle_size as u32) {
 			return Err(Error::InvalidPow);
@@ -181,6 +179,12 @@ fn validate_header(header: &BlockHeader, ctx: &mut BlockContext) -> Result<(), E
 
 	if !ctx.opts.intersects(SKIP_POW) {
 		// verify the proof of work and related parameters
+
+		// explicit check to ensure we are not below the minimum difficulty
+		// we will also check difficulty based on next_difficulty later on
+		if header.difficulty < Difficulty::minimum() {
+			return Err(Error::DifficultyTooLow);
+		}
 
 		if header.total_difficulty != prev.total_difficulty.clone() + prev.pow.to_difficulty() {
 			return Err(Error::WrongTotalDifficulty);
@@ -230,14 +234,17 @@ fn validate_block(
 			}
 		}
 
-		// rewind the sum trees up the forking block, providing the height of the
-  // forked block and the last commitment we want to rewind to
 		let forked_block = ctx.store.get_block(&current)?;
-		if forked_block.header.height > 0 {
-			let last_output = &forked_block.outputs[forked_block.outputs.len() - 1];
-			let last_kernel = &forked_block.kernels[forked_block.kernels.len() - 1];
-			ext.rewind(forked_block.header.height, last_output, last_kernel)?;
-		}
+
+		debug!(
+			LOGGER,
+			"validate_block: forked_block: {} at {}",
+			forked_block.header.hash(),
+			forked_block.header.height,
+		);
+
+		// rewind the sum trees up to the forking block
+		ext.rewind(&forked_block)?;
 
 		// apply all forked blocks, including this new one
 		for h in hashes {
@@ -252,6 +259,26 @@ fn validate_block(
 		|| kernel_root.hash != b.header.kernel_root
 	{
 		ext.dump(false);
+
+		debug!(
+			LOGGER,
+			"validate_block: utxo roots - {:?}, {:?}",
+			utxo_root.hash,
+			b.header.utxo_root,
+		);
+		debug!(
+			LOGGER,
+			"validate_block: rproof roots - {:?}, {:?}",
+			rproof_root.hash,
+			b.header.range_proof_root,
+		);
+		debug!(
+			LOGGER,
+			"validate_block: kernel roots - {:?}, {:?}",
+			kernel_root.hash,
+			b.header.kernel_root,
+		);
+
 		return Err(Error::InvalidRoot);
 	}
 

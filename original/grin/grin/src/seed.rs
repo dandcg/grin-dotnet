@@ -22,6 +22,7 @@ use std::net::SocketAddr;
 use std::str::{self, FromStr};
 use std::sync::Arc;
 use std::time;
+use std::time::Duration;
 
 use cpupool;
 use futures::{self, future, Future, Stream};
@@ -35,7 +36,7 @@ use util::LOGGER;
 
 const PEER_MAX_COUNT: u32 = 25;
 const PEER_PREFERRED_COUNT: u32 = 8;
-const SEEDS_URL: &'static str = "http://www.mimwim.org/seeds.txt";
+const SEEDS_URL: &'static str = "http://grin-tech.org/seeds.txt";
 
 pub struct Seeder {
 	peer_store: Arc<p2p::PeerStore>,
@@ -63,7 +64,7 @@ impl Seeder {
 		seed_list: Box<Future<Item = Vec<SocketAddr>, Error = String>>,
 	) {
 		// open a channel with a listener that connects every peer address sent below
-  // max peer count
+		// max peer count
 		let (tx, rx) = futures::sync::mpsc::unbounded();
 		h.spawn(self.listen_for_addrs(h.clone(), rx));
 
@@ -85,14 +86,17 @@ impl Seeder {
 		let p2p_server = self.p2p.clone();
 
 		// now spawn a new future to regularly check if we need to acquire more peers
-  // and if so, gets them from db
+		// and if so, gets them from db
 		let mon_loop = Timer::default()
 			.interval(time::Duration::from_secs(10))
 			.for_each(move |_| {
+				debug!(LOGGER, "monitoring peers ({})", p2p_server.all_peers().len());
+
 				// maintenance step first, clean up p2p server peers and mark bans
-	// if needed
+				// if needed
 				let disconnected = p2p_server.clean_peers();
 				for p in disconnected {
+					let p = p.read().unwrap();
 					if p.is_banned() {
 						debug!(LOGGER, "Marking peer {} as banned.", p.info.addr);
 						let update_result =
@@ -115,7 +119,7 @@ impl Seeder {
 					if peers.len() > 0 {
 						debug!(
 							LOGGER,
-							"Got {} more peers from db, trying to connect.",
+							"Got {} peers from db, trying to connect.",
 							peers.len()
 						);
 						thread_rng().shuffle(&mut peers[..]);
@@ -156,7 +160,7 @@ impl Seeder {
 			})
 			.and_then(|mut peers| {
 				// if so, get their addresses, otherwise use our seeds
-				if peers.len() > 0 {
+				if peers.len() > 3 {
 					thread_rng().shuffle(&mut peers[..]);
 					Box::new(future::ok(peers.iter().map(|p| p.addr).collect::<Vec<_>>()))
 				} else {
@@ -195,16 +199,17 @@ impl Seeder {
 			debug!(LOGGER, "New peer address to connect to: {}.", peer_addr);
 			let inner_h = h.clone();
 			if p2p_server.peer_count() < PEER_MAX_COUNT {
-				connect_and_req(
-					capab,
-					p2p_store.clone(),
-					p2p_server.clone(),
-					inner_h,
-					peer_addr,
+				h.spawn(
+					connect_and_req(
+						capab,
+						p2p_store.clone(),
+						p2p_server.clone(),
+						inner_h,
+						peer_addr,
+					)
 				)
-			} else {
-				Box::new(future::ok(()))
-			}
+			};
+			Box::new(future::ok(()))
 		});
 		Box::new(listener)
 	}
@@ -216,6 +221,7 @@ pub fn web_seeds(h: reactor::Handle) -> Box<Future<Item = Vec<SocketAddr>, Error
 	let url = hyper::Uri::from_str(&SEEDS_URL).unwrap();
 	let seeds = future::ok(()).and_then(move |_| {
 		let client = hyper::Client::new(&h);
+		debug!(LOGGER, "Retrieving seed nodes from {}", &SEEDS_URL);
 
 		// http get, filtering out non 200 results
 		client
@@ -239,6 +245,7 @@ pub fn web_seeds(h: reactor::Handle) -> Box<Future<Item = Vec<SocketAddr>, Error
 						let addrs = res.split_whitespace()
 							.map(|s| s.parse().unwrap())
 							.collect::<Vec<_>>();
+						debug!(LOGGER, "Retrieved seed addresses: {:?}", addrs);
 						Ok(addrs)
 					})
 			})
@@ -269,17 +276,21 @@ fn connect_and_req(
 	h: reactor::Handle,
 	addr: SocketAddr,
 ) -> Box<Future<Item = (), Error = ()>> {
-	let fut = p2p.connect_peer(addr, h).then(move |p| {
+	let connect_peer = p2p.connect_peer(addr, h).map_err(|_| ());
+	let timer = Timer::default();
+	let timeout = timer.timeout(connect_peer, Duration::from_secs(5));
+
+	let fut = timeout.then(move |p| {
 		match p {
 			Ok(Some(p)) => {
+				let p = p.read().unwrap();
 				let peer_result = p.send_peer_request(capab);
 				match peer_result {
 					Ok(()) => {}
 					Err(_) => {}
 				}
 			}
-			Err(e) => {
-				error!(LOGGER, "Peer request error: {:?}", e);
+			Err(_) => {
 				let update_result = peer_store.update_state(addr, p2p::State::Defunct);
 				match update_result {
 					Ok(()) => {}

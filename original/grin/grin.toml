@@ -26,19 +26,20 @@ api_http_addr = "127.0.0.1:13413"
 db_root = ".grin"
 
 #How to seed this server, can be None, List or WebStatic
+#
+#seeding_type = "None"
 
-seeding_type = "None"
-
-#if seeding_type = List, the list of peers to connect to.
+#If seeding_type = List, the list of peers to connect to.
+#
 #seeds = ["192.168.0.1:8080","192.168.0.2:8080"]
 
-#The mining parameter mode, which defines the set of cuckoo parameters
-#used for mining. Can be:
+#The chain type, which defines the genesis block and the set of cuckoo
+#parameters used for mining. Can be:
 #AutomatedTesting - For CI builds and instant blockchain creation
 #UserTesting - For regular user testing (cuckoo 16)
-#Production - Full production cuckoo parameter (cuckoo 30)
-
-mining_parameter_mode = "UserTesting"
+#Testnet1 - Full production cuckoo parameter (cuckoo 30)
+#
+#chain_type = "UserTesting"
 
 #7 = Bit flags for FULL_NODE, this structure needs to be changed
 #internally to make it more configurable
@@ -49,7 +50,7 @@ capabilities = [7]
 #grin server nodes
 
 [server.p2p_config]
-host = "127.0.0.1"
+host = "0.0.0.0"
 port = 13414
 
 #########################################
@@ -62,7 +63,7 @@ port = 13414
 log_to_stdout = true
 
 # Log level for stdout: Critical, Error, Warning, Info, Debug, Trace
-stdout_log_level = "Debug"
+stdout_log_level = "Warning"
 
 # Whether to log to a file
 log_to_file = true
@@ -111,7 +112,7 @@ attempt_time_per_block = 90
 
 #the wallet reciever to which coinbase rewards will be sent
 
-wallet_receiver_url = "http://127.0.0.1:13415"
+wallet_listener_url = "http://127.0.0.1:13415"
 
 #whether to ignore the reward (mostly for testing)
 
@@ -149,7 +150,7 @@ burn_reward = false
 #slower.
 [[mining.cuckoo_miner_plugin_config]]
 type_filter = "mean_compat_cpu"
-parameter_list = {NUM_THREADS=4, NUM_TRIMS=68}
+parameter_list = {NUM_THREADS=1, NUM_TRIMS=68}
 
 #note lean_cpu currently has a bug which prevents it from
 #working with threads > 1

@@ -207,7 +207,7 @@ impl Miner {
 					let stats = job_handle.get_stats(i);
 					if let Ok(stat_vec) = stats {
 						for s in stat_vec {
-							let last_solution_time_secs = s.last_solution_time as f64 / 1000.0;
+							let last_solution_time_secs = s.last_solution_time as f64 / 1000000000.0;
 							let last_hashes_per_sec = 1.0 / last_solution_time_secs;
 							debug!(
 								LOGGER,
@@ -299,7 +299,7 @@ impl Miner {
 			if time::get_time().sec >= next_stat_check {
 				let stats_vec = plugin_miner.get_stats(0).unwrap();
 				for s in stats_vec.into_iter() {
-					let last_solution_time_secs = s.last_solution_time as f64 / 1000.0;
+					let last_solution_time_secs = s.last_solution_time as f64 / 1000000000.0;
 					let last_hashes_per_sec = 1.0 / last_solution_time_secs;
 					debug!(
 						LOGGER,
@@ -442,11 +442,21 @@ impl Miner {
 
 		loop {
 			debug!(LOGGER, "in miner loop...");
+			trace!(LOGGER, "key_id: {:?}", key_id);
 
 			// get the latest chain state and build a block on top of it
 			let head = self.chain.head_header().unwrap();
 			let mut latest_hash = self.chain.head().unwrap().last_block_h;
-			let (mut b, block_fees) = self.build_block(&head, key_id);
+			let mut result = self.build_block(&head, key_id.clone());
+			while let Err(e) = result {
+				result = self.build_block(&head, key_id.clone());
+				if let self::Error::Chain(chain::Error::DuplicateCommitment(_)) = e {
+					warn!(LOGGER, "Duplicate commit for potential coinbase detected. Trying next derivation.");
+				} else {
+					break;
+				}
+			}
+			let (mut b, block_fees) = result.unwrap();
 
 			let mut sol = None;
 			let mut use_async = false;
@@ -497,12 +507,7 @@ impl Miner {
 					b.hash()
 				);
 				b.header.pow = proof;
-				let opts = if cuckoo_size < consensus::DEFAULT_SIZESHIFT as u32 {
-					chain::EASY_POW
-				} else {
-					chain::NONE
-				};
-				let res = self.chain.process_block(b, opts);
+				let res = self.chain.process_block(b, chain::NONE);
 				if let Err(e) = res {
 					error!(
 						LOGGER,
@@ -530,7 +535,7 @@ impl Miner {
 		&self,
 		head: &core::BlockHeader,
 		key_id: Option<Identifier>,
-	) -> (core::Block, BlockFees) {
+	) -> Result<(core::Block, BlockFees), Error> {
 		// prepare the block header timestamp
 		let mut now_sec = time::get_time().sec;
 		let head_sec = head.timestamp.to_timespec().sec;
@@ -579,10 +584,21 @@ impl Miner {
 		b.header.nonce = rng.gen();
 		b.header.difficulty = difficulty;
 		b.header.timestamp = time::at_utc(time::Timespec::new(now_sec, 0));
-		self.chain
-			.set_sumtree_roots(&mut b)
-			.expect("Error setting sum tree roots");
-		(b, block_fees)
+		trace!(LOGGER, "Block: {:?}", b);
+		let result=self.chain.set_sumtree_roots(&mut b);
+		match result {
+			Ok(_) => Ok((b, block_fees)),
+			//If it's a duplicate commitment, it's likely trying to use 
+			//a key that's already been derived but not in the wallet
+			//for some reason, allow caller to retry
+			Err(chain::Error::DuplicateCommitment(e)) =>
+				Err(Error::Chain(chain::Error::DuplicateCommitment(e))),
+			//Some other issue is worth a panic
+			Err(e) => {
+				error!(LOGGER, "Error setting sumtree root to build a block: {:?}", e);
+				panic!(e);
+			}
+		}
 	}
 
 	///
@@ -608,7 +624,7 @@ impl Miner {
 		} else {
 			let url = format!(
 				"{}/v1/receive/coinbase",
-				self.config.wallet_receiver_url.as_str()
+				self.config.wallet_listener_url.as_str()
 			);
 
 			let res = wallet::client::create_coinbase(&url, &block_fees)?;
