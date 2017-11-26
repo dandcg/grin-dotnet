@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Serilog;
@@ -11,7 +12,7 @@ namespace Grin
         public static int Main(string[] args)
         {
             Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug()
+                .MinimumLevel.Verbose()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
@@ -40,9 +41,19 @@ namespace Grin
         public static IWebHost BuildWebHost(string[] args)
         {
             return WebHost.CreateDefaultBuilder(args)
+
+                .UseKestrel(options =>
+                {
+                    options.Listen(IPAddress.Any, 5000);
+                    //options.Listen(IPAddress.Parse("192.168.0.1"), 5000);
+                    //options.Listen(IPAddress.Loopback, 5001, listenOptions =>
+                    //{
+                    //    listenOptions.UseHttps("testCert.pfx", "testPassword");
+                    //});
+                })
                 .UseStartup<Startup>()
                 .UseSerilog()
-                .UseUrls("http://0.0.0.0:5000")
+                //.UseUrls("http://0.0.0.0:5000")
                 .Build();
         }
     }
