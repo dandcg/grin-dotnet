@@ -47,148 +47,106 @@ pub const AUTOMATED_TESTING_COINBASE_MATURITY: u64 = 3;
 /// User testing coinbase maturity
 pub const USER_TESTING_COINBASE_MATURITY: u64 = 3;
 
-/// Mining parameter modes
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum MiningParameterMode {
+/// Types of chain a server can run with, dictates the genesis block and
+/// and mining parameters used.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub enum ChainTypes {
 	/// For CI testing
 	AutomatedTesting,
 
 	/// For User testing
 	UserTesting,
 
-	/// For production, use the values in consensus.rs
-	Production,
+  /// First test network
+	Testnet1,
+
+  /// Main production network
+	Mainnet,
+}
+
+impl Default for ChainTypes {
+	fn default() -> ChainTypes {
+		ChainTypes::UserTesting
+	}
 }
 
 lazy_static!{
 	/// The mining parameter mode
-	pub static ref MINING_PARAMETER_MODE: RwLock<MiningParameterMode> =
-			RwLock::new(MiningParameterMode::Production);
+	pub static ref CHAIN_TYPE: RwLock<ChainTypes> =
+			RwLock::new(ChainTypes::Mainnet);
 }
 
 /// Set the mining mode
-pub fn set_mining_mode(mode: MiningParameterMode) {
-	let mut param_ref = MINING_PARAMETER_MODE.write().unwrap();
+pub fn set_mining_mode(mode: ChainTypes) {
+	let mut param_ref = CHAIN_TYPE.write().unwrap();
 	*param_ref = mode;
 }
 
 /// The sizeshift
 pub fn sizeshift() -> u8 {
-	let param_ref = MINING_PARAMETER_MODE.read().unwrap();
+	let param_ref = CHAIN_TYPE.read().unwrap();
 	match *param_ref {
-		MiningParameterMode::AutomatedTesting => AUTOMATED_TESTING_SIZESHIFT,
-		MiningParameterMode::UserTesting => USER_TESTING_SIZESHIFT,
-		MiningParameterMode::Production => DEFAULT_SIZESHIFT,
+		ChainTypes::AutomatedTesting => AUTOMATED_TESTING_SIZESHIFT,
+		ChainTypes::UserTesting => USER_TESTING_SIZESHIFT,
+		ChainTypes::Testnet1 => USER_TESTING_SIZESHIFT,
+		ChainTypes::Mainnet => DEFAULT_SIZESHIFT,
 	}
 }
 
 /// The proofsize
 pub fn proofsize() -> usize {
-	let param_ref = MINING_PARAMETER_MODE.read().unwrap();
+	let param_ref = CHAIN_TYPE.read().unwrap();
 	match *param_ref {
-		MiningParameterMode::AutomatedTesting => AUTOMATED_TESTING_PROOF_SIZE,
-		MiningParameterMode::UserTesting => USER_TESTING_PROOF_SIZE,
-		MiningParameterMode::Production => PROOFSIZE,
+		ChainTypes::AutomatedTesting => AUTOMATED_TESTING_PROOF_SIZE,
+		ChainTypes::UserTesting => USER_TESTING_PROOF_SIZE,
+		ChainTypes::Testnet1 => PROOFSIZE,
+		ChainTypes::Mainnet => PROOFSIZE,
 	}
 }
 
 /// Coinbase maturity
 pub fn coinbase_maturity() -> u64 {
-	let param_ref = MINING_PARAMETER_MODE.read().unwrap();
+	let param_ref = CHAIN_TYPE.read().unwrap();
 	match *param_ref {
-		MiningParameterMode::AutomatedTesting => AUTOMATED_TESTING_COINBASE_MATURITY,
-		MiningParameterMode::UserTesting => USER_TESTING_COINBASE_MATURITY,
-		MiningParameterMode::Production => COINBASE_MATURITY,
+		ChainTypes::AutomatedTesting => AUTOMATED_TESTING_COINBASE_MATURITY,
+		ChainTypes::UserTesting => USER_TESTING_COINBASE_MATURITY,
+		ChainTypes::Testnet1 => COINBASE_MATURITY,
+		ChainTypes::Mainnet => COINBASE_MATURITY,
 	}
 }
 
 /// Are we in automated testing mode?
 pub fn is_automated_testing_mode() -> bool {
-	let param_ref = MINING_PARAMETER_MODE.read().unwrap();
-	if let MiningParameterMode::AutomatedTesting = *param_ref {
-		return true;
-	} else {
-		return false;
-	}
+	let param_ref = CHAIN_TYPE.read().unwrap();
+	ChainTypes::AutomatedTesting == *param_ref
 }
 
-/// Are we in production mode?
+/// Are we in user testing mode?
+pub fn is_user_testing_mode() -> bool {
+	let param_ref = CHAIN_TYPE.read().unwrap();
+	ChainTypes::UserTesting == *param_ref
+}
+
+/// Are we in production mode (a live public network)?
 pub fn is_production_mode() -> bool {
-	let param_ref = MINING_PARAMETER_MODE.read().unwrap();
-	if let MiningParameterMode::Production = *param_ref {
-		return true;
-	} else {
-		return false;
-	}
+	let param_ref = CHAIN_TYPE.read().unwrap();
+	ChainTypes::Testnet1 == *param_ref ||
+    ChainTypes::Mainnet == *param_ref
 }
-
 
 /// Helper function to get a nonce known to create a valid POW on
 /// the genesis block, to prevent it taking ages. Should be fine for now
 /// as the genesis block POW solution turns out to be the same for every new
 /// block chain
 /// at the moment
-
 pub fn get_genesis_nonce() -> u64 {
-	let param_ref = MINING_PARAMETER_MODE.read().unwrap();
+	let param_ref = CHAIN_TYPE.read().unwrap();
 	match *param_ref {
 		// won't make a difference
-		MiningParameterMode::AutomatedTesting => 0,
+		ChainTypes::AutomatedTesting => 0,
 		// Magic nonce for current genesis block at cuckoo16
-		MiningParameterMode::UserTesting => 22141,
-		// Magic nonce for current genesis at cuckoo30
-		MiningParameterMode::Production => 1429942738856787200,
+		ChainTypes::UserTesting => 27944,
+
+		_ => panic!("Pre-set"),
 	}
-}
-
-/// Returns the genesis POW for production, because it takes far too long to
-/// mine at production values
-/// using the internal miner
-
-pub fn get_genesis_pow() -> [u32; 42] {
-	// TODO: This is diff 26, probably just want a 10: mine one
-	[
-		7444824,
-		11926557,
-		28520390,
-		30594072,
-		50854023,
-		52797085,
-		57882033,
-		59816511,
-		61404804,
-		84947619,
-		87779345,
-		115270337,
-		162618676,
-		166860710,
-		178656003,
-		178971372,
-		200454733,
-		209197630,
-		221231015,
-		228598741,
-		241012783,
-		245401183,
-		279080304,
-		295848517,
-		327300943,
-		329741709,
-		366394532,
-		382493153,
-		389329248,
-		404353381,
-		406012911,
-		418813499,
-		426573907,
-		452566575,
-		456930760,
-		463021458,
-		474340589,
-		476248039,
-		478197093,
-		487576917,
-		495653489,
-		501862896,
-	]
 }
