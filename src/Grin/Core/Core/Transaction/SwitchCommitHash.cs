@@ -15,6 +15,8 @@ namespace Grin.Core.Core
             return hash.AsString();
 
         }
+
+        /// simple hash
         public byte[] hash { get; private set; } //: [u8; SWITCH_COMMIT_HASH_SIZE],
 
         public static SwitchCommitHash From_switch_commit(Commitment switchCommit)

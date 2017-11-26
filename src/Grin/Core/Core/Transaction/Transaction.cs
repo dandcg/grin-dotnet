@@ -222,6 +222,12 @@ namespace Grin.Core.Core
             {
                 throw new OddFeeException();
             }
+            if (inputs.Length > Consensus.MAX_BLOCK_INPUTS)
+            {
+                throw new ToManyInputsException();
+            }
+
+
             foreach (var outp in outputs)
             {
                 outp.Verify_proof(secp);
