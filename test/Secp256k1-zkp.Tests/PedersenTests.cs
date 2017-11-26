@@ -199,7 +199,7 @@ namespace Secp256k1Proxy.Tests
             var range_proof = secp.range_proof(0, 7, blinding, commit, msg.clone());
             var proof_range = secp.verify_range_proof(commit, range_proof);
 
-            Assert.Equal<ulong>(proof_range.min, 0);
+            Assert.Equal<ulong>(0,proof_range.min);
 
             var  proof_info = secp.range_proof_info(range_proof);
             Assert.True(proof_info.success);
