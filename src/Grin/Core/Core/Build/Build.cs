@@ -18,36 +18,6 @@ using Serilog;
 
 namespace Grin.Core.Core
 {
-    /// Context information available to transaction combinators.
-    public class Context
-    {
-        public Context(Keychain.Keychain keychain, Transaction tx, BlindSum sum)
-        {
-            Keychain = keychain;
-            Tx = tx;
-            Sum = sum;
-        }
-
-        public Keychain.Keychain Keychain { get; }
-        public Transaction Tx { get; set; }
-        public BlindSum Sum { get; set; }
-    }
-
-    /// Function type returned by the transaction combinators. Transforms a
-    /// (Transaction, BlindSum) pair into another, provided some context.
-    public class Append
-    {
-        public Transaction Transaction { get; }
-        public BlindSum Blind { get; }
-
-        public Append(Transaction transaction, BlindSum blind)
-        {
-            Transaction = transaction;
-            Blind = blind;
-        }
-    }
-
-
     public static class Build
     {
         /// Builds a new transaction by combining all the combinators provided in a

@@ -473,7 +473,7 @@ namespace Secp256k1Proxy.Tests
 
                 var hash = Hash(kp.publicKey.Value);
 
-                Assert.False(set.Contains(hash));
+                Assert.DoesNotContain(hash, set);
 
                 set.Add(hash);
             }
