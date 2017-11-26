@@ -50,7 +50,7 @@ namespace Grin.Core.Core
         /// Minimum difficulty according to our consensus rules.
         public static Difficulty minimum()
         {
-            return new Difficulty(Concensus.MINIMUM_DIFFICULTY); 
+            return new Difficulty(Consensus.MINIMUM_DIFFICULTY); 
           
         }
 
