@@ -14,8 +14,15 @@ namespace Grin.Core
         //! here.
 
 
-        /// A grin is divisible to 10^9, a nanogrin
+        /// A grin is divisible to 10^9, following the SI prefixes
         public const ulong GRIN_BASE = 1_000_000_000;
+        /// Milligrin, a thousand of a grin
+        public const ulong MILLI_GRIN = GRIN_BASE / 1_000;
+        /// Microgrin, a thousand of a milligrin
+        public const ulong MICRO_GRIN = MILLI_GRIN / 1_000;
+        /// Nanogrin, smallest unit, takes a billion to make a grin
+        public const ulong NANO_GRIN= 1;
+
 
         /// The block subsidy amount
         public const ulong REWARD = 50 * GRIN_BASE;
@@ -69,6 +76,12 @@ namespace Grin.Core
         /// Total maximum block weight
         public const uint MAX_BLOCK_WEIGHT = 80_000;
 
+        /// Maximum inputs for a block (issue#261)
+        /// Hundreds of inputs + 1 output might be slow to validate (issue#258)
+        public const uint MAX_BLOCK_INPUTS = 300_000; // soft fork down when too_high
+
+
+
         /// Whether a block exceeds the maximum acceptable weight
         public static bool exceeds_weight(uint input_len, uint output_len, uint kernel_len)
 
@@ -113,11 +126,12 @@ namespace Grin.Core
         /// Average time span of the difficulty adjustment window
         public const ulong BLOCK_TIME_WINDOW = DIFFICULTY_ADJUST_WINDOW * BLOCK_TIME_SEC;
 
-        /// Maximum size time window used for difficutly adjustments
-        public const ulong UPPER_TIME_BOUND = BLOCK_TIME_WINDOW * 4 / 3;
+        /// Maximum size time window used for difficulty adjustments
+        public const ulong UPPER_TIME_BOUND = BLOCK_TIME_WINDOW* 4 / 3;
 
-        /// Minimum size time window used for difficutly adjustments
-        public const ulong LOWER_TIME_BOUND = BLOCK_TIME_WINDOW * 5 / 6;
+        /// Minimum size time window used for difficulty adjustments
+        public const ulong LOWER_TIME_BOUND = BLOCK_TIME_WINDOW* 5 / 6;
+
 
         /// Error when computing the next difficulty adjustment.
         /// Computes the proof-of-work difficulty that the next block should comply
@@ -170,7 +184,7 @@ namespace Grin.Core
             // Check we have enough blocks
             if (window_end.Count < (int) MEDIAN_TIME_WINDOW)
             {
-                return Difficulty.From_num(MINIMUM_DIFFICULTY);
+                return Difficulty.minimum();
             }
 
             // Calculating time medians at the beginning and end of the window.
@@ -200,8 +214,9 @@ namespace Grin.Core
             }
             ;
 
-            var diffNum = diff_avg * Difficulty.From_num(BLOCK_TIME_WINDOW).num / Difficulty.From_num(adj_ts).num;
-
+            var diffNum =
+                Math.Max(diff_avg * Difficulty.From_num(BLOCK_TIME_WINDOW).num / Difficulty.From_num(adj_ts).num,
+                    Difficulty.minimum().num);
 
             return Difficulty.From_num(diffNum);
         }

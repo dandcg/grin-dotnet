@@ -32,7 +32,7 @@ namespace Grin.Core.Core
             return new Difficulty(num);
         }
 
-        /// Difficulty of zero, which is practically invalid (not target can be
+        /// Difficulty of zero, which is invalid (no target can be
         /// calculated from it) but very useful as a start for additions.
         public static Difficulty Zero()
         {
@@ -41,12 +41,21 @@ namespace Grin.Core.Core
 
         /// Difficulty of one, which is the minumum difficulty (when the hash
         /// equals the max target)
+        /// TODO - is this the minimum dificulty or is consensus::MINIMUM_DIFFICULTY the minimum?
         public static Difficulty One()
         {
             return new Difficulty(1);
         }
 
-        public Difficulty Clone()
+        /// Minimum difficulty according to our consensus rules.
+        public static Difficulty minimum()
+        {
+            return new Difficulty(Concensus.MINIMUM_DIFFICULTY); 
+          
+        }
+
+
+public Difficulty Clone()
         {
             return new Difficulty(num);
         }

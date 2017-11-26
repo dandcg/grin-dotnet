@@ -19,6 +19,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="Chain\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
 

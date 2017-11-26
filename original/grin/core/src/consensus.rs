@@ -20,12 +20,19 @@
 //! here.
 
 use std::fmt;
+use std::cmp::max;
 
 use ser;
 use core::target::Difficulty;
 
-/// A grin is divisible to 10^9, a nanogrin
+/// A grin is divisible to 10^9, following the SI prefixes
 pub const GRIN_BASE: u64 = 1_000_000_000;
+/// Milligrin, a thousand of a grin
+pub const MILLI_GRIN: u64 = GRIN_BASE / 1_000;
+/// Microgrin, a thousand of a milligrin
+pub const MICRO_GRIN: u64 = MILLI_GRIN / 1_000;
+/// Nanogrin, smallest unit, takes a billion to make a grin
+pub const NANO_GRIN: u64 = 1;
 
 /// The block subsidy amount
 pub const REWARD: u64 = 50 * GRIN_BASE;
@@ -78,10 +85,15 @@ pub const BLOCK_KERNEL_WEIGHT: usize = 2;
 /// Total maximum block weight
 pub const MAX_BLOCK_WEIGHT: usize = 80_000;
 
+/// Maximum inputs for a block (issue#261)
+/// Hundreds of inputs + 1 output might be slow to validate (issue#258)
+pub const MAX_BLOCK_INPUTS: usize = 300_000; // soft fork down when too_high
+
 /// Whether a block exceeds the maximum acceptable weight
 pub fn exceeds_weight(input_len: usize, output_len: usize, kernel_len: usize) -> bool {
 	input_len * BLOCK_INPUT_WEIGHT + output_len * BLOCK_OUTPUT_WEIGHT
 		+ kernel_len * BLOCK_KERNEL_WEIGHT > MAX_BLOCK_WEIGHT
+		|| input_len > MAX_BLOCK_INPUTS
 }
 
 /// Fork every 250,000 blocks for first 2 years, simple number and just a
@@ -119,10 +131,10 @@ pub const DIFFICULTY_ADJUST_WINDOW: u64 = 23;
 /// Average time span of the difficulty adjustment window
 pub const BLOCK_TIME_WINDOW: u64 = DIFFICULTY_ADJUST_WINDOW * BLOCK_TIME_SEC;
 
-/// Maximum size time window used for difficutly adjustments
+/// Maximum size time window used for difficulty adjustments
 pub const UPPER_TIME_BOUND: u64 = BLOCK_TIME_WINDOW * 4 / 3;
 
-/// Minimum size time window used for difficutly adjustments
+/// Minimum size time window used for difficulty adjustments
 pub const LOWER_TIME_BOUND: u64 = BLOCK_TIME_WINDOW * 5 / 6;
 
 /// Error when computing the next difficulty adjustment.
@@ -181,7 +193,7 @@ where
 
 	// Check we have enough blocks
 	if window_end.len() < (MEDIAN_TIME_WINDOW as usize) {
-		return Ok(Difficulty::from_num(MINIMUM_DIFFICULTY));
+		return Ok(Difficulty::minimum());
 	}
 
 	// Calculating time medians at the beginning and end of the window.
@@ -203,7 +215,10 @@ where
 		ts_damp
 	};
 
-	Ok(diff_avg * Difficulty::from_num(BLOCK_TIME_WINDOW) / Difficulty::from_num(adj_ts))
+	let difficulty =
+		diff_avg * Difficulty::from_num(BLOCK_TIME_WINDOW) / Difficulty::from_num(adj_ts);
+
+	Ok(max(difficulty, Difficulty::minimum()))
 }
 
 /// Consensus rule that collections of items are sorted lexicographically over the wire.
@@ -318,6 +333,12 @@ mod test {
 		assert_eq!(
 			next_difficulty(repeat(200, 1000, just_enough)).unwrap(),
 			Difficulty::from_num(750)
+		);
+
+		// We should never drop below MINIMUM_DIFFICULTY (10)
+		assert_eq!(
+			next_difficulty(repeat(90, 10, just_enough)).unwrap(),
+			Difficulty::from_num(10)
 		);
 	}
 
