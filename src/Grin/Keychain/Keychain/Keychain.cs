@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using Konscious.Security.Cryptography;
 using Secp256k1Proxy;
+using Serilog;
 
 namespace Grin.Keychain
 {
@@ -12,13 +14,16 @@ namespace Grin.Keychain
         public Secp256k1 Secp { get; }
         public ExtendedKey Extkey { get; }
         public Dictionary<string, SecretKey> KeyOverrides { get; }
+        public ConcurrentDictionary<string, uint> KeyDerivationCache { get; }
 
 
-        private Keychain(Secp256k1 secp, ExtendedKey extkey, Dictionary<string, SecretKey> keyOverrides)
+        private Keychain(Secp256k1 secp, ExtendedKey extkey, Dictionary<string, SecretKey> keyOverrides,
+            ConcurrentDictionary<string, uint> key_derivation_cache)
         {
             Secp = secp;
             Extkey = extkey;
             KeyOverrides = keyOverrides;
+            KeyDerivationCache = key_derivation_cache;
         }
 
 
@@ -33,7 +38,7 @@ namespace Grin.Keychain
         {
             var keyOverridesNew =
                 new Dictionary<string, SecretKey> {{burnKeyId.Hex, SecretKey.from_slice(keychain.Secp, new byte[32])}};
-            return new Keychain(keychain.Secp, keychain.Extkey.Clone(), keyOverridesNew);
+            return new Keychain(keychain.Secp, keychain.Extkey.Clone(), keyOverridesNew, keychain.KeyDerivationCache);
         }
 
         public static Keychain From_seed(byte[] seed)
@@ -41,9 +46,10 @@ namespace Grin.Keychain
             var secp = Secp256k1.WithCaps(ContextFlag.Commit);
             var extkey = ExtendedKey.from_seed(secp, seed);
             var keychain = new Keychain(
-                secp,
-                extkey,
-                new Dictionary<string, SecretKey>());
+                    secp,
+                    extkey,
+                    new Dictionary<string, SecretKey>(), new ConcurrentDictionary<string, uint>())
+                ;
 
             return keychain;
         }
@@ -72,18 +78,51 @@ namespace Grin.Keychain
 
         public SecretKey Derived_key(Identifier keyId)
         {
+            Log.Verbose("Derived Key by key_id: {key_id}", keyId);
+
+            // first check our overrides and just return the key if we have one in there
             KeyOverrides.TryGetValue(keyId.Hex, out var sk);
 
             if (sk != null)
             {
+                Log.Verbose("... Derived Key (using override) key_id: {key_id}", keyId);
                 return sk;
             }
+
+            // then check the derivation cache to see if we have previously derived this key
+            // if so use the derivation from the cache to derive the key
+
+            var cache = KeyDerivationCache;
+
+            if (cache.TryGetValue(keyId.Hex, out var derivation))
+            {
+                if (derivation != null)
+                {
+                    Log.Verbose("... Derived Key (cache hit) key_id: {key_id}, derivation: {}", keyId, derivation);
+                    return derived_key_from_index(derivation);
+                }
+            }
+
+
+            // otherwise iterate over a large number of derivations looking for our key
+            // cache the resulting derivations by key_id for faster lookup later
+            // TODO - remove the 10k hard limit and be smarter about batching somehow
+
 
             for (uint i = 1; i <= 10000; i++)
 
             {
                 var extkeyNew = Extkey.Derive(Secp, i);
                 var ident = extkeyNew.Identifier(Secp);
+
+
+                if (!cache.ContainsKey(ident.Hex))
+                {
+                    Log.Verbose("... Derived Key (cache miss) key_id: {key_id}, derivation: {derivation}", ident,
+                        extkeyNew.NChild);
+                    cache.TryAdd(ident.Hex, extkeyNew.NChild);
+                }
+
 
                 if (ident.Hex == keyId.Hex)
                 {
@@ -94,6 +133,15 @@ namespace Grin.Keychain
 
             throw new Exception($"KeyDerivation - cannot find extkey for {keyId.Hex}");
         }
+
+        // if we know the derivation index we can just straight to deriving the key
+        public SecretKey derived_key_from_index(uint derivation)
+        {
+            Log.Verbose("Derived Key (fast) by derivation: {}", derivation);
+            var extkey = Extkey.Derive(Secp, derivation);
+            return extkey.Key;
+        }
+
 
         public Commitment Commit(ulong amount, Identifier keyId)
         {
