@@ -10,13 +10,13 @@ namespace Grin.Wallet.Types
             
         }
 
-        [JsonProperty]
+        [JsonProperty("fees")]
         public ulong fees { get; private set; }
 
-        [JsonProperty]
+        [JsonProperty("height")]
         public ulong height { get; private set; }
 
-        [JsonProperty]
+        [JsonProperty("key_id")]
         public Identifier key_id { get; private set; }
 
 

@@ -3,28 +3,27 @@ using Common;
 using Grin.Core.Core.Transaction;
 using Grin.Core.Ser;
 using Grin.Keychain.Blind;
-using Microsoft.Azure.KeyVault.Models;
 using Newtonsoft.Json;
 
 namespace Grin.Wallet.Types
 {
-
     /// Helper in serializing the information a receiver requires to build a
     /// transaction.
     public class PartialTx
     {
-
-        public ulong amount { get;  set; }
+        [JsonProperty("amount")]
+        public ulong amount { get; set; }
+        [JsonProperty("blind_sum")]
         public string blind_sum { get; set; }
-        public string tx { get;  set; }
+        [JsonProperty("tx")]
+        public string tx { get; set; }
 
 
         /// Builds a PartialTx from data sent by a sender (not yet completed by the receiver).
-public static PartialTx build_partial_tx(
-           ulong receiveAmount,
-        BlindingFactor blindSum,
-        Transaction transaction
-    
+        public static PartialTx build_partial_tx(
+            ulong receiveAmount,
+            BlindingFactor blindSum,
+            Transaction transaction
         )
         {
             return new PartialTx
@@ -54,7 +53,6 @@ public static PartialTx build_partial_tx(
 
 
                 return (partial_tx.amount, blinding, transaction);
-
             }
         }
     }
