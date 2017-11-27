@@ -8,6 +8,20 @@ namespace Common
 {
     public static class JsonUtil
     {
+
+        public static string ReadString(this Stream stream)
+        {
+            using (var reader = new StreamReader(stream))
+            {
+
+                return reader.ReadToEnd();
+
+            }
+
+        }
+
+
+
         public static  IEnumerable<TResult> ReadJsonArray<TResult>(this Stream stream)
         {
             var serializer = new JsonSerializer();

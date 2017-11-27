@@ -101,11 +101,10 @@ namespace Grin.Keychain.Keychain
 
             if (cache.TryGetValue(keyId.Hex, out var derivation))
             {
-                if (derivation != null)
-                {
-                    Log.Verbose("... Derived Key (cache hit) key_id: {key_id}, derivation: {}", keyId, derivation);
+         
+                    Log.Verbose("... Derived Key (cache hit) key_id: {key_id}, derivation: {derivation}", keyId, derivation);
                     return derived_key_from_index(derivation);
-                }
+              
             }
 
 

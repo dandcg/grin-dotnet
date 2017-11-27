@@ -1,6 +1,7 @@
 using Common;
 using Grin.Core.Ser;
 using Grin.Keychain.ExtKey;
+using Grin.Wallet.Receiver;
 using Grin.Wallet.Types;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,7 +23,7 @@ namespace Grin.Wallet.Handlers
      public CbData build_coinbase(BlockFees bf)
         {
 
-            var (outp, kern, block_fees) = Receiver.Receiver.receive_coinbase(
+            var (outp, kern, block_fees) = WalletReceiver.receive_coinbase(
                                              config,
                                              keychain,
                                              bf);

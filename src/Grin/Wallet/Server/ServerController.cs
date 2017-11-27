@@ -1,5 +1,8 @@
+using System.IO;
+using System.Text;
 using Common;
 using Grin.Wallet.Handlers;
+using Grin.Wallet.Receiver;
 using Grin.Wallet.Types;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,10 +12,12 @@ namespace Grin.Wallet.Server
     public class ServerController:Controller
     {
         private readonly CoinbaseHandler coinbasehandler;
+        private readonly WalletReceiver walletReceiver;
 
-        public ServerController(CoinbaseHandler coinbasehandler)
+        public ServerController(CoinbaseHandler coinbasehandler, WalletReceiver walletReceiver)
         {
             this.coinbasehandler = coinbasehandler;
+            this.walletReceiver = walletReceiver;
         }
 
 
@@ -22,6 +27,22 @@ namespace Grin.Wallet.Server
         {
             return Content("-[ Grin Wallet On DotNetCore ]-");
         }
+
+
+        [Route("/v1/receive/transaction")]
+        [HttpPost]
+        public  IActionResult ReceiveTransaction()
+        {
+
+
+            var partialTxStr = Request.Body.ReadString();
+         
+            var res = walletReceiver.Handle(partialTxStr);
+            return res;
+
+        }
+
+
 
         [Route("/v1/receive/coinbase")]
         [HttpPost]
