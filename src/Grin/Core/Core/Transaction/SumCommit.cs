@@ -1,7 +1,10 @@
 ﻿using System;
+using Grin.Core.Ser;
 using Secp256k1Proxy;
+using Secp256k1Proxy.Lib;
+using Secp256k1Proxy.Pedersen;
 
-namespace Grin.Core.Core
+namespace Grin.Core.Core.Transaction
 {
     /// Wrapper to Output commitments to provide the Summable trait.
     public class SumCommit : IWriteable, IReadable
@@ -21,7 +24,7 @@ namespace Grin.Core.Core
         public void read(IReader reader)
         {
             secp = Secp256k1.WithCaps(ContextFlag.Commit);
-            commit = Ser.ReadCommitment(reader);
+            commit = Ser.Ser.ReadCommitment(reader);
         }
 
 

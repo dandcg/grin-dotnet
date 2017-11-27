@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Grin.Wallet
+namespace Grin.Wallet.Types
 {
     public class FeeDisputeException : ApplicationException
     {

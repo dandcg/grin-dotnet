@@ -1,4 +1,4 @@
-namespace Grin.Wallet
+namespace Grin.Wallet.Types
 {
     public class WalletConfig
     {

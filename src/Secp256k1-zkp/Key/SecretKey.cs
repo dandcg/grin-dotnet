@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Security.Cryptography;
 using Common;
+using Secp256k1Proxy.Ffi;
+using Secp256k1Proxy.Lib;
 
-namespace Secp256k1Proxy
+namespace Secp256k1Proxy.Key
 {
     public class SecretKey
     {
@@ -44,7 +46,7 @@ namespace Secp256k1Proxy
         { 
             switch (data.Length)
             {
-                case Constants.SECRET_KEY_SIZE:
+                case Constants.Constants.SECRET_KEY_SIZE:
 
                
                     if (Proxy.secp256k1_ec_seckey_verify(secp.Ctx,data) == 0)

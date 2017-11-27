@@ -1,4 +1,4 @@
-namespace Grin.Wallet
+namespace Grin.Wallet.Client
 {
     public class Client
     {

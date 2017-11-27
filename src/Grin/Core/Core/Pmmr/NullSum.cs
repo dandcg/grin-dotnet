@@ -1,6 +1,7 @@
 ﻿using System;
+using Grin.Core.Ser;
 
-namespace Grin.Core.Core
+namespace Grin.Core.Core.Pmmr
 {
     public class NullSum : ISummable, IWriteable, IReadable
     {

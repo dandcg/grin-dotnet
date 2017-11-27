@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace Grin.Core
+namespace Grin.Core.Ser
 {
     public class BinReader : ReaderBase
     {

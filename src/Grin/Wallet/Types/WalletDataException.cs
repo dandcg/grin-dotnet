@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Threading.Tasks;
 
-namespace Grin.Wallet
+namespace Grin.Wallet.Types
 {
     public class WalletDataException : ApplicationException
     {

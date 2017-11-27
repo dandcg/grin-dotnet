@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using Grin.Core.Core.Hash;
+using Grin.Core.Core.Target;
+using Grin.Core.Ser;
 
-namespace Grin.Core.Core
+namespace Grin.Core.Core.Mod
 {
     public class Proof:IWriteable,IReadable
         

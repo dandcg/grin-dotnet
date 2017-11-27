@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Secp256k1Proxy
+namespace Secp256k1Proxy.Lib
 {
     public class RecoveryId
     {

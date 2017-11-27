@@ -1,4 +1,4 @@
-﻿namespace Grin.Core
+﻿namespace Grin.Core.Ser
 {
     /// Trait that every type that can be deserialized from binary must implement.
     /// Reads directly to a Reader, a utility type thinly wrapping an

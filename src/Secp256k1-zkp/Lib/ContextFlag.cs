@@ -1,4 +1,4 @@
-﻿namespace Secp256k1Proxy
+﻿namespace Secp256k1Proxy.Lib
 {
     /// Flags used to determine the capabilities of a `Secp256k1` object;
     /// the more capabilities, the more expensive it is to New.

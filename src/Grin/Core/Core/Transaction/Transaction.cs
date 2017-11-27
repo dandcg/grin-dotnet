@@ -1,9 +1,14 @@
 ﻿using System.Linq;
-using Grin.Wallet;
+using Grin.Core.Core.Hash;
+using Grin.Core.Core.Mod;
+using Grin.Core.Core.Transaction.Errors;
+using Grin.Core.Ser;
 using Secp256k1Proxy;
+using Secp256k1Proxy.Lib;
+using Secp256k1Proxy.Pedersen;
 using Serilog;
 
-namespace Grin.Core.Core
+namespace Grin.Core.Core.Transaction
 {
     /// A transaction
     public class Transaction : IWriteable, IReadable, ICommitted
@@ -141,8 +146,8 @@ namespace Grin.Core.Core
             var input_len = reader.read_u64();
             var output_len = reader.read_u64();
 
-            inputs = Ser.read_and_verify_sorted<Input>(reader, input_len);
-            outputs = Ser.read_and_verify_sorted<Output>(reader, output_len);
+            inputs = Ser.Ser.read_and_verify_sorted<Input>(reader, input_len);
+            outputs = Ser.Ser.read_and_verify_sorted<Output>(reader, output_len);
         }
 
 

@@ -1,7 +1,10 @@
-﻿using Grin.Keychain;
+﻿using Grin.Core.Ser;
+using Grin.Keychain.ExtKey;
 using Secp256k1Proxy;
+using Secp256k1Proxy.Lib;
+using Secp256k1Proxy.Pedersen;
 
-namespace Grin.Core.Core
+namespace Grin.Core.Core.Transaction
 {
     /// Output for a transaction, defining the new ownership of coins that are being
     /// transferred. The commitment is a blinded value for the output while the
@@ -43,7 +46,7 @@ namespace Grin.Core.Core
 
         /// Given the original blinding factor we can recover the
         /// value from the range proof and the commitment
-        public ulong? Recover_value(Keychain.Keychain keychain, Identifier keyId)
+        public ulong? Recover_value(Keychain.Keychain.Keychain keychain, Identifier keyId)
         {
             var pi = keychain.Rewind_range_proof(keyId, commit, proof);
 
@@ -58,9 +61,9 @@ namespace Grin.Core.Core
         public void read(IReader reader)
         {
             features = (OutputFeatures) reader.read_u8();
-            commit = Ser.ReadCommitment(reader);
+            commit = Ser.Ser.ReadCommitment(reader);
             switch_commit_hash = SwitchCommitHash.readnew(reader);
-            proof = Ser.ReadRangeProof(reader);
+            proof = Ser.Ser.ReadRangeProof(reader);
         }
 
         public void write(IWriter writer)

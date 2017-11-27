@@ -1,6 +1,9 @@
 using System;
 using System.Security.Cryptography;
 using Common;
+using Secp256k1Proxy.Key;
+using Secp256k1Proxy.Lib;
+using Secp256k1Proxy.Pedersen;
 using Xunit;
 
 namespace Secp256k1Proxy.Tests

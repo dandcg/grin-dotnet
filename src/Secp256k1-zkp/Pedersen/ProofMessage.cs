@@ -1,4 +1,4 @@
-﻿namespace Secp256k1Proxy
+﻿namespace Secp256k1Proxy.Pedersen
 {
     public class ProofMessage
     {
@@ -11,7 +11,7 @@
 
         public static ProofMessage empty()
         {
-            return new ProofMessage(new byte[Constants.MESSAGE_SIZE]);
+            return new ProofMessage(new byte[Constants.Constants.MESSAGE_SIZE]);
         }
 
         public ProofMessage clone()

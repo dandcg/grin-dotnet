@@ -3,7 +3,10 @@ using System.IO;
 using Common;
 using Grin.Core;
 using Grin.Core.Core;
+using Grin.Core.Core.Transaction;
+using Grin.Core.Ser;
 using Secp256k1Proxy;
+using Secp256k1Proxy.Pedersen;
 using Xunit;
 
 namespace Grin.Tests.Unit.CoreTests.Core
@@ -13,7 +16,7 @@ namespace Grin.Tests.Unit.CoreTests.Core
         [Fact]
         public void test_kernel_ser_deser()
         {
-            var keychain = Keychain.Keychain.From_random_seed();
+            var keychain = Keychain.Keychain.Keychain.From_random_seed();
             var key_id = keychain.Derive_key_id(1);
             var commit = keychain.Commit(5, key_id);
 
@@ -75,7 +78,7 @@ namespace Grin.Tests.Unit.CoreTests.Core
         [Fact]
         public void test_output_ser_deser()
         {
-            var keychain = Keychain.Keychain.From_random_seed();
+            var keychain = Keychain.Keychain.Keychain.From_random_seed();
             var key_id_set = keychain.Derive_key_id(1);
             var commit = keychain.Commit(5, key_id_set);
             var switch_commit = keychain.Switch_commit(key_id_set);
@@ -109,7 +112,7 @@ namespace Grin.Tests.Unit.CoreTests.Core
         [Fact]
         public void test_output_value_recovery()
         {
-            var keychain = Keychain.Keychain.From_random_seed();
+            var keychain = Keychain.Keychain.Keychain.From_random_seed();
             var key_id = keychain.Derive_key_id(1);
 
             var commit = keychain.Commit(1003, key_id);

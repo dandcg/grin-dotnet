@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using Common;
+using Secp256k1Proxy.Key;
+using Secp256k1Proxy.Lib;
 using Xunit;
 
 namespace Secp256k1Proxy.Tests
@@ -340,39 +342,39 @@ namespace Secp256k1Proxy.Tests
             // Bad sizes
             Assert.Throws<Exception>(() =>
             {
-                PublicKey.from_slice(s, ByteUtil.get_bytes(0, Constants.PUBLIC_KEY_SIZE - 1));
+                PublicKey.from_slice(s, ByteUtil.get_bytes(0, Constants.Constants.PUBLIC_KEY_SIZE - 1));
             });
 
             Assert.Throws<Exception>(() =>
             {
-                PublicKey.from_slice(s, ByteUtil.get_bytes(0, Constants.PUBLIC_KEY_SIZE + 1));
+                PublicKey.from_slice(s, ByteUtil.get_bytes(0, Constants.Constants.PUBLIC_KEY_SIZE + 1));
             });
 
             Assert.Throws<Exception>(() =>
             {
-                PublicKey.from_slice(s, ByteUtil.get_bytes(0, Constants.COMPRESSED_PUBLIC_KEY_SIZE + 1));
+                PublicKey.from_slice(s, ByteUtil.get_bytes(0, Constants.Constants.COMPRESSED_PUBLIC_KEY_SIZE + 1));
             });
 
             Assert.Throws<Exception>(() =>
             {
-                PublicKey.from_slice(s, ByteUtil.get_bytes(0, Constants.UNCOMPRESSED_PUBLIC_KEY_SIZE - 1));
+                PublicKey.from_slice(s, ByteUtil.get_bytes(0, Constants.Constants.UNCOMPRESSED_PUBLIC_KEY_SIZE - 1));
             });
 
             Assert.Throws<Exception>(() =>
             {
-                PublicKey.from_slice(s, ByteUtil.get_bytes(0, Constants.UNCOMPRESSED_PUBLIC_KEY_SIZE + 1));
+                PublicKey.from_slice(s, ByteUtil.get_bytes(0, Constants.Constants.UNCOMPRESSED_PUBLIC_KEY_SIZE + 1));
             });
 
             //// Bad parse
 
             Assert.Throws<Exception>(() =>
             {
-                PublicKey.from_slice(s, ByteUtil.get_bytes(0xff, Constants.UNCOMPRESSED_PUBLIC_KEY_SIZE));
+                PublicKey.from_slice(s, ByteUtil.get_bytes(0xff, Constants.Constants.UNCOMPRESSED_PUBLIC_KEY_SIZE));
             });
 
             Assert.Throws<Exception>(() =>
             {
-                PublicKey.from_slice(s, ByteUtil.get_bytes(0x55, Constants.COMPRESSED_PUBLIC_KEY_SIZE));
+                PublicKey.from_slice(s, ByteUtil.get_bytes(0x55, Constants.Constants.COMPRESSED_PUBLIC_KEY_SIZE));
             });
 
         }

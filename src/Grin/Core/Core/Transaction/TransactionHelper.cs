@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Grin.Core.Core
+namespace Grin.Core.Core.Transaction
 {
     public static class TransactionHelper
     {

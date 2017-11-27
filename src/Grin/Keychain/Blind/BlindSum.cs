@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using Grin.Keychain.ExtKey;
 
-namespace Grin.Keychain
+namespace Grin.Keychain.Blind
 {
     public class BlindSum
     {

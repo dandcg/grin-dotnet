@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace Grin.Core
+namespace Grin.Core.Ser
 {
     /// Utility wrapper for an underlying byte Writer. Defines higher level methods
     /// to write numbers, byte vectors, hashes, etc.

@@ -1,10 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using Common;
-using Microsoft.AspNetCore.Http;
+using Grin.Core.Ser;
 
-namespace Grin.Core.Core
+namespace Grin.Core.Core.Hash
 {
     public class Hash:IReadable, IWriteable
     {

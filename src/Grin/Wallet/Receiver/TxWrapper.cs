@@ -1,4 +1,4 @@
-namespace Grin.Wallet
+namespace Grin.Wallet.Receiver
 {
     public class TxWrapper
     {

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Security.Cryptography;
 using Common;
+using Secp256k1Proxy.Ffi;
+using Secp256k1Proxy.Key;
 
-namespace Secp256k1Proxy
+namespace Secp256k1Proxy.Lib
 {
     public class Secp256k1
     {

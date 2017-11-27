@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace Secp256k1Proxy
+namespace Secp256k1Proxy.Pedersen
 {
     public class RangeProof
     {
@@ -17,7 +17,7 @@ namespace Secp256k1Proxy
         public static RangeProof zero()
         {
             return new RangeProof(
-                new byte[Constants.MAX_PROOF_SIZE],
+                new byte[Constants.Constants.MAX_PROOF_SIZE],
                 0);
         }
 

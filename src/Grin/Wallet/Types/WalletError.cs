@@ -1,4 +1,4 @@
-namespace Grin.Wallet
+namespace Grin.Wallet.Types
 {
     /// Wallet errors, mostly wrappers around underlying crypto or I/O errors.
     public enum WalletError

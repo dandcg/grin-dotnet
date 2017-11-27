@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Secp256k1Proxy
+namespace Secp256k1Proxy.Lib
 {
     public class Message
     {
@@ -15,10 +15,10 @@ namespace Secp256k1Proxy
         {
             switch (data.Length)
             {
-                case Constants.MESSAGE_SIZE:
+                case Constants.Constants.MESSAGE_SIZE:
 
-                    var ret = new byte[Constants.MESSAGE_SIZE];
-                    Array.Copy(data, ret, Constants.MESSAGE_SIZE);
+                    var ret = new byte[Constants.Constants.MESSAGE_SIZE];
+                    Array.Copy(data, ret, Constants.Constants.MESSAGE_SIZE);
                     return new Message(data);
 
 

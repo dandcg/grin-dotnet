@@ -1,4 +1,4 @@
-﻿namespace Grin.Core.Core
+﻿namespace Grin.Core.Core.Pmmr
 {
     /// Trait for an element of the tree that has a well-defined sum and hash that
     /// the tree can sum over

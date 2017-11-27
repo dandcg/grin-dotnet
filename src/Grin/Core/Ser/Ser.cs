@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using Grin.Keychain;
+using Grin.Keychain.ExtKey;
 using Secp256k1Proxy;
+using Secp256k1Proxy.Constants;
+using Secp256k1Proxy.Pedersen;
 
-namespace Grin.Core
+namespace Grin.Core.Ser
 {
     public static class Ser
     {

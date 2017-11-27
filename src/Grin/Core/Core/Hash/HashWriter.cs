@@ -1,7 +1,8 @@
 ﻿using System.IO;
+using Grin.Core.Ser;
 using Konscious.Security.Cryptography;
 
-namespace Grin.Core.Core
+namespace Grin.Core.Core.Hash
 {
     public class HashWriter : WriterBase
     {

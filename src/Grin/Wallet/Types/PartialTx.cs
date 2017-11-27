@@ -1,11 +1,11 @@
 using System.IO;
 using Common;
-using Grin.Core;
-using Grin.Core.Core;
-using Grin.Keychain;
+using Grin.Core.Core.Transaction;
+using Grin.Core.Ser;
+using Grin.Keychain.Blind;
 using Newtonsoft.Json;
 
-namespace Grin.Wallet
+namespace Grin.Wallet.Types
 {
     public class PartialTx
     {
@@ -33,7 +33,7 @@ namespace Grin.Wallet
 
         /// Reads a partial transaction encoded as JSON into the amount, sum of blinding
         /// factors and the transaction itself.
-        public (ulong, BlindingFactor, Transaction) partial_tx_from_json(Keychain.Keychain keychain, string json_str)
+        public (ulong, BlindingFactor, Transaction) partial_tx_from_json(Keychain.Keychain.Keychain keychain, string json_str)
         {
             var partial_tx = JsonConvert.DeserializeObject<PartialTx>(json_str);
             

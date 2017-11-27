@@ -1,8 +1,7 @@
 using System;
 using Grin.Core;
-using Microsoft.EntityFrameworkCore.ValueGeneration.Internal;
 
-namespace Grin.Wallet
+namespace Grin.Wallet.Types
 {
     public class Types
     {

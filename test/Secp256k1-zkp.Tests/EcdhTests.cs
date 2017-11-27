@@ -1,4 +1,6 @@
 using System.Security.Cryptography;
+using Secp256k1Proxy.Ecdh;
+using Secp256k1Proxy.Lib;
 using Xunit;
 
 namespace Secp256k1Proxy.Tests

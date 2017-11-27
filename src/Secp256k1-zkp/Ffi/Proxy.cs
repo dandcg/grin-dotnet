@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using Secp256k1Proxy.Helpers;
+using Secp256k1Proxy.Key;
 
-namespace Secp256k1Proxy
+namespace Secp256k1Proxy.Ffi
 {
     public class Proxy
     {

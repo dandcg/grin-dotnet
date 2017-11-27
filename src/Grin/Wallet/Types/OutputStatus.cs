@@ -1,4 +1,4 @@
-namespace Grin.Wallet
+namespace Grin.Wallet.Types
 {
     /// Status of an output that's being tracked by the wallet. Can either be
     /// unconfirmed, spent, unspent, or locked (when it's been used to generate

@@ -1,6 +1,6 @@
 using System;
 
-namespace Grin.Wallet
+namespace Grin.Core.Core.Transaction.Errors
 {
     public class ToManyInputsException : ApplicationException
     {

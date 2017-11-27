@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
 using Common;
+using Secp256k1Proxy.Key;
+using Secp256k1Proxy.Lib;
 
-namespace Secp256k1Proxy
+namespace Secp256k1Proxy.Pedersen
 {
     public class Commitment
     {
@@ -33,9 +35,9 @@ namespace Secp256k1Proxy
         /// completed by zeroes. If it's too long, it will be truncated.
         public static Commitment from_vec(byte[] v)
         {
-            var h = new byte[Constants.PEDERSEN_COMMITMENT_SIZE];
+            var h = new byte[Constants.Constants.PEDERSEN_COMMITMENT_SIZE];
 
-            for (var i = 0; i < Math.Min(v.Length, Constants.PEDERSEN_COMMITMENT_SIZE); i++)
+            for (var i = 0; i < Math.Min(v.Length, Constants.Constants.PEDERSEN_COMMITMENT_SIZE); i++)
                 h[i] = v[i];
             return new Commitment(h);
         }
@@ -43,7 +45,7 @@ namespace Secp256k1Proxy
         /// Uninitialized commitment, use with caution
         public static Commitment blank()
         {
-            return new Commitment(new byte[Constants.PEDERSEN_COMMITMENT_SIZE]);
+            return new Commitment(new byte[Constants.Constants.PEDERSEN_COMMITMENT_SIZE]);
         }
 
         /// Converts a commitment into two "candidate" public keys
@@ -55,7 +57,7 @@ namespace Secp256k1Proxy
         {
             var pks = new PublicKey[2];
 
-            var pk1 = new byte[Constants.COMPRESSED_PUBLIC_KEY_SIZE];
+            var pk1 = new byte[Constants.Constants.COMPRESSED_PUBLIC_KEY_SIZE];
 
             for (var i = 0; i < Value.Length; i++)
 
@@ -65,7 +67,7 @@ namespace Secp256k1Proxy
             // TODO - we should not unwrap these here, and handle errors better
             pks[0] = PublicKey.from_slice(secp, pk1);
 
-            var pk2 = new byte[Constants.COMPRESSED_PUBLIC_KEY_SIZE];
+            var pk2 = new byte[Constants.Constants.COMPRESSED_PUBLIC_KEY_SIZE];
             for (var i = 0; i < Value.Length; i++)
 
                 if (i == 0) pk2[i] = 0x03;

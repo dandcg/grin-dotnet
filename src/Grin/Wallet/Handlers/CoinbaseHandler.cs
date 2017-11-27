@@ -1,28 +1,28 @@
-using System;
 using Common;
-using Grin.Core;
-using Grin.Keychain;
+using Grin.Core.Ser;
+using Grin.Keychain.ExtKey;
+using Grin.Wallet.Types;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Grin.Wallet
+namespace Grin.Wallet.Handlers
 {
     public class CoinbaseHandler
     {
-        public CoinbaseHandler(WalletConfig config, Keychain.Keychain keychain)
+        public CoinbaseHandler(WalletConfig config, Keychain.Keychain.Keychain keychain)
         {
             this.config = config;
             this.keychain = keychain;
         }
 
         public WalletConfig config { get;  }
-        public Keychain.Keychain keychain { get; }
+        public Keychain.Keychain.Keychain keychain { get; }
 
 
       
      public CbData build_coinbase(BlockFees bf)
         {
 
-            var (outp, kern, block_fees) = Receiver.receive_coinbase(
+            var (outp, kern, block_fees) = Receiver.Receiver.receive_coinbase(
                                              config,
                                              keychain,
                                              bf);

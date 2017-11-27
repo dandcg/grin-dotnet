@@ -1,7 +1,7 @@
 ﻿using System;
 using Common;
 
-namespace Grin.Core
+namespace Grin.Core.Ser
 {
     public abstract class ReaderBase : IReader
     {

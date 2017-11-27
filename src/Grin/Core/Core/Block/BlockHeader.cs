@@ -1,7 +1,10 @@
 ﻿using System;
 using Common;
+using Grin.Core.Core.Mod;
+using Grin.Core.Core.Target;
+using Grin.Core.Ser;
 
-namespace Grin.Core.Core
+namespace Grin.Core.Core.Block
 {
     public class BlockHeader : IWriteable, IReadable
 
@@ -36,19 +39,19 @@ namespace Grin.Core.Core
         public ulong height { get; internal set; }
 
         /// Hash of the block previous to this in the chain.
-        public Hash previous { get; internal set; }
+        public Hash.Hash previous { get; internal set; }
 
         /// Timestamp at which the block was built.
         public DateTime timestamp { get; internal set; }
 
         /// Merklish root of all the commitments in the UTXO set
-        public Hash utxo_root { get; internal set; }
+        public Hash.Hash utxo_root { get; internal set; }
 
         /// Merklish root of all range proofs in the UTXO set
-        public Hash range_proof_root { get; internal set; }
+        public Hash.Hash range_proof_root { get; internal set; }
 
         /// Merklish root of all transaction kernels in the UTXO set
-        public Hash kernel_root { get; internal set; }
+        public Hash.Hash kernel_root { get; internal set; }
 
         /// Nonce increment used to mine this block.
         public ulong nonce { get; internal set; }
@@ -75,13 +78,13 @@ namespace Grin.Core.Core
             {
                 version = 1,
                 height = 0,
-                previous = Hash.ZERO_HASH(),
+                previous = Hash.Hash.ZERO_HASH(),
                 timestamp = DateTime.UtcNow,
                 difficulty = Difficulty.From_num(Consensus.MINIMUM_DIFFICULTY),
                 total_difficulty = Difficulty.From_num(Consensus.MINIMUM_DIFFICULTY),
-                utxo_root = Hash.ZERO_HASH(),
-                range_proof_root = Hash.ZERO_HASH(),
-                kernel_root = Hash.ZERO_HASH(),
+                utxo_root = Hash.Hash.ZERO_HASH(),
+                range_proof_root = Hash.Hash.ZERO_HASH(),
+                kernel_root = Hash.Hash.ZERO_HASH(),
                 nonce = 0,
                 pow = Proof.Zero(proofSize)
             };
@@ -110,11 +113,11 @@ namespace Grin.Core.Core
         {
             version = reader.read_u16();
             height = reader.read_u64();
-            previous = Hash.readNew(reader);
+            previous = Hash.Hash.readNew(reader);
             timestamp = reader.read_i64().FromUnixTime();
-            utxo_root = Hash.readNew(reader);
-            range_proof_root = Hash.readNew(reader);
-            kernel_root = Hash.readNew(reader);
+            utxo_root = Hash.Hash.readNew(reader);
+            range_proof_root = Hash.Hash.readNew(reader);
+            kernel_root = Hash.Hash.readNew(reader);
             nonce = reader.read_u64();
             difficulty = Difficulty.readnew(reader);
             total_difficulty = Difficulty.readnew(reader);

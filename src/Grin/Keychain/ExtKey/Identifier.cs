@@ -1,9 +1,10 @@
 ﻿using Common;
-using Grin.Core;
 using Konscious.Security.Cryptography;
 using Secp256k1Proxy;
+using Secp256k1Proxy.Key;
+using Secp256k1Proxy.Lib;
 
-namespace Grin.Keychain
+namespace Grin.Keychain.ExtKey
 {
     public class Identifier
     {

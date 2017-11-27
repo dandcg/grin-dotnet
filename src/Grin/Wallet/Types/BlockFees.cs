@@ -1,7 +1,7 @@
-using Grin.Keychain;
+using Grin.Keychain.ExtKey;
 using Newtonsoft.Json;
 
-namespace Grin.Wallet
+namespace Grin.Wallet.Types
 {
     public class BlockFees
     {

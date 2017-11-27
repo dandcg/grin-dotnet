@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using Common;
+using Secp256k1Proxy.Ffi;
+using Secp256k1Proxy.Key;
+using Secp256k1Proxy.Lib;
 
-namespace Secp256k1Proxy
+namespace Secp256k1Proxy.Pedersen
 {
     public static class Secp256k1PedersonExtensions
     {
@@ -42,7 +45,7 @@ namespace Secp256k1Proxy
 
             var commit = new byte[33];
 
-            Proxy.secp256k1_switch_commit(self.Ctx, commit, blind, Constants.GENERATOR_J);
+            Proxy.secp256k1_switch_commit(self.Ctx, commit, blind, Constants.Constants.GENERATOR_J);
 
 
             return new Commitment(commit);
@@ -61,7 +64,7 @@ namespace Secp256k1Proxy
                 commit,
                 blind.Value,
                 value,
-                Constants.GENERATOR_H
+                Constants.Constants.GENERATOR_H
             );
 
             return new Commitment(commit);
@@ -83,7 +86,7 @@ namespace Secp256k1Proxy
                 commit,
                 zblind,
                 value,
-                Constants.GENERATOR_H);
+                Constants.Constants.GENERATOR_H);
 
 
             return new Commitment(commit);
@@ -177,8 +180,8 @@ namespace Secp256k1Proxy
             Commitment commit, ProofMessage message)
         {
             var retried = false;
-            var proof = new byte[Constants.MAX_PROOF_SIZE];
-            var plen = Constants.MAX_PROOF_SIZE;
+            var proof = new byte[Constants.Constants.MAX_PROOF_SIZE];
+            var plen = Constants.Constants.MAX_PROOF_SIZE;
             // IntPtr proofPtr= Marshal.AllocHGlobal(proof.Length);
 
             var proofPtr = Marshal.AllocCoTaskMem(plen);
@@ -216,7 +219,7 @@ namespace Secp256k1Proxy
                                   message.Value.Length,
                                   extra_commit,
                                   0,
-                                  Constants.GENERATOR_H) == 1;
+                                  Constants.Constants.GENERATOR_H) == 1;
 
                 if (success || retried)
                     break;
@@ -250,7 +253,7 @@ namespace Secp256k1Proxy
                     proof.Plen,
                     extra_commit,
                     0,
-                    Constants.GENERATOR_H
+                    Constants.Constants.GENERATOR_H
                 ) == 1;
 
             if (success)
@@ -281,7 +284,7 @@ namespace Secp256k1Proxy
                               proof.Plen,
                               extra_commit,
                               0,
-                              Constants.GENERATOR_H
+                              Constants.Constants.GENERATOR_H
                           ) == 1;
 
             return new
@@ -304,8 +307,8 @@ namespace Secp256k1Proxy
             ulong value = 0;
             var blind = new byte[32];
 
-            var message = new byte[Constants.PROOF_MSG_SIZE];
-            var mlen = (UInt64)Constants.PROOF_MSG_SIZE;
+            var message = new byte[Constants.Constants.PROOF_MSG_SIZE];
+            var mlen = (UInt64)Constants.Constants.PROOF_MSG_SIZE;
             
             ulong min = 0;
             ulong max = 0;
@@ -327,7 +330,7 @@ namespace Secp256k1Proxy
                               proof.Plen,
                               extra_commit,
                               0,
-                              Constants.GENERATOR_H
+                              Constants.Constants.GENERATOR_H
                           ) == 1;
 
 

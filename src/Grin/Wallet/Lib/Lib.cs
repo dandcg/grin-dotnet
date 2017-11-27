@@ -1,4 +1,4 @@
-namespace Grin.Wallet
+namespace Grin.Wallet.Lib
 {
     public class Lib
     {

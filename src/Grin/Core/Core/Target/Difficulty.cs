@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Linq;
 using Common;
+using Grin.Core.Ser;
 
-namespace Grin.Core.Core
+namespace Grin.Core.Core.Target
 {
     //! Definition of the maximum target value a proof-of-work block hash can have
     //! and
@@ -80,7 +81,7 @@ public Difficulty Clone()
 
         /// Computes the difficulty from a hash. Divides the maximum target by the
         /// provided hash.
-        public static Difficulty From_hash(Hash hash)
+        public static Difficulty From_hash(Hash.Hash hash)
         {
             var mt = MAX_TARGET;
             mt.BigEndian();

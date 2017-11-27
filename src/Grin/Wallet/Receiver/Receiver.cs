@@ -1,10 +1,14 @@
 using System;
 using Grin.Core;
-using Grin.Core.Core;
-using Grin.Keychain;
+using Grin.Core.Core.Block;
+using Grin.Core.Core.Build;
+using Grin.Core.Core.Transaction;
+using Grin.Keychain.Blind;
+using Grin.Keychain.ExtKey;
+using Grin.Wallet.Types;
 using Serilog;
 
-namespace Grin.Wallet
+namespace Grin.Wallet.Receiver
 {
     /*
 
@@ -67,7 +71,7 @@ namespace Grin.Wallet
         /// network.
         public static void receive_json_tx(
             WalletConfig config,
-            Keychain.Keychain keychain,
+            Keychain.Keychain.Keychain keychain,
             string partial_tx_str
         )
         {
@@ -121,7 +125,7 @@ namespace Grin.Wallet
 
         public static (Identifier, uint) next_available_key(
             WalletConfig config,
-            Keychain.Keychain keychain
+            Keychain.Keychain.Keychain keychain
         )
         {
             var res = WalletData.read_wallet(config.data_file_dir,
@@ -139,7 +143,7 @@ namespace Grin.Wallet
         /// Build a coinbase output and the corresponding kernel
         public static (Output, TxKernel, BlockFees) receive_coinbase(
             WalletConfig config,
-            Keychain.Keychain keychain,
+            Keychain.Keychain.Keychain keychain,
             BlockFees block_fees
         )
         {
@@ -197,7 +201,7 @@ namespace Grin.Wallet
         /// Builds a full transaction from the partial one sent to us for transfer
         public static Transaction receive_transaction(
             WalletConfig config,
-            Keychain.Keychain keychain,
+            Keychain.Keychain.Keychain keychain,
             ulong amount,
             BlindingFactor blinding,
             Transaction partial
@@ -211,7 +215,7 @@ namespace Grin.Wallet
             // double check the fee amount included in the partial tx
             // we don't necessarily want to just trust the sender
             // we could just overwrite the fee here (but we won't) due to the ecdsa sig
-            var fee = Types.tx_fee((uint) partial.inputs.Length, (uint) partial.outputs.Length + 1, null);
+            var fee = Types.Types.tx_fee((uint) partial.inputs.Length, (uint) partial.outputs.Length + 1, null);
 
             if (fee != partial.fee)
             {

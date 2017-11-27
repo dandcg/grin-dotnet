@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Common;
-using Microsoft.AspNetCore.Server.Kestrel.Internal.System.Collections.Sequences;
+using Grin.Core.Ser;
 using Secp256k1Proxy;
+using Secp256k1Proxy.Lib;
+using Secp256k1Proxy.Pedersen;
 
-namespace Grin.Core.Core
+namespace Grin.Core.Core.Mod
 {
 
     /// Implemented by types that hold inputs and outputs including Pedersen

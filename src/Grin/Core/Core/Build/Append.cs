@@ -1,15 +1,15 @@
-﻿using Grin.Keychain;
+﻿using Grin.Keychain.Blind;
 
-namespace Grin.Core.Core
+namespace Grin.Core.Core.Build
 {
     /// Function type returned by the transaction combinators. Transforms a
     /// (Transaction, BlindSum) pair into another, provided some context.
     public class Append
     {
-        public Transaction Transaction { get; }
+        public Transaction.Transaction Transaction { get; }
         public BlindSum Blind { get; }
 
-        public Append(Transaction transaction, BlindSum blind)
+        public Append(Transaction.Transaction transaction, BlindSum blind)
         {
             Transaction = transaction;
             Blind = blind;

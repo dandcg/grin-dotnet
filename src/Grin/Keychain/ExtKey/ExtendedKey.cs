@@ -4,8 +4,10 @@ using System.Text;
 using Common;
 using Konscious.Security.Cryptography;
 using Secp256k1Proxy;
+using Secp256k1Proxy.Key;
+using Secp256k1Proxy.Lib;
 
-namespace Grin.Keychain
+namespace Grin.Keychain.ExtKey
 {
     /// An ExtendedKey is a secret key which can be used to derive new
     /// secret keys to blind the commitment of a transaction output.
@@ -41,7 +43,7 @@ namespace Grin.Keychain
             var ext = new ExtendedKey {Depth = slice[0]};
 
             var rootKeyBytes = slice.Skip(1).Take(10).ToArray();
-            ext.RootKeyId = Grin.Keychain.Identifier.from_bytes(rootKeyBytes);
+            ext.RootKeyId = ExtKey.Identifier.from_bytes(rootKeyBytes);
 
             var nchildBytes = slice.Skip(11).Take(4).ToArray();
             Array.Reverse(nchildBytes);
@@ -75,7 +77,7 @@ namespace Grin.Keychain
             var ext = new ExtendedKey
             {
                 Depth = 0,
-                RootKeyId = Grin.Keychain.Identifier.Zero(),
+                RootKeyId = ExtKey.Identifier.Zero(),
                 NChild = 0
             };
 
@@ -103,7 +105,7 @@ namespace Grin.Keychain
             // get public key from private
             var keyId = PublicKey.from_secret_key(secp, Key);
 
-            return Grin.Keychain.Identifier.from_key_id(secp, keyId);
+            return ExtKey.Identifier.from_key_id(secp, keyId);
         }
 
         /// Derive an extended key from an extended key

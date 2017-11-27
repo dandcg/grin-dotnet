@@ -1,9 +1,11 @@
 ﻿using System.Linq;
 using Common;
+using Grin.Core.Ser;
 using Konscious.Security.Cryptography;
 using Secp256k1Proxy;
+using Secp256k1Proxy.Pedersen;
 
-namespace Grin.Core.Core
+namespace Grin.Core.Core.Transaction
 {
     /// Definition of the switch commitment hash
     public class SwitchCommitHash : IReadable, IWriteable

@@ -1,4 +1,4 @@
-﻿namespace Grin.Core
+﻿namespace Grin.Core.Ser
 {
     /// Signal to a serializable object how much of its data should be serialized
     public enum SerializationMode

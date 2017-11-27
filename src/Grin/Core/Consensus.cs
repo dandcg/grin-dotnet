@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Grin.Core.Core;
+using Grin.Core.Core.Target;
 
 namespace Grin.Core
 {

@@ -1,7 +1,7 @@
 using System.Linq;
-using Grin.Keychain;
+using Grin.Keychain.ExtKey;
 
-namespace Grin.Wallet
+namespace Grin.Wallet.Types
 {
     /// Information about an output that's being tracked by the wallet. Must be
     /// enough to reconstruct the commitment associated with the ouput when the

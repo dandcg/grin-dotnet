@@ -1,6 +1,8 @@
 ﻿using Secp256k1Proxy;
+using Secp256k1Proxy.Key;
+using Secp256k1Proxy.Lib;
 
-namespace Grin.Keychain
+namespace Grin.Keychain.Blind
 {
     /// Encapsulate a secret key for the blind_sum operation
     public class BlindingFactor

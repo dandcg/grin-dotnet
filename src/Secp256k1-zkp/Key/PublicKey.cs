@@ -2,8 +2,10 @@
 using System.Linq;
 using System.Runtime.ExceptionServices;
 using Common;
+using Secp256k1Proxy.Ffi;
+using Secp256k1Proxy.Lib;
 
-namespace Secp256k1Proxy
+namespace Secp256k1Proxy.Key
 {
 
 
@@ -85,8 +87,8 @@ namespace Secp256k1Proxy
         public byte[] serialize_vec(Secp256k1 secp, bool isCompressed)
         {
 
-            Int64 ret_len = Constants.PUBLIC_KEY_SIZE;
-            var ret = new byte[Constants.PUBLIC_KEY_SIZE];
+            Int64 ret_len = Constants.Constants.PUBLIC_KEY_SIZE;
+            var ret = new byte[Constants.Constants.PUBLIC_KEY_SIZE];
             
             var compressed = (uint) (isCompressed==true
                 ? Secp256K1Options.SECP256K1_SER_COMPRESSED

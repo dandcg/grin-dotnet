@@ -1,4 +1,4 @@
-namespace Grin.Wallet
+namespace Grin.Wallet.Types
 {
     /// Amount in request to build a coinbase output.
     public class WalletReceiveRequest

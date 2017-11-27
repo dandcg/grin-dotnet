@@ -1,7 +1,10 @@
 ﻿using System.Linq;
+using Grin.Core.Ser;
 using Secp256k1Proxy;
+using Secp256k1Proxy.Lib;
+using Secp256k1Proxy.Pedersen;
 
-namespace Grin.Core.Core
+namespace Grin.Core.Core.Transaction
 {
     /// A proof that a transaction sums to zero. Includes both the transaction's
     /// Pedersen commitment and the signature, that guarantees that the commitments
@@ -54,7 +57,7 @@ namespace Grin.Core.Core
             features = (KernelFeatures) reader.read_u8();
             fee = reader.read_u64();
             lock_height = reader.read_u64();
-            excess = Ser.ReadCommitment(reader);
+            excess = Ser.Ser.ReadCommitment(reader);
             excess_sig = reader.read_vec();
         }
 

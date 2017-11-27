@@ -7,7 +7,7 @@ using Common;
 using Konscious.Security.Cryptography;
 using Serilog;
 
-namespace Grin.Wallet
+namespace Grin.Wallet.Types
 {
     public class WalletSeed
     {
@@ -38,12 +38,12 @@ namespace Grin.Wallet
             return hex;
         }
 
-        public Keychain.Keychain derive_keychain(string password)
+        public Keychain.Keychain.Keychain derive_keychain(string password)
         {
             var key = Encoding.ASCII.GetBytes(password);
             var blake2b = new HMACBlake2B(key, 64 * 8);
             var seed = blake2b.ComputeHash(Value);
-            var result = Keychain.Keychain.From_seed(seed);
+            var result = Keychain.Keychain.Keychain.From_seed(seed);
 
             return result;
         }

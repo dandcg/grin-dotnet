@@ -1,11 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Grin.Keychain;
+using Grin.Core.Core.Hash;
+using Grin.Core.Core.Mod;
+using Grin.Core.Core.Target;
+using Grin.Core.Core.Transaction;
+using Grin.Core.Ser;
+using Grin.Keychain.ExtKey;
 using Secp256k1Proxy;
+using Secp256k1Proxy.Constants;
+using Secp256k1Proxy.Lib;
+using Secp256k1Proxy.Pedersen;
 using Serilog;
 
-namespace Grin.Core.Core
+namespace Grin.Core.Core.Block
 {
     public class Block : IReadable, IWriteable, ICommitted
     {
@@ -43,7 +51,7 @@ namespace Grin.Core.Core
         /// that all transactions are valid and calculates the Merkle tree.
         /// 
         /// Only used in tests (to be confirmed, may be wrong here).
-        public static Block New(BlockHeader prev, Transaction[] txs, Keychain.Keychain keychain, Identifier keyId)
+        public static Block New(BlockHeader prev, Transaction.Transaction[] txs, Keychain.Keychain.Keychain keychain, Identifier keyId)
         {
             var txfees = txs.Select(s => s.fee).ToArray();
 
@@ -64,7 +72,7 @@ namespace Grin.Core.Core
         /// Builds a new block ready to mine from the header of the previous block,
         /// a vector of transactions and the reward information. Checks
         /// that all transactions are valid and calculates the Merkle tree.
-        public static Block with_reward(BlockHeader prev, Transaction[] txs, Output reward_out, TxKernel reward_kern)
+        public static Block with_reward(BlockHeader prev, Transaction.Transaction[] txs, Output reward_out, TxKernel reward_kern)
         {
             // note: the following reads easily but may not be the most efficient due to
             // repeated iterations, revisit if a problem
@@ -119,7 +127,7 @@ namespace Grin.Core.Core
 
 
         // Blockhash, computed using only the header
-        public Hash hash()
+        public Hash.Hash hash()
         {
             return header.hash();
         }
@@ -291,7 +299,7 @@ namespace Grin.Core.Core
         }
 
 
-        public static (Output, TxKernel) Reward_output(Keychain.Keychain keychain, Identifier keyId, ulong fees)
+        public static (Output, TxKernel) Reward_output(Keychain.Keychain.Keychain keychain, Identifier keyId, ulong fees)
         {
             var secp = keychain.Secp;
 
@@ -351,9 +359,9 @@ namespace Grin.Core.Core
             var kernel_len = reader.read_u64();
 
 
-            inputs = Ser.read_and_verify_sorted<Input>(reader, input_len);
-            outputs = Ser.read_and_verify_sorted<Output>(reader, output_len);
-            kernels = Ser.read_and_verify_sorted<TxKernel>(reader, kernel_len);
+            inputs = Ser.Ser.read_and_verify_sorted<Input>(reader, input_len);
+            outputs = Ser.Ser.read_and_verify_sorted<Output>(reader, output_len);
+            kernels = Ser.Ser.read_and_verify_sorted<TxKernel>(reader, kernel_len);
         }
 
 

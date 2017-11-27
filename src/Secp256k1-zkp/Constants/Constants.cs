@@ -1,4 +1,4 @@
-﻿namespace Secp256k1Proxy
+﻿namespace Secp256k1Proxy.Constants
 {
     public static class Constants
     {

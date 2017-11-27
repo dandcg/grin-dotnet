@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Grin.Core.Core
+﻿namespace Grin.Core.Core.Pmmr
 {
     public class Sum
     {

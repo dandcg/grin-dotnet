@@ -12,11 +12,15 @@
 //!   with_fee(1)])
 
 using System;
-using Grin.Keychain;
+using Grin.Core.Core.Transaction;
+using Grin.Keychain.Blind;
+using Grin.Keychain.ExtKey;
 using Secp256k1Proxy;
+using Secp256k1Proxy.Lib;
+using Secp256k1Proxy.Pedersen;
 using Serilog;
 
-namespace Grin.Core.Core
+namespace Grin.Core.Core.Build
 {
     public static class Build
     {
@@ -29,10 +33,10 @@ namespace Grin.Core.Core
         /// with_fee(1)], keychain).unwrap();
         /// let (tx2, _) = build::transaction(vec![initial_tx(tx1), with_excess(sum),
         /// output_rand(2)], keychain).unwrap();
-        public static (Transaction transaction, BlindingFactor blindingFactor) transaction(Func<Context,Append>[] elems,Keychain.Keychain keychain)
+        public static (Transaction.Transaction transaction, BlindingFactor blindingFactor) transaction(Func<Context,Append>[] elems,Keychain.Keychain.Keychain keychain)
 
         {
-            var tx = Transaction.Empty();
+            var tx = Transaction.Transaction.Empty();
             var sum = BlindSum.New();
             var ctx = new Context(keychain,tx,sum);
 
@@ -52,7 +56,7 @@ namespace Grin.Core.Core
         }
 
         /// Sets an initial transaction to add to when building a new transaction.
-        public static Append initial_tx(this Context build, Transaction tx)
+        public static Append initial_tx(this Context build, Transaction.Transaction tx)
         {
             return new Append(tx.clone(), build.Sum);
         }

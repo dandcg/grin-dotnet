@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Grin.Core
+namespace Grin.Core.Ser
 {
     /// Implementations defined how different numbers and binary structures are
     /// written to an underlying stream or container (depending on implementation).

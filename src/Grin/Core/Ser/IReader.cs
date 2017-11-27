@@ -1,4 +1,4 @@
-﻿namespace Grin.Core
+﻿namespace Grin.Core.Ser
 {
     /// Implementations defined how different numbers and binary structures are
     /// read from an underlying stream or container (depending on implementation).

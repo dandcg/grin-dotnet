@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Security.Cryptography;
 using Common;
+using Secp256k1Proxy.Key;
+using Secp256k1Proxy.Lib;
 using Xunit;
 
 
@@ -338,19 +340,19 @@ namespace Secp256k1Proxy.Tests
             var s = Secp256k1.New();
 
             Exception ex=null;
-            ex = Assert.Throws<Exception>(() => { Signiture.from_der(s, new byte[Constants.MAX_SIGNATURE_SIZE + 1]);});
+            ex = Assert.Throws<Exception>(() => { Signiture.from_der(s, new byte[Constants.Constants.MAX_SIGNATURE_SIZE + 1]);});
             Assert.Equal("InvalidSignature", ex.Message);
 
-            ex = Assert.Throws<Exception>(() => { Signiture.from_der(s, new byte[Constants.MAX_SIGNATURE_SIZE]); });
+            ex = Assert.Throws<Exception>(() => { Signiture.from_der(s, new byte[Constants.Constants.MAX_SIGNATURE_SIZE]); });
             Assert.Equal("InvalidSignature", ex.Message);
 
-            ex = Assert.Throws<Exception>(() => { Message.from_slice(new byte[Constants.MESSAGE_SIZE - 1]); });
+            ex = Assert.Throws<Exception>(() => { Message.from_slice(new byte[Constants.Constants.MESSAGE_SIZE - 1]); });
             Assert.Equal("InvalidMessage", ex.Message);
 
-            ex = Assert.Throws<Exception>(() => { Message.from_slice(new byte[Constants.MESSAGE_SIZE + 1]); });
+            ex = Assert.Throws<Exception>(() => { Message.from_slice(new byte[Constants.Constants.MESSAGE_SIZE + 1]); });
             Assert.Equal("InvalidMessage", ex.Message);
 
-            Message.from_slice(new byte[Constants.MESSAGE_SIZE]);
+            Message.from_slice(new byte[Constants.Constants.MESSAGE_SIZE]);
         }
 
         [Fact]

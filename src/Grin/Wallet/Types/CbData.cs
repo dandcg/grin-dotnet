@@ -1,4 +1,4 @@
-namespace Grin.Wallet
+namespace Grin.Wallet.Types
 {
     /// Response to build a coinbase output.
     public class CbData

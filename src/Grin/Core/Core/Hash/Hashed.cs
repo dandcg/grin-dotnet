@@ -1,7 +1,8 @@
 ﻿using System;
+using Grin.Core.Ser;
 using Serilog;
 
-namespace Grin.Core.Core
+namespace Grin.Core.Core.Hash
 {
     /// A trait for types that have a canonical hash
     public static class Hashed

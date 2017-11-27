@@ -1,7 +1,7 @@
 ﻿using System;
-using Grin.Core.Core;
+using Grin.Core.Core.Transaction;
 
-namespace Grin.Core
+namespace Grin.Core.Ser
 {
     public interface ICommitted
     {

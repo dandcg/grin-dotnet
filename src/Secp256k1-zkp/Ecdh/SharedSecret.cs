@@ -1,6 +1,9 @@
 ﻿using System;
+using Secp256k1Proxy.Ffi;
+using Secp256k1Proxy.Key;
+using Secp256k1Proxy.Lib;
 
-namespace Secp256k1Proxy
+namespace Secp256k1Proxy.Ecdh
 {
     public class SharedSecret
     {

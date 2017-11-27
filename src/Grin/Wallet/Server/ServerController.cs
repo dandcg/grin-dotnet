@@ -1,13 +1,9 @@
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Net.Mime;
 using Common;
+using Grin.Wallet.Handlers;
+using Grin.Wallet.Types;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure;
-using Newtonsoft.Json;
 
-namespace Grin.Wallet
+namespace Grin.Wallet.Server
 {
 
     public class ServerController:Controller

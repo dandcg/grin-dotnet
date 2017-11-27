@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Common.Algo;
-using Grin.Keychain;
+using Grin.Keychain.ExtKey;
 using Newtonsoft.Json;
 using Polly;
 using Serilog;
 
-namespace Grin.Wallet
+namespace Grin.Wallet.Types
 {
     /// Wallet information tracking all our outputs. Based on HD derivation and
     /// avoids storing any key data, only storing output amounts and child index.

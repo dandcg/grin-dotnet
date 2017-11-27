@@ -3,11 +3,16 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
+using Grin.Keychain.Blind;
+using Grin.Keychain.ExtKey;
 using Konscious.Security.Cryptography;
 using Secp256k1Proxy;
+using Secp256k1Proxy.Key;
+using Secp256k1Proxy.Lib;
+using Secp256k1Proxy.Pedersen;
 using Serilog;
 
-namespace Grin.Keychain
+namespace Grin.Keychain.Keychain
 {
     public class Keychain
     {

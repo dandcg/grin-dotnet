@@ -1,6 +1,7 @@
 ﻿using System;
+using Secp256k1Proxy.Ffi;
 
-namespace Secp256k1Proxy
+namespace Secp256k1Proxy.Lib
 {
     public class Signiture
     {

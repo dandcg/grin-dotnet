@@ -1,4 +1,4 @@
-﻿namespace Grin.Core
+﻿namespace Grin.Core.Ser
 {
     public interface IWriteable
     {
