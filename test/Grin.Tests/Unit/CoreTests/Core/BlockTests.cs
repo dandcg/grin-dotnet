@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Grin.Tests.Unit.CoreTests.Core
 {
-    public class BlockTests
+    public class BlockTests : IClassFixture<LoggingFixture>
     {
         // utility to create a block without worrying about the key or previous
         // header

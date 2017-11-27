@@ -6,7 +6,7 @@ using Xunit;
 
 namespace Grin.Tests.Unit.KeychainTests
 {
-    public class ExtKeyTests
+    public class ExtKeyTests : IClassFixture<LoggingFixture>
     {
  
         public class HasAnIdentifier

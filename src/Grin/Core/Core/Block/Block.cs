@@ -104,8 +104,7 @@ namespace Grin.Core.Core
             bh.previous = prev.hash();
             bh.timestamp = DateTime.UtcNow;
 
-            bh.total_difficulty =
-                Difficulty.From_num(prev.pow.Clone().to_difficulty().num + prev.total_difficulty.Clone().num);
+            bh.total_difficulty = Difficulty.From_num(prev.pow.Clone().to_difficulty().num + prev.total_difficulty.Clone().num);
 
             var b = new Block
             {
@@ -151,17 +150,17 @@ namespace Grin.Core.Core
 
             var out_set = new HashSet<string>();
 
-            foreach (var o in outputs.Where(w => w.features.HasFlag(OutputFeatures.COINBASE_OUTPUT)))
+            foreach (var o in outputs.Where(w => !w.features.HasFlag(OutputFeatures.COINBASE_OUTPUT)))
             {
-                in_set.Add(o.commit.Hex);
+                out_set.Add(o.commit.Hex);
             }
 
 
             var commitments_to_compact = in_set.Intersect(out_set);
 
-            var new_inputs = inputs.Where(w => commitments_to_compact.Contains(w.Value.Hex)).Select(s => s.Clone());
+            var new_inputs = inputs.Where(w => !commitments_to_compact.Contains(w.Value.Hex)).Select(s => s.Clone());
 
-            var new_outputs = outputs.Where(w => commitments_to_compact.Contains(w.commit.Hex)).Select(s => s.Clone());
+            var new_outputs = outputs.Where(w => !commitments_to_compact.Contains(w.commit.Hex)).Select(s => s.Clone());
 
 
             var new_kernels = kernels.Select(s => s.Clone());

@@ -8,7 +8,7 @@ using Xunit;
 
 namespace Grin.Tests.Unit.CoreTests.Core
 {
-    public class TransactionTests
+    public class TransactionTests : IClassFixture<LoggingFixture>
     {
         [Fact]
         public void test_kernel_ser_deser()

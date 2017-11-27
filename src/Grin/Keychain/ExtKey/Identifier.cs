@@ -8,7 +8,12 @@ namespace Grin.Keychain
     public class Identifier
     {
 
+        public override string ToString()
+        {
 
+            return Hex;
+
+        }
         // const
         public const int IdentifierSize = 10;
 
@@ -29,6 +34,7 @@ namespace Grin.Keychain
             Hex = HexUtil.to_hex(bytes);
         }
 
+        
 
         // data 
         public byte[] Bytes { get; }

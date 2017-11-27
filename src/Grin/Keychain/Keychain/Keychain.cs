@@ -137,7 +137,7 @@ namespace Grin.Keychain
         // if we know the derivation index we can just straight to deriving the key
         public SecretKey derived_key_from_index(uint derivation)
         {
-            Log.Verbose("Derived Key (fast) by derivation: {}", derivation);
+            Log.Verbose("Derived Key (fast) by derivation: {derivation}", derivation);
             var extkey = Extkey.Derive(Secp, derivation);
             return extkey.Key;
         }

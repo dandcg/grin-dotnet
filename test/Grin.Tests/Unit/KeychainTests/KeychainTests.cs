@@ -3,7 +3,7 @@ using Xunit;
 
 namespace Grin.Tests.Unit.KeychainTests
 {
-    public class KeychainTests
+    public class KeychainTests : IClassFixture<LoggingFixture>
     {
         [Fact]
         public void test_key_derivation()
