@@ -157,6 +157,9 @@
       <NamedTestSelector>
         <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.reward_empty_block</TestName>
       </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Grin.Tests.Unit.CoreTests.Core.BlockTests.compactable_block</TestName>
+      </NamedTestSelector>
     </IgnoredTests>
     <ImplicitProjectDependencyPathsRelativeToSolutionDirectory />
     <UseCPUArchitecture>AutoDetect</UseCPUArchitecture>
