@@ -12,26 +12,26 @@ namespace Grin.CoreImpl.Core.Transaction
             
         }
 
-        public Input(Commitment value)
+        public Input(Commitment commitment)
         {
-            Value = value;
+            Commitment = commitment;
         }
  
-        public Commitment Value { get; private set; }
+        public Commitment Commitment { get; private set; }
 
         public void read(IReader reader)
         {
-            Value = Ser.Ser.ReadCommitment(reader);
+            Commitment = Ser.Ser.ReadCommitment(reader);
         }
 
         public void write(IWriter writer)
         {
-            Value.WriteCommitment(writer);
+            Commitment.WriteCommitment(writer);
         }
 
         public Input Clone()
         {
-            return new Input(Value.Clone());
+            return new Input(Commitment.Clone());
         }
     }
 }

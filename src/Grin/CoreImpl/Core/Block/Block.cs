@@ -152,7 +152,7 @@ namespace Grin.CoreImpl.Core.Block
 
             foreach (var i in inputs)
             {
-                in_set.Add(i.Value.Hex);
+                in_set.Add(i.Commitment.Hex);
             }
 
 
@@ -166,7 +166,7 @@ namespace Grin.CoreImpl.Core.Block
 
             var commitments_to_compact = in_set.Intersect(out_set);
 
-            var new_inputs = inputs.Where(w => !commitments_to_compact.Contains(w.Value.Hex)).Select(s => s.Clone());
+            var new_inputs = inputs.Where(w => !commitments_to_compact.Contains(w.Commitment.Hex)).Select(s => s.Clone());
 
             var new_outputs = outputs.Where(w => !commitments_to_compact.Contains(w.commit.Hex)).Select(s => s.Clone());
 

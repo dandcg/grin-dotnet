@@ -32,7 +32,7 @@ namespace Grin.WalletImpl.WalletTypes
         /// How many derivations down from the root key
         public uint n_child { get; set; }
 
-        /// Value of the output, necessary to rebuild the commitment
+        /// Commitment of the output, necessary to rebuild the commitment
         public ulong value { get; set; }
 
         /// Current status of the output

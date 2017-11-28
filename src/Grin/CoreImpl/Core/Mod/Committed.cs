@@ -33,7 +33,7 @@ namespace Grin.CoreImpl.Core.Mod
      
             foreach (var input in committed.inputs_commited())
             {
-               inputCommits.Add(input.Value);
+               inputCommits.Add(input.Commitment);
 
             }
             var outputCommits = new List<Commitment>();
