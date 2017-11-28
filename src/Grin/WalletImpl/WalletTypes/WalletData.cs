@@ -36,7 +36,7 @@ namespace Grin.WalletImpl.WalletTypes
         public static T read_wallet<T>(string data_file_dir, Func<WalletData, T> f)
         {
             // open the wallet readonly and do what needs to be done with it
-            var data_file_path = string.Format("{0}{1}{2}", data_file_dir, Path.PathSeparator, Types.DAT_FILE);
+            var data_file_path = Path.Combine(data_file_dir, Types.DAT_FILE);
             var wdat = read_or_create(data_file_path);
             return f(wdat);
         }
@@ -61,8 +61,8 @@ namespace Grin.WalletImpl.WalletTypes
             // create directory if it doesn't exist
             Directory.CreateDirectory(data_file_dir);
 
-            var data_file_path = $"{data_file_dir}{Path.PathSeparator}{Types.DAT_FILE}";
-            var lock_file_path = $"{data_file_dir}{Path.PathSeparator}{Types.LOCK_FILE}";
+            var data_file_path = Path.Combine(data_file_dir, Types.DAT_FILE);
+            var lock_file_path = Path.Combine(data_file_dir, Types.LOCK_FILE);
 
             Log.Information("Acquiring wallet lock ...");
 

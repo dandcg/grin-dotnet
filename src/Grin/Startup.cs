@@ -24,10 +24,16 @@ namespace Grin
 
             services.AddMvc();
 
+            var location = System.Reflection.Assembly.GetEntryAssembly().Location;
+            var directory = System.IO.Path.GetDirectoryName(location);
+
+
             var walletConfig = WalletConfig.Default();
             walletConfig.check_node_api_http_addr = "http://localhost:13413";
+            walletConfig.data_file_dir = directory;
 
-            var keychain =Keychain.From_random_seed();
+            var walletSeed = WalletSeed.from_file(walletConfig);
+            var keychain =Keychain.From_seed(walletSeed.Value);
 
             services.AddSingleton(pr => walletConfig);
             services.AddSingleton(pr => keychain);

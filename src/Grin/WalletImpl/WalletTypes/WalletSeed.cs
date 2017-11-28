@@ -62,12 +62,7 @@ namespace Grin.WalletImpl.WalletTypes
             Directory.CreateDirectory(wallet_config.data_file_dir);
 
 
-            var seed_file_path = string.Format(
-                "{0}{1}{2}",
-                wallet_config.data_file_dir,
-                Path.PathSeparator,
-                Types.SEED_FILE
-            );
+            var seed_file_path = Path.Combine(wallet_config.data_file_dir,Types.SEED_FILE);
 
 
             Log.Debug("Generating wallet seed file at: {seed_file_path}", seed_file_path);
@@ -95,13 +90,8 @@ namespace Grin.WalletImpl.WalletTypes
             Directory.CreateDirectory(wallet_config.data_file_dir);
 
 
-            var seed_file_path = string.Format(
-                "{0}{1}{2}",
-                wallet_config.data_file_dir,
-                Path.PathSeparator,
-                Types.SEED_FILE
-            );
-
+            var seed_file_path = Path.Combine(wallet_config.data_file_dir, Types.SEED_FILE);
+                
             Log.Debug("Using wallet seed at: {seed_file_path}", seed_file_path);
 
             if (File.Exists(seed_file_path))
@@ -114,8 +104,11 @@ namespace Grin.WalletImpl.WalletTypes
                     return wallet_seed;
                 }
             }
-            Log.Error("Run: \"grin wallet init\" to initialize a new wallet.");
-            throw new Exception("wallet seed file does not yet exist (grin wallet init)");
+
+            return init_file(wallet_config);
+
+            //Log.Error("Run: \"grin wallet init\" to initialize a new wallet.");
+            //throw new Exception("wallet seed file does not yet exist (grin wallet init)");
         }
     }
 }
