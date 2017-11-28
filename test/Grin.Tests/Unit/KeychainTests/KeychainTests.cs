@@ -13,7 +13,7 @@ namespace Grin.Tests.Unit.KeychainTests
         {
             var secp = Secp256k1.WithCaps(ContextFlag.Commit);
 
-            var keychain = Keychain.Keychain.Keychain.From_random_seed();
+            var keychain = Keychain.KeychainImpl.Keychain.From_random_seed();
 
             // use the keychain to derive a "key_id_set" based on the underlying seed
             var key_id = keychain.Derive_key_id(1);
@@ -34,7 +34,7 @@ namespace Grin.Tests.Unit.KeychainTests
         [Fact]
         public void test_rewind_range_proof()
         {
-            var keychain = Keychain.Keychain.Keychain.From_random_seed();
+            var keychain = Keychain.KeychainImpl.Keychain.From_random_seed();
             var key_id = keychain.Derive_key_id(1);
             var commit = keychain.Commit(5, key_id);
             var msg = ProofMessage.empty();

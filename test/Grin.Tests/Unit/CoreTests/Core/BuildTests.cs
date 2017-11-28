@@ -10,7 +10,7 @@ namespace Grin.Tests.Unit.CoreTests.Core
         [Fact]
         public void blind_simple_tx()
         {
-            var keychain = Keychain.Keychain.Keychain.From_random_seed();
+            var keychain = Keychain.KeychainImpl.Keychain.From_random_seed();
             var key_id1 = keychain.Derive_key_id(1);
             var key_id2 = keychain.Derive_key_id(2);
             var key_id3 = keychain.Derive_key_id(3);
@@ -30,7 +30,7 @@ namespace Grin.Tests.Unit.CoreTests.Core
         [Fact]
         public void blind_simpler_tx()
         {
-            var keychain = Keychain.Keychain.Keychain.From_random_seed();
+            var keychain = Keychain.KeychainImpl.Keychain.From_random_seed();
             var key_id1 = keychain.Derive_key_id(1);
             var key_id2 = keychain.Derive_key_id(2);
 

@@ -24,7 +24,7 @@ namespace Grin
             services.AddMvc();
 
             var walletConfig = WalletConfig.Default();
-            var keychain = Keychain.Keychain.Keychain.From_random_seed();
+            var keychain = Keychain.KeychainImpl.Keychain.From_random_seed();
                 
             services.AddSingleton<CoinbaseHandler>(pr=>new CoinbaseHandler(walletConfig, keychain));
             services.AddSingleton<WalletReceiver>(pr => new WalletReceiver(walletConfig, keychain));

@@ -51,7 +51,7 @@ namespace Grin.Core.Core.Block
         /// that all transactions are valid and calculates the Merkle tree.
         /// 
         /// Only used in tests (to be confirmed, may be wrong here).
-        public static Block New(BlockHeader prev, Transaction.Transaction[] txs, Keychain.Keychain.Keychain keychain, Identifier keyId)
+        public static Block New(BlockHeader prev, Transaction.Transaction[] txs, Keychain.KeychainImpl.Keychain keychain, Identifier keyId)
         {
             var txfees = txs.Select(s => s.fee).ToArray();
 
@@ -299,7 +299,7 @@ namespace Grin.Core.Core.Block
         }
 
 
-        public static (Output, TxKernel) Reward_output(Keychain.Keychain.Keychain keychain, Identifier keyId, ulong fees)
+        public static (Output, TxKernel) Reward_output(Keychain.KeychainImpl.Keychain keychain, Identifier keyId, ulong fees)
         {
             var secp = keychain.Secp;
 

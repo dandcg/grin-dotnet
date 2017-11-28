@@ -33,7 +33,7 @@ namespace Grin.Core.Core.Build
         /// with_fee(1)], keychain).unwrap();
         /// let (tx2, _) = build::transaction(vec![initial_tx(tx1), with_excess(sum),
         /// output_rand(2)], keychain).unwrap();
-        public static (Transaction.Transaction transaction, BlindingFactor blindingFactor) transaction(Func<Context,Append>[] elems,Keychain.Keychain.Keychain keychain)
+        public static (Transaction.Transaction transaction, BlindingFactor blindingFactor) transaction(Func<Context,Append>[] elems,Keychain.KeychainImpl.Keychain keychain)
 
         {
             var tx = Transaction.Transaction.Empty();

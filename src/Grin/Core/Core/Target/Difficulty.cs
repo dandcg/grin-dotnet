@@ -28,11 +28,6 @@ namespace Grin.Core.Core.Target
             this.num = num;
         }
 
-        public static Difficulty From_num(ulong num)
-        {
-            return new Difficulty(num);
-        }
-
         /// Difficulty of zero, which is invalid (no target can be
         /// calculated from it) but very useful as a start for additions.
         public static Difficulty Zero()
@@ -55,8 +50,39 @@ namespace Grin.Core.Core.Target
           
         }
 
+        /// Convert a `u32` into a `Difficulty`
+        public static Difficulty From_num(ulong num)
+        {
+            return new Difficulty(num);
+        }
 
-public Difficulty Clone()
+
+
+
+        /// Computes the difficulty from a hash. Divides the maximum target by the
+        /// provided hash.
+        public static Difficulty From_hash(Hash.Hash hash)
+        {
+            var mt = MAX_TARGET;
+            mt.BigEndian();
+            var max_target = BitConverter.ToUInt64(mt, 0);
+
+            // Use the first 64 bits of the given hash
+            var in_vec = hash.Value.Take(8).ToArray();
+            in_vec.BigEndian();
+            var num = BitConverter.ToUInt64(in_vec, 0);
+            return new Difficulty(max_target / num);
+        }
+
+
+        /// Converts the difficulty into a u64
+        public ulong into_num()
+        {
+            return num;
+        }
+
+
+    public Difficulty Clone()
         {
             return new Difficulty(num);
         }
@@ -78,20 +104,5 @@ public Difficulty Clone()
             return d;
         }
 
-
-        /// Computes the difficulty from a hash. Divides the maximum target by the
-        /// provided hash.
-        public static Difficulty From_hash(Hash.Hash hash)
-        {
-            var mt = MAX_TARGET;
-            mt.BigEndian();
-            var max_target = BitConverter.ToUInt64(mt, 0);
-
-            // Use the first 64 bits of the given hash
-            var in_vec = hash.Value.Take(8).ToArray();
-            in_vec.BigEndian();
-            var num = BitConverter.ToUInt64(in_vec, 0);
-            return new Difficulty(max_target / num);
-        }
     }
 }

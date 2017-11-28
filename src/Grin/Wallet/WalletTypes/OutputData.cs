@@ -24,28 +24,28 @@ namespace Grin.Wallet.Types
         }
 
         /// Root key_id_set that the key for this output is derived from
-        public Identifier root_key_id { get; }
+        public Identifier root_key_id { get; set; }
 
         /// Derived key for this output
-        public Identifier key_id { get; }
+        public Identifier key_id { get; set; }
 
         /// How many derivations down from the root key
-        public uint n_child { get; }
+        public uint n_child { get; set; }
 
         /// Value of the output, necessary to rebuild the commitment
-        public ulong value { get; }
+        public ulong value { get; set; }
 
         /// Current status of the output
-        public OutputStatus status { get; private set; }
+        public OutputStatus status { get;  set; }
 
         /// Height of the output
-        public ulong height { get; }
+        public ulong height { get; set; }
 
         /// Height we are locked until
-        public ulong lock_height { get; }
+        public ulong lock_height { get; set; }
 
         /// Is this a coinbase output? Is it subject to coinbase locktime?
-        public bool is_coinbase { get; }
+        public bool is_coinbase { get; set; }
 
         public OutputData clone()
         {

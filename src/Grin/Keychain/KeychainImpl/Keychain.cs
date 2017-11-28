@@ -6,13 +6,12 @@ using System.Security.Cryptography;
 using Grin.Keychain.Blind;
 using Grin.Keychain.ExtKey;
 using Konscious.Security.Cryptography;
-using Secp256k1Proxy;
 using Secp256k1Proxy.Key;
 using Secp256k1Proxy.Lib;
 using Secp256k1Proxy.Pedersen;
 using Serilog;
 
-namespace Grin.Keychain.Keychain
+namespace Grin.Keychain.KeychainImpl
 {
     public class Keychain
     {
@@ -155,6 +154,15 @@ namespace Grin.Keychain.Keychain
             return commit;
         }
 
+        public Commitment commit_with_key_index(ulong amount, uint derivation)
+        {
+
+            var skey = derived_key_from_index(derivation);
+            var commit = Secp.commit(amount, skey);
+            return commit;
+
+        }
+
         public Commitment Switch_commit(Identifier keyId)
         {
             var skey = Derived_key(keyId);
@@ -204,5 +212,7 @@ namespace Grin.Keychain.Keychain
             var sig = Secp.Sign(msg, blinding.Key);
             return sig;
         }
+
+ 
     }
 }

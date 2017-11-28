@@ -9,14 +9,14 @@ namespace Grin.Wallet.Handlers
 {
     public class CoinbaseHandler
     {
-        public CoinbaseHandler(WalletConfig config, Keychain.Keychain.Keychain keychain)
+        public CoinbaseHandler(WalletConfig config, Keychain.KeychainImpl.Keychain keychain)
         {
             this.config = config;
             this.keychain = keychain;
         }
 
         public WalletConfig config { get;  }
-        public Keychain.Keychain.Keychain keychain { get; }
+        public Keychain.KeychainImpl.Keychain keychain { get; }
 
 
       

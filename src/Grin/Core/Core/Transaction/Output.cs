@@ -46,7 +46,7 @@ namespace Grin.Core.Core.Transaction
 
         /// Given the original blinding factor we can recover the
         /// value from the range proof and the commitment
-        public ulong? Recover_value(Keychain.Keychain.Keychain keychain, Identifier keyId)
+        public ulong? Recover_value(Keychain.KeychainImpl.Keychain keychain, Identifier keyId)
         {
             var pi = keychain.Rewind_range_proof(keyId, commit, proof);
 

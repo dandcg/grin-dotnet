@@ -38,12 +38,12 @@ namespace Grin.Wallet.Types
             return hex;
         }
 
-        public Keychain.Keychain.Keychain derive_keychain(string password)
+        public Keychain.KeychainImpl.Keychain derive_keychain(string password)
         {
             var key = Encoding.ASCII.GetBytes(password);
             var blake2b = new HMACBlake2B(key, 64 * 8);
             var seed = blake2b.ComputeHash(Value);
-            var result = Keychain.Keychain.Keychain.From_seed(seed);
+            var result = Keychain.KeychainImpl.Keychain.From_seed(seed);
 
             return result;
         }

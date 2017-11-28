@@ -3,6 +3,7 @@ using System.IO;
 using System.Net.Http;
 using System.Text;
 using Common;
+using Grin.Api;
 using Grin.Core;
 using Grin.Core.Core.Block;
 using Grin.Core.Core.Build;
@@ -22,14 +23,14 @@ namespace Grin.Wallet.Receiver
 
     public class WalletReceiver
     {
-        public WalletReceiver(WalletConfig config, Keychain.Keychain.Keychain keychain)
+        public WalletReceiver(WalletConfig config, Keychain.KeychainImpl.Keychain keychain)
         {
             this.config = config;
             this.keychain = keychain;
         }
 
         public WalletConfig config { get; }
-        public Keychain.Keychain.Keychain keychain { get; }
+        public Keychain.KeychainImpl.Keychain keychain { get; }
 
 
         public IActionResult Handle(string partialTxStr)
@@ -58,7 +59,7 @@ namespace Grin.Wallet.Receiver
     /// network.
     public static void receive_json_tx(
             WalletConfig config,
-            Keychain.Keychain.Keychain keychain,
+            Keychain.KeychainImpl.Keychain keychain,
             PartialTx partialTx
         )
         {
@@ -71,25 +72,18 @@ namespace Grin.Wallet.Receiver
 
 
 
-            using (var c = new HttpClient())
-            {
+       //todo:asyncification
                 var uri = "http://192.168.0.3/v1/pool/push";
-                c.PostAsync(uri, new JsonContent(new TxWrapper(){tx_hex=tx_hex}));
+            var res = Api.Client.PostAsync(uri, new JsonContent(new TxWrapper(){tx_hex=tx_hex})).Result;
 
-            }
-
+           
 
             //let url = format!("{}/v1/pool/push", config.check_node_api_http_addr.as_str());
             //let _: () = api::client::post(url.as_str(), &TxWrapper { tx_hex: tx_hex
             //})
             //.map_err(|e| Error::Node(e))?;
         }
-        public class JsonContent : StringContent
-        {
-            public JsonContent(object obj) :
-                base(JsonConvert.SerializeObject(obj), Encoding.UTF8, "application/json")
-            { }
-        }
+  
 
         // Read wallet data without acquiring the write lock.
         public static (Identifier, uint) retrieve_existing_key(
@@ -130,7 +124,7 @@ namespace Grin.Wallet.Receiver
 
         public static (Identifier, uint) next_available_key(
             WalletConfig config,
-            Keychain.Keychain.Keychain keychain
+            Keychain.KeychainImpl.Keychain keychain
         )
         {
             var res = WalletData.read_wallet(config.data_file_dir,
@@ -148,7 +142,7 @@ namespace Grin.Wallet.Receiver
         /// Build a coinbase output and the corresponding kernel
         public static (Output, TxKernel, BlockFees) receive_coinbase(
             WalletConfig config,
-            Keychain.Keychain.Keychain keychain,
+            Keychain.KeychainImpl.Keychain keychain,
             BlockFees block_fees
         )
         {
@@ -206,7 +200,7 @@ namespace Grin.Wallet.Receiver
         /// Builds a full transaction from the partial one sent to us for transfer
         public static Transaction receive_transaction(
             WalletConfig config,
-            Keychain.Keychain.Keychain keychain,
+            Keychain.KeychainImpl.Keychain keychain,
             ulong amount,
             BlindingFactor blinding,
             Transaction partial
@@ -224,11 +218,8 @@ namespace Grin.Wallet.Receiver
 
             if (fee != partial.fee)
             {
-                throw new FeeDisputeException
-                (
-                    partial.fee,
-                    fee
-                );
+                throw new WalletErrorException(WalletError.FeeDispute).Data("sender_fee", partial.fee).Data("recipient_fee",fee);
+
             }
 
             var out_amount = amount - fee;

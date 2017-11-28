@@ -37,7 +37,7 @@ namespace Grin.Wallet.Types
         /// Reads a partial transaction into the amount, sum of blinding
         /// factors and the transaction itself.
         public static (ulong amount, BlindingFactor blinding, Transaction tx) read_partial_tx(
-            Keychain.Keychain.Keychain keychain,
+            Keychain.KeychainImpl.Keychain keychain,
             PartialTx partial_tx
         )
         {
