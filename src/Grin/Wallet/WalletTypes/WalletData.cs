@@ -61,8 +61,8 @@ namespace Grin.Wallet.Types
             // create directory if it doesn't exist
             Directory.CreateDirectory(data_file_dir);
 
-            var data_file_path = string.Format("{0}{1}{2}", data_file_dir, Path.PathSeparator, Types.DAT_FILE);
-            var lock_file_path = string.Format("{0}{1}{2}", data_file_dir, Path.PathSeparator, Types.LOCK_FILE);
+            var data_file_path = $"{data_file_dir}{Path.PathSeparator}{Types.DAT_FILE}";
+            var lock_file_path = $"{data_file_dir}{Path.PathSeparator}{Types.LOCK_FILE}";
 
             Log.Information("Acquiring wallet lock ...");
 
@@ -105,7 +105,7 @@ namespace Grin.Wallet.Types
             catch (IOException)
             {
                 Log.Error("Failed to acquire wallet lock file (multiple retries)");
-                throw new WalletDataException("Failed to acquire lock file");
+                throw new WalletErrorException(WalletError.WalletData,"Failed to acquire lock file");
             }
 
 
@@ -121,7 +121,7 @@ namespace Grin.Wallet.Types
             }
             catch (IOException ex)
             {
-                throw new WalletDataException("Could not remove wallet lock file. Maybe insufficient rights?", ex);
+                throw new WalletErrorException(WalletError.WalletData, "Could not remove wallet lock file. Maybe insufficient rights?", ex);
             }
 
 
@@ -155,11 +155,11 @@ namespace Grin.Wallet.Types
             }
             catch (IOException ex)
             {
-                throw new WalletDataException($"Could not open {data_file_path}: {ex.Message}", ex);
+                throw new WalletErrorException(WalletError.WalletData, $"Could not open {data_file_path}: {ex.Message}", ex);
             }
             catch (Exception ex)
             {
-                throw new WalletDataException($"Error reading {data_file_path}: {ex.Message}", ex);
+                throw new WalletErrorException(WalletError.WalletData, $"Error reading {data_file_path}: {ex.Message}", ex);
             }
         }
 
@@ -177,11 +177,11 @@ namespace Grin.Wallet.Types
 
             catch (IOException ex)
             {
-                throw new WalletDataException($"Could not create {data_file_path}: {ex.Message}", ex);
+                throw new WalletErrorException(WalletError.WalletData, $"Could not create {data_file_path}: {ex.Message}", ex);
             }
             catch (Exception ex)
             {
-                throw new WalletDataException($"Error serializing wallet data: {ex.Message}", ex);
+                throw new WalletErrorException(WalletError.WalletData, $"Error serializing wallet data: {ex.Message}", ex);
             }
         }
 
