@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Grin.CoreImpl.Core.Hash;
+using Grin.CoreImpl.Core.Mod;
 using Grin.CoreImpl.Core.Target;
 using Grin.CoreImpl.Core.Transaction;
 using Grin.CoreImpl.Ser;

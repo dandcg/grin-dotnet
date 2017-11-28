@@ -1,26 +1,7 @@
 ﻿using System;
-using Grin.CoreImpl.Core.Block;
-using Grin.CoreImpl.Core.Hash;
-using Grin.CoreImpl.Core.Target;
-using Grin.CoreImpl.Ser;
 
 namespace Grin.ChainImpl.ChainTypes
 {
-    /// Options for block validation
-    public enum ChainOptions : uint
-
-    {
-        /// None flag
-        NONE = 0b00000001,
-
-        /// Runs without checking the Proof of Work, mostly to make testing easier.
-        SKIP_POW = 0b00000010,
-
-        /// Adds block while in syncing mode.
-        SYNC = 0b00001000
-    }
-
-
     public class ChainErrorException:ApplicationException
     {
         public ChainErrorException(ChainError error) : base(error.ToString())
@@ -35,55 +16,6 @@ namespace Grin.ChainImpl.ChainTypes
         }
     }
 
-
-
-   /// Errors
-
-public enum ChainError
-    {
-        /// The block doesn't fit anywhere in our chain
-        Unfit,
-        /// Special case of orphan blocks
-        Orphan,
-        /// Difficulty is too low either compared to ours or the block PoW hash
-        DifficultyTooLow,
-        /// Addition of difficulties on all previous block is wrong
-        WrongTotalDifficulty,
-        /// The proof of work is invalid
-        InvalidPow,
-        /// The block doesn't sum correctly or a tx signature is invalid
-        InvalidBlockProof,
-        /// Block time is too old
-        InvalidBlockTime,
-        /// Block height is invalid (not previous + 1)
-        InvalidBlockHeight,
-        /// One of the root hashes in the block is invalid
-        InvalidRoot,
-        /// One of the inputs in the block has already been spent
-        AlreadySpent,
-        /// An output with that commitment already exists (should be unique)
-        DuplicateCommitment,
-        /// A kernel with that excess commitment already exists (should be unique)
-        DuplicateKernel,
-        /// coinbase can only be spent after it has matured (n blocks)
-        ImmatureCoinbase,
-        /// output not found
-        OutputNotFound,
-        /// output spent
-        OutputSpent,
-        /// Invalid block version, either a mistake or outdated software
-        InvalidBlockVersion,
-        /// Internal issue when trying to save or load data from store
-        StoreErr,
-        /// Error serializing or deserializing a type
-        SerErr,
-        /// Error while updating the sum trees
-        SumTreeErr,
-        /// No chain exists and genesis block is required
-        GenesisBlockRequired,
-        /// Anything else
-        Other
-    }
 
     //impl From<grin_store::Error> for Error {
     //    fn from(e: grin_store::Error) -> Error {
@@ -102,80 +34,6 @@ public enum ChainError
     //        Error::SumTreeErr(e.to_string())
 
     //    }
-
-
-    /// The tip of a fork. A handle to the fork ancestry from its leaf in the
-    /// blockchain tree. References the max height and the latest and previous
-    /// blocks
-    /// for convenience and the total difficulty.
-    public struct ChainTip : IWriteable, IReadable, ICloneable
-    {
-        /// Height of the tip (max height of the fork)
-        public ulong height { get; set; }
-
-        /// Last block pushed to the fork
-        public Hash last_block_h { get; set; }
-
-        /// Block previous to last
-        public Hash prev_block_h { get; set; }
-
-        /// Total difficulty accumulated on that fork
-        public Difficulty total_difficulty { get; set; }
-
-        public object Clone()
-        {
-            throw new NotImplementedException();
-        }
-
-        /// Creates a new tip at height zero and the provided genesis hash.
-        public static ChainTip New(Hash gbh)
-        {
-            return new ChainTip
-            {
-                height = 0,
-                last_block_h = gbh,
-                prev_block_h = gbh,
-                total_difficulty = Difficulty.One()
-            };
-        }
-
-        /// Append a new block to this tip, returning a new updated tip.
-        public static ChainTip from_block(BlockHeader bh)
-        {
-            return new ChainTip
-            {
-                height = bh.height,
-                last_block_h = bh.hash(),
-                prev_block_h = bh.previous,
-                total_difficulty = bh.total_difficulty.Clone()
-            };
-        }
-
-
-        /// Serialization of a tip, required to save to datastore.
-        public void write(IWriter writer)
-        {
-            writer.write_u64(height);
-            last_block_h.write(writer);
-            prev_block_h.write(writer);
-            total_difficulty.write(writer);
-        }
-
-        public void read(IReader reader)
-        {
-            height = reader.read_u64();
-            last_block_h = Hash.readNew(reader);
-            prev_block_h = Hash.readNew(reader);
-            total_difficulty = Difficulty.readnew(reader);
-        }
-
-        public static ChainTip readnew(IReader reader)
-        {
-            var tip = new ChainTip();
-            tip.read(reader);
-            return tip;
-        }
-    }
 
 
 ///// Trait the chain pipeline requires an implementor for in order to process

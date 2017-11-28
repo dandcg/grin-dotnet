@@ -47,7 +47,7 @@ namespace Grin.WalletImpl.WalletReceiver
 
 
 
-
+        
 
 
 
@@ -71,8 +71,8 @@ namespace Grin.WalletImpl.WalletReceiver
 
 
        //todo:asyncification
-                var uri = "http://192.168.0.3/v1/pool/push";
-            var res = Client.PostAsync(uri, new JsonContent(new TxWrapper(){tx_hex=tx_hex})).Result;
+                var uri = $"{config.check_node_api_http_addr}/v1/pool/push";
+            var res = ApiClient.PostAsync(uri, new JsonContent(new TxWrapper(){tx_hex=tx_hex})).Result;
 
            
 

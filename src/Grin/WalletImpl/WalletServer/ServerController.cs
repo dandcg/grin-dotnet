@@ -1,4 +1,5 @@
 using Common;
+using Grin.KeychainImpl;
 using Grin.WalletImpl.WalletHandlers;
 using Grin.WalletImpl.WalletTypes;
 using Microsoft.AspNetCore.Mvc;
@@ -8,13 +9,19 @@ namespace Grin.WalletImpl.WalletServer
 
     public class ServerController:Controller
     {
+
         private readonly CoinbaseHandler coinbasehandler;
         private readonly WalletReceiver.WalletReceiver walletReceiver;
+        private readonly WalletConfig config;
+        private readonly Keychain keychain;
 
-        public ServerController(CoinbaseHandler coinbasehandler, WalletReceiver.WalletReceiver walletReceiver)
+        public ServerController(CoinbaseHandler coinbasehandler, WalletReceiver.WalletReceiver walletReceiver, WalletConfig config, Keychain keychain)
         {
+           
             this.coinbasehandler = coinbasehandler;
             this.walletReceiver = walletReceiver;
+            this.config = config;
+            this.keychain = keychain;
         }
 
 
@@ -22,7 +29,15 @@ namespace Grin.WalletImpl.WalletServer
         [HttpGet]
         public IActionResult Default()
         {
-            return Content("-[ Grin Wallet On DotNetCore ]-");
+            return Content("-[ Grin Wallet On DotNetCore ]-\n\r");
+        }
+
+        [Route("/info")]
+        [HttpGet]
+        public IActionResult Info()
+        {
+            var text = WalletInfo.Info.build_info(config, keychain);
+            return Content(text);
         }
 
 

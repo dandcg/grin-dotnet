@@ -25,8 +25,13 @@ namespace Grin
             services.AddMvc();
 
             var walletConfig = WalletConfig.Default();
-            var keychain = Keychain.From_random_seed();
-                
+            walletConfig.check_node_api_http_addr = "http://192.168.0.3";
+
+            var keychain =Keychain.From_random_seed();
+
+            services.AddSingleton(pr => walletConfig);
+            services.AddSingleton(pr => keychain);
+
             services.AddSingleton<CoinbaseHandler>(pr=>new CoinbaseHandler(walletConfig, keychain));
             services.AddSingleton<WalletReceiver>(pr => new WalletReceiver(walletConfig, keychain));
         }

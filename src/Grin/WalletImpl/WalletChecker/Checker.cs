@@ -1,10 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO.Pipes;
 using System.Linq;
+using System.Net.Http;
+using Grin.Api.ApiTypes;
 using Grin.ApiImpl.ApiClient;
 using Grin.KeychainImpl;
 using Grin.KeychainImpl.ExtKey;
+using Grin.WalletImpl.WalletClient;
 using Grin.WalletImpl.WalletTypes;
+using Newtonsoft.Json;
 using Secp256k1Proxy.Pedersen;
 using Serilog;
 
@@ -46,7 +51,7 @@ namespace Grin.WalletImpl.WalletChecker
 
         /// Builds a single api query to retrieve the latest output data from the node.
         /// So we can refresh the local wallet outputs.
-        public static void refresh_outputs(WalletConfig config, Keychain keychain)
+        public static bool refresh_outputs(WalletConfig config, Keychain keychain)
 
         {
             Log.Debug("Refreshing wallet outputs");
@@ -86,16 +91,39 @@ namespace Grin.WalletImpl.WalletChecker
             var api_outputs = new Dictionary<string, ApiOutput>();
 
             //HttpClient here
-//	match api::client::get::<Vec<api::Output>>(url.as_str())
-//{
-//    Ok(outputs) => for out in outputs {
-//        api_outputs.insert(out.commit, out);
-//    },
-//		Err(e) => {
-//        // if we got anything other than 200 back from server, don't attempt to refresh the wallet
-//        // data after
-//        return Err(Error::Node(e));
-//    }
+            // todo:asyncification
+
+
+ 
+            HttpResponseMessage response=null;
+            try
+            {
+              response = ApiClient.GetAsync(url).Result;
+
+            }
+            catch (Exception ex)
+            {
+                Log.Warning(ex, "Failed to refresh from {Url}", url);
+                return false;
+            }
+
+
+            // if we got anything other than 200 back from server, don't attempt to refresh the wallet
+            //  data after
+            if (!response.IsSuccessStatusCode)
+            {
+                Log.Warning("Failed to refresh from {Url} : {StatusCode} - {ReasonPhrase}", url, response.StatusCode, response.ReasonPhrase);
+                return false;
+            }
+
+            var content = response.Content.ReadAsStringAsync().Result;
+
+            var outputs = JsonConvert.DeserializeObject<ApiOutput[]>(content);
+
+            foreach (var op in outputs)
+            {
+                api_outputs.Add(op.commit.Hex, op);
+            }
 
 
 // now for each commit, find the output in the wallet and
@@ -122,18 +150,27 @@ namespace Grin.WalletImpl.WalletChecker
                 }
                 return wallet_data;
             });
+
+            return true;
         }
 
         public static ApiTip get_tip_from_node(WalletConfig config)
         {
 
-            throw new NotImplementedException();
-var uri = $"{config.check_node_api_http_addr}/v1/chain";
+
+            var uri = $"{config.check_node_api_http_addr}/v1/chain";
             //todo:asyncification
    
-            var res = Client.GetAsync(uri).Result;
-            //res.IsSuccessStatusCode 
-            ////	api::client::get::<api::Tip>(url.as_str()).map_err(|e| Error::Node(e))
+            var response = ApiClient.GetAsync(uri).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                Log.Warning("Failed to refresh from {Url} : {StatusCode} - {ReasonPhrase}", response.StatusCode, response.ReasonPhrase);
+                throw new WalletErrorException(WalletError.Node);
+
+            }
+            var content = response.Content.ReadAsStringAsync().Result;
+            var result = JsonConvert.DeserializeObject<ApiTip>(content);
+            return result;
         }
     }
 }

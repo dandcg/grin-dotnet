@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Grin.CoreImpl.Core.Hash;
+using Grin.CoreImpl.Core.Mod;
 using Grin.CoreImpl.Core.Transaction.Errors;
 using Grin.CoreImpl.Ser;
 using Secp256k1Proxy.Lib;

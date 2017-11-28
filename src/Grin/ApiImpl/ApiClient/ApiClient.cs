@@ -1,16 +1,16 @@
-﻿using System.Net.Http;
-using System.Text;
+﻿using System;
+using System.Net.Http;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 
 namespace Grin.ApiImpl.ApiClient
 {
-    public static class Client
+    public static class ApiClient
     {
         public static async Task<HttpResponseMessage> PostAsync(string uri, object obj)
         {
             using (var c = new HttpClient())
             {
+                c.Timeout = TimeSpan.FromSeconds(15);
                 var res = await c.PostAsync(uri, new JsonContent(obj));
                 return res;
             }
@@ -20,18 +20,10 @@ namespace Grin.ApiImpl.ApiClient
         {
             using (var c = new HttpClient())
             {
+                c.Timeout = TimeSpan.FromSeconds(15);
                 var res = await c.GetAsync(uri);
                 return res;
             }
-        }
-    }
-
-
-    public class JsonContent : StringContent
-    {
-        public JsonContent(object obj) :
-            base(JsonConvert.SerializeObject(obj), Encoding.UTF8, "application/json")
-        {
         }
     }
 }
