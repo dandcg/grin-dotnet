@@ -1,9 +1,7 @@
 ﻿using System;
-using Grin.Core.Core;
 using Grin.CoreImpl.Core.Block;
 using Grin.CoreImpl.Core.Build;
 using Grin.CoreImpl.Core.Transaction;
-using Grin.Keychain;
 using Grin.KeychainImpl;
 using Grin.KeychainImpl.ExtKey;
 using Xunit;

@@ -1,8 +1,6 @@
 using Common;
-using Grin.Keychain;
 using Grin.KeychainImpl.ExtKey;
 using Newtonsoft.Json;
-using Secp256k1Proxy;
 using Secp256k1Proxy.Key;
 using Secp256k1Proxy.Lib;
 using Xunit;

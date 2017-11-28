@@ -1,16 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using Grin.Core.Core;
 using Grin.CoreImpl.Core.Block;
 using Grin.CoreImpl.Core.Build;
 using Grin.CoreImpl.Core.Hash;
 using Grin.CoreImpl.Core.Transaction;
 using Grin.CoreImpl.Ser;
-using Grin.Keychain;
 using Grin.KeychainImpl;
 using Grin.KeychainImpl.Blind;
-using Secp256k1Proxy;
 using Secp256k1Proxy.Pedersen;
 using Xunit;
 

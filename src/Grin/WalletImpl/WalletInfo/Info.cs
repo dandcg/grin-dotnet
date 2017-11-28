@@ -95,7 +95,7 @@ namespace Grin.WalletImpl.WalletInfo
                 return wallet_data;
             });
 
-            if (result)
+            if (!result)
             {
                 sb.AppendLine("");
                 sb.AppendLine(

@@ -1,11 +1,9 @@
 ﻿using System;
 using System.IO;
 using Common;
-using Grin.Core.Core;
 using Grin.CoreImpl.Core.Transaction;
 using Grin.CoreImpl.Ser;
 using Grin.KeychainImpl;
-using Secp256k1Proxy;
 using Secp256k1Proxy.Pedersen;
 using Xunit;
 

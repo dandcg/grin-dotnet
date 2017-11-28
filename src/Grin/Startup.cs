@@ -25,7 +25,7 @@ namespace Grin
             services.AddMvc();
 
             var walletConfig = WalletConfig.Default();
-            walletConfig.check_node_api_http_addr = "http://192.168.0.3";
+            walletConfig.check_node_api_http_addr = "http://localhost:13413";
 
             var keychain =Keychain.From_random_seed();
 
