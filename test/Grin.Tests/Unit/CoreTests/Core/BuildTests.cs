@@ -1,6 +1,7 @@
 ﻿using System;
 using Grin.Core.Core;
-using Grin.Core.Core.Build;
+using Grin.CoreImpl.Core.Build;
+using Grin.KeychainImpl;
 using Xunit;
 
 namespace Grin.Tests.Unit.CoreTests.Core
@@ -10,7 +11,7 @@ namespace Grin.Tests.Unit.CoreTests.Core
         [Fact]
         public void blind_simple_tx()
         {
-            var keychain = Keychain.KeychainImpl.Keychain.From_random_seed();
+            var keychain = Keychain.From_random_seed();
             var key_id1 = keychain.Derive_key_id(1);
             var key_id2 = keychain.Derive_key_id(2);
             var key_id3 = keychain.Derive_key_id(3);
@@ -30,7 +31,7 @@ namespace Grin.Tests.Unit.CoreTests.Core
         [Fact]
         public void blind_simpler_tx()
         {
-            var keychain = Keychain.KeychainImpl.Keychain.From_random_seed();
+            var keychain = Keychain.From_random_seed();
             var key_id1 = keychain.Derive_key_id(1);
             var key_id2 = keychain.Derive_key_id(2);
 

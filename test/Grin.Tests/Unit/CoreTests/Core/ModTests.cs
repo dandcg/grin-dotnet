@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Grin.Core;
 using Grin.Core.Core;
-using Grin.Core.Core.Block;
-using Grin.Core.Core.Build;
-using Grin.Core.Core.Hash;
-using Grin.Core.Core.Transaction;
-using Grin.Core.Ser;
+using Grin.CoreImpl.Core.Block;
+using Grin.CoreImpl.Core.Build;
+using Grin.CoreImpl.Core.Hash;
+using Grin.CoreImpl.Core.Transaction;
+using Grin.CoreImpl.Ser;
 using Grin.Keychain;
-using Grin.Keychain.Blind;
+using Grin.KeychainImpl;
+using Grin.KeychainImpl.Blind;
 using Secp256k1Proxy;
 using Secp256k1Proxy.Pedersen;
 using Xunit;
@@ -21,7 +21,7 @@ namespace Grin.Tests.Unit.CoreTests.Core
         [Fact]
         public void test_zero_commit_fails()
         {
-            var keychain = Keychain.KeychainImpl.Keychain.From_random_seed();
+            var keychain = Keychain.From_random_seed();
             var keyId1 = keychain.Derive_key_id(1);
 
             // blinding should fail as signing with a zero r*G shouldn't work
@@ -103,7 +103,7 @@ namespace Grin.Tests.Unit.CoreTests.Core
         [Fact]
         public void hash_output()
         {
-            var keychain = Keychain.KeychainImpl.Keychain.From_random_seed();
+            var keychain = Keychain.From_random_seed();
             var key_id1 = keychain.Derive_key_id(1);
             var key_id2 = keychain.Derive_key_id(2);
             var key_id3 = keychain.Derive_key_id(3);
@@ -126,7 +126,7 @@ namespace Grin.Tests.Unit.CoreTests.Core
         [Fact]
         public void blind_tx()
         {
-            var keychain = Keychain.KeychainImpl.Keychain.From_random_seed();
+            var keychain = Keychain.From_random_seed();
 
             var btx = tx2i1o();
             btx.verify_sig(keychain.Secp);
@@ -156,7 +156,7 @@ namespace Grin.Tests.Unit.CoreTests.Core
         [Fact]
         public void tx_build_exchange()
         {
-            var keychain = Keychain.KeychainImpl.Keychain.From_random_seed();
+            var keychain = Keychain.From_random_seed();
             var key_id1 = keychain.Derive_key_id(1);
             var key_id2 = keychain.Derive_key_id(2);
             var key_id3 = keychain.Derive_key_id(3);
@@ -207,7 +207,7 @@ namespace Grin.Tests.Unit.CoreTests.Core
         [Fact]
         public void reward_empty_block()
         {
-            var keychain = Keychain.KeychainImpl.Keychain.From_random_seed();
+            var keychain = Keychain.From_random_seed();
             var key_id = keychain.Derive_key_id(1);
 
             var b = Block.New(BlockHeader.Default(), new Transaction[0], keychain, key_id);
@@ -311,7 +311,7 @@ namespace Grin.Tests.Unit.CoreTests.Core
         [Fact]
         public void test_verify_1i1o_sig()
         {
-            var keychain = Keychain.KeychainImpl.Keychain.From_random_seed();
+            var keychain = Keychain.From_random_seed();
             var tx = tx1i1o();
             tx.verify_sig(keychain.Secp);
         }
@@ -319,7 +319,7 @@ namespace Grin.Tests.Unit.CoreTests.Core
         [Fact]
         public void test_verify_2i1o_sig()
         {
-            var keychain = Keychain.KeychainImpl.Keychain.From_random_seed();
+            var keychain = Keychain.From_random_seed();
             var tx = tx2i1o();
             tx.verify_sig(keychain.Secp);
         }
@@ -328,7 +328,7 @@ namespace Grin.Tests.Unit.CoreTests.Core
         // utility producing a transaction with 2 inputs and a single outputs
         public static Transaction tx2i1o()
         {
-            var keychain = Keychain.KeychainImpl.Keychain.From_random_seed();
+            var keychain = Keychain.From_random_seed();
             var key_id1 = keychain.Derive_key_id(1);
             var key_id2 = keychain.Derive_key_id(2);
             var key_id3 = keychain.Derive_key_id(3);
@@ -350,7 +350,7 @@ namespace Grin.Tests.Unit.CoreTests.Core
         // utility producing a transaction with a single input and output
         public static Transaction tx1i1o()
         {
-            var keychain = Keychain.KeychainImpl.Keychain.From_random_seed();
+            var keychain = Keychain.From_random_seed();
             var key_id1 = keychain.Derive_key_id(1);
             var key_id2 = keychain.Derive_key_id(2);
 

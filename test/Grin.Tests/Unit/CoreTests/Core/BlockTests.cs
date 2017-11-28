@@ -1,10 +1,11 @@
 ﻿using System;
 using Grin.Core.Core;
-using Grin.Core.Core.Block;
-using Grin.Core.Core.Build;
-using Grin.Core.Core.Transaction;
+using Grin.CoreImpl.Core.Block;
+using Grin.CoreImpl.Core.Build;
+using Grin.CoreImpl.Core.Transaction;
 using Grin.Keychain;
-using Grin.Keychain.ExtKey;
+using Grin.KeychainImpl;
+using Grin.KeychainImpl.ExtKey;
 using Xunit;
 
 namespace Grin.Tests.Unit.CoreTests.Core
@@ -13,7 +14,7 @@ namespace Grin.Tests.Unit.CoreTests.Core
     {
         // utility to create a block without worrying about the key or previous
         // header
-        private Block new_block(Transaction[] txs, Keychain.KeychainImpl.Keychain keychain)
+        private Block new_block(Transaction[] txs, Keychain keychain)
         {
             var key_id = keychain.Derive_key_id(1);
             return Block.New(BlockHeader.Default(), txs, keychain, key_id);
@@ -21,7 +22,7 @@ namespace Grin.Tests.Unit.CoreTests.Core
 
         // utility producing a transaction that spends an output with the provided
         // value and blinding key
-        private Transaction txspend1i1o(ulong v, Keychain.KeychainImpl.Keychain keychain, Identifier key_id1, Identifier key_id2)
+        private Transaction txspend1i1o(ulong v, Keychain keychain, Identifier key_id1, Identifier key_id2)
         {
             var (tx, _) = Build.transaction(new Func<Context, Append>[]
             {
@@ -65,7 +66,7 @@ namespace Grin.Tests.Unit.CoreTests.Core
         // builds a block with a tx spending another and check if merging occurred
         public void compactable_block()
         {
-            var keychain = Keychain.KeychainImpl.Keychain.From_random_seed();
+            var keychain = Keychain.From_random_seed();
             var key_id1 = keychain.Derive_key_id(1);
             var key_id2 = keychain.Derive_key_id(2);
             var key_id3 = keychain.Derive_key_id(3);

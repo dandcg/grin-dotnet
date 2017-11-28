@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Grin.Wallet.Handlers;
-using Grin.Wallet.Receiver;
-using Grin.Wallet.Types;
+using Grin.KeychainImpl;
+using Grin.WalletImpl.WalletHandlers;
+using Grin.WalletImpl.WalletReceiver;
+using Grin.WalletImpl.WalletTypes;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -24,7 +25,7 @@ namespace Grin
             services.AddMvc();
 
             var walletConfig = WalletConfig.Default();
-            var keychain = Keychain.KeychainImpl.Keychain.From_random_seed();
+            var keychain = Keychain.From_random_seed();
                 
             services.AddSingleton<CoinbaseHandler>(pr=>new CoinbaseHandler(walletConfig, keychain));
             services.AddSingleton<WalletReceiver>(pr => new WalletReceiver(walletConfig, keychain));
