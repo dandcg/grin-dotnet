@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Common;
 using Grin.CoreImpl.Core.Hash;
 using Grin.CoreImpl.Core.Mod;
 using Grin.CoreImpl.Core.Target;
@@ -8,6 +9,7 @@ using Grin.CoreImpl.Core.Transaction;
 using Grin.CoreImpl.Ser;
 using Grin.KeychainImpl;
 using Grin.KeychainImpl.ExtKey;
+using Grin.UtilImpl;
 using Secp256k1Proxy.Constants;
 using Secp256k1Proxy.Lib;
 using Secp256k1Proxy.Pedersen;
@@ -55,13 +57,12 @@ namespace Grin.CoreImpl.Core.Block
         {
             var txfees = txs.Select(s => s.fee).ToArray();
 
-            ulong fees=0;
+            ulong fees = 0;
 
             if (txfees.Any())
             {
-                fees=txfees.Aggregate((t, t1) => t + t1);
+                fees = txfees.Aggregate((t, t1) => t + t1);
             }
-
 
 
             var (reward_out, reward_proof) = Reward_output(keychain, keyId, fees);
@@ -72,7 +73,8 @@ namespace Grin.CoreImpl.Core.Block
         /// Builds a new block ready to mine from the header of the previous block,
         /// a vector of transactions and the reward information. Checks
         /// that all transactions are valid and calculates the Merkle tree.
-        public static Block with_reward(BlockHeader prev, Transaction.Transaction[] txs, Output reward_out, TxKernel reward_kern)
+        public static Block with_reward(BlockHeader prev, Transaction.Transaction[] txs, Output reward_out,
+            TxKernel reward_kern)
         {
             // note: the following reads easily but may not be the most efficient due to
             // repeated iterations, revisit if a problem
@@ -112,7 +114,8 @@ namespace Grin.CoreImpl.Core.Block
             bh.previous = prev.hash();
             bh.timestamp = DateTime.UtcNow;
 
-            bh.total_difficulty = Difficulty.From_num(prev.pow.Clone().to_difficulty().num + prev.total_difficulty.Clone().num);
+            bh.total_difficulty =
+                Difficulty.From_num(prev.pow.Clone().to_difficulty().num + prev.total_difficulty.Clone().num);
 
             var b = new Block
             {
@@ -166,7 +169,8 @@ namespace Grin.CoreImpl.Core.Block
 
             var commitments_to_compact = in_set.Intersect(out_set);
 
-            var new_inputs = inputs.Where(w => !commitments_to_compact.Contains(w.Commitment.Hex)).Select(s => s.Clone());
+            var new_inputs = inputs.Where(w => !commitments_to_compact.Contains(w.Commitment.Hex))
+                .Select(s => s.Clone());
 
             var new_outputs = outputs.Where(w => !commitments_to_compact.Contains(w.commit.Hex)).Select(s => s.Clone());
 
@@ -220,11 +224,11 @@ namespace Grin.CoreImpl.Core.Block
         /// TODO - performs various verification steps - discuss renaming this to "verify"
         public void validate(Secp256k1 secp)
         {
-            if (Consensus.exceeds_weight((uint)inputs.Length, (uint)outputs.Length, (uint)kernels.Length))
+            if (Consensus.exceeds_weight((uint) inputs.Length, (uint) outputs.Length, (uint) kernels.Length))
             {
-               throw new Exception("WeightExceeded");
+                throw new BlockErrorException(BlockError.WeightExceeded);
             }
-            verify_coinbase(secp);
+            verify_coinbase();
             verify_kernels(secp, false);
         }
 
@@ -236,33 +240,29 @@ namespace Grin.CoreImpl.Core.Block
         {
             foreach (var k in kernels)
             {
-                if (k.fee != 0)
+                if ((k.fee & 1) != 0)
                 {
-                    //return Err(Error.OddKernelFee);
+                    //throw new BlockErrorException(BlockError.OddKernelFee);
                 }
 
                 if (k.lock_height > header.height)
 
                 {
-                    throw new Exception("KernelLockHeight");
-                    //{
-
-                    //     k.lock_height
-                    //});
+                    throw new BlockErrorException(BlockError.KernelLockHeight).Data("lock_height", k.lock_height);
                 }
 
 
                 // sum all inputs and outs commitments
-                var io_sum =this.sum_commitments(secp);
+                var io_sum = this.sum_commitments(secp);
 
 // sum all kernels commitments
-                var proof_commits =kernels.Select(s=>s.excess).ToArray();
-                var proof_sum = secp.commit_sum(proof_commits, new Commitment[]{}  ) ;
+                var proof_commits = kernels.Select(s => s.excess).ToArray();
+                var proof_sum = secp.commit_sum(proof_commits, new Commitment[] { });
 
                 // both should be the same
                 if (proof_sum.Hex != io_sum.Hex)
                 {
-                    throw new Exception("KernelSumMismatch");
+                    throw new BlockErrorException(BlockError.KernelSumMismatch);
                 }
 
                 // verify all signatures with the commitment as pk
@@ -281,20 +281,32 @@ namespace Grin.CoreImpl.Core.Block
         // * That the sum of all coinbase-marked outputs equal the supply.
         // * That the sum of blinding factors for all coinbase-marked outputs match
         //   the coinbase-marked kernels.
-        public void verify_coinbase(Secp256k1 secp)
+        public void verify_coinbase()
         {
-            var cb_outs = outputs.Where(w => w.features.HasFlag(OutputFeatures.COINBASE_OUTPUT)).Select(s=>s.commit).ToArray();
+            var cb_outs = outputs.Where(w => w.features.HasFlag(OutputFeatures.COINBASE_OUTPUT)).Select(s => s.commit)
+                .ToArray();
 
-            var cb_kerns = kernels.Where(w => w.features.HasFlag(KernelFeatures.COINBASE_KERNEL)).Select(s => s.excess).ToArray();
+            var cb_kerns = kernels.Where(w => w.features.HasFlag(KernelFeatures.COINBASE_KERNEL)).Select(s => s.excess)
+                .ToArray();
 
+            var secp = SecpStatic.Instance;
 
-            var over_commit = secp.commit_value(Consensus.reward(total_fees()));
-            var out_adjust_sum = secp.commit_sum(cb_outs, new []{over_commit});
+            Commitment out_adjust_sum;
+            Commitment kerns_sum;
+            try
+            {
+                var over_commit = secp.commit_value(Consensus.reward(total_fees()));
+                out_adjust_sum = secp.commit_sum(cb_outs, new[] {over_commit});
+                kerns_sum = secp.commit_sum(cb_kerns, new Commitment[] { });
+            }
+            catch (Exception ex)
+            {
+                throw new BlockErrorException(BlockError.Secp, ex);
+            }
 
-            var kerns_sum = secp.commit_sum(cb_kerns, new Commitment[] { });
             if (kerns_sum.Hex != out_adjust_sum.Hex)
             {
-                throw new Exception("CoinbaseSumMismatch");
+                throw new BlockErrorException(BlockError.CoinbaseSumMismatch);
             }
         }
 
@@ -359,9 +371,12 @@ namespace Grin.CoreImpl.Core.Block
             var kernel_len = reader.read_u64();
 
 
-            inputs = Ser.Ser.read_and_verify_sorted<Input>(reader, input_len);
-            outputs = Ser.Ser.read_and_verify_sorted<Output>(reader, output_len);
-            kernels = Ser.Ser.read_and_verify_sorted<TxKernel>(reader, kernel_len);
+            //Console.WriteLine(input_len);
+
+            //    inputs = Ser.Ser.read_and_verify_sorted<Input>(reader, input_len);
+            //    outputs = Ser.Ser.read_and_verify_sorted<Output>(reader, output_len);
+            //    kernels = Ser.Ser.read_and_verify_sorted<TxKernel>(reader, kernel_len);
+            //
         }
 
 
@@ -374,6 +389,7 @@ namespace Grin.CoreImpl.Core.Block
 
             if (writer.serialization_mode() != SerializationMode.Hash)
             {
+               // Console.WriteLine(inputs.Length);
                 writer.write_u64((ulong) inputs.Length);
                 writer.write_u64((ulong) outputs.Length);
                 writer.write_u64((ulong) kernels.Length);
@@ -414,7 +430,7 @@ namespace Grin.CoreImpl.Core.Block
 
         public long overage()
         {
-            return ((long) total_fees() / 2)-(long)Consensus.REWARD;
+            return (long) total_fees() / 2 - (long) Consensus.REWARD;
         }
     }
 }

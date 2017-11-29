@@ -157,7 +157,7 @@ namespace Secp256k1Proxy.Ffi
         //                                   blind: *const c_uchar,
         //                                   gen: *const c_uchar)
         //                                   -> c_int;
-        public static extern int secp256k1_switch_commit(IntPtr selfCtx, byte[] commit, SecretKey blind, byte[] generatorJ);
+        public static extern int secp256k1_switch_commit(IntPtr selfCtx, byte[] commit, byte[] blind, byte[] generatorJ);
 
 
         [DllImport(LibName)]

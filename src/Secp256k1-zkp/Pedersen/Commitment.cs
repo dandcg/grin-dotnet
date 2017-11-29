@@ -12,18 +12,18 @@ namespace Secp256k1Proxy.Pedersen
         public override string ToString()
         {
 
-            return Value.AsString();
+            return Hex;
 
         }
 
         public byte[] Value { get; }
 
-        public string Hex { get; }
+        public string Hex => HexUtil.to_hex(Value);
 
         internal Commitment(byte[] value)
         {
             Value = value;
-            Hex = HexUtil.to_hex(value);
+         
         }
 
         public static Commitment from(byte[] value)

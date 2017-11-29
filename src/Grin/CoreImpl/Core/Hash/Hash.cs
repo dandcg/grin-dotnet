@@ -4,16 +4,15 @@ using Grin.CoreImpl.Ser;
 
 namespace Grin.CoreImpl.Core.Hash
 {
-    public class Hash:IReadable, IWriteable
+    public class Hash : IReadable, IWriteable
     {
         public byte[] Value { get; private set; }
 
-        public string Hex { get; private set; }
+        public string Hex => HexUtil.to_hex(Value);
 
         public Hash(byte[] value)
         {
             Value = value;
-            Hex = HexUtil.to_hex(value);
         }
 
         private Hash()
@@ -34,21 +33,17 @@ namespace Grin.CoreImpl.Core.Hash
 
         public static Hash readNew(IReader reader)
         {
-            var hash=new Hash();
+            var hash = new Hash();
             hash.read(reader);
             return hash;
-
         }
 
 
         public void read(IReader reader)
         {
-   var v = reader.read_fixed_bytes(32);
+            var v = reader.read_fixed_bytes(32);
             Value = v;
-            Hex = HexUtil.to_hex(v);
         }
-
-
 
 
         public void write(IWriter writer)
@@ -62,7 +57,7 @@ namespace Grin.CoreImpl.Core.Hash
             {
                 return false;
             }
-            return (this.Hex == other.Hex);
+            return Hex == other.Hex;
         }
 
         public override int GetHashCode()
@@ -75,6 +70,5 @@ namespace Grin.CoreImpl.Core.Hash
         {
             return new Hash(Value.ToArray());
         }
-
     }
 }

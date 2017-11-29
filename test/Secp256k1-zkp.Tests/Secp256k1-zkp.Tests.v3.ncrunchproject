@@ -25,8 +25,17 @@
       <NamedTestSelector>
         <TestName>Secp256k1Proxy.Tests.EcdhTests.Ecdh</TestName>
       </NamedTestSelector>
+      <FixtureTestSelector>
+        <FixtureName>Secp256k1Proxy.Tests.EcdhTests</FixtureName>
+      </FixtureTestSelector>
+      <FixtureTestSelector>
+        <FixtureName>Secp256k1Proxy.Tests.KeyTests</FixtureName>
+      </FixtureTestSelector>
       <NamedTestSelector>
-        <TestName>Secp256k1Proxy.Tests.PedersenTests.test_verify_commit_sum_zero_keys</TestName>
+        <TestName>Secp256k1Proxy.Tests.PedersenTests.test_commit_sum</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Secp256k1Proxy.Tests.PedersenTests.test_range_proof</TestName>
       </NamedTestSelector>
       <NamedTestSelector>
         <TestName>Secp256k1Proxy.Tests.PedersenTests.test_to_pubkey</TestName>
@@ -41,15 +50,11 @@
         <TestName>Secp256k1Proxy.Tests.PedersenTests.test_verify_commit_sum_random_keys</TestName>
       </NamedTestSelector>
       <NamedTestSelector>
+        <TestName>Secp256k1Proxy.Tests.PedersenTests.test_verify_commit_sum_zero_keys</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
         <TestName>Secp256k1Proxy.Tests.PedersenTests.test_sign_with_pubkey_from_commitment</TestName>
       </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Secp256k1Proxy.Tests.PedersenTests.test_commit_sum</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Secp256k1Proxy.Tests.PedersenTests.test_range_proof</TestName>
-      </NamedTestSelector>
-      <AllTestsSelector />
     </IgnoredTests>
   </Settings>
 </ProjectConfiguration>

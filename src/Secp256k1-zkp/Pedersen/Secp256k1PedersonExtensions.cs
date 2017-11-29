@@ -45,7 +45,7 @@ namespace Secp256k1Proxy.Pedersen
 
             var commit = new byte[33];
 
-            Proxy.secp256k1_switch_commit(self.Ctx, commit, blind, Constants.Constants.GENERATOR_J);
+            Proxy.secp256k1_switch_commit(self.Ctx, commit, blind.Value, Constants.Constants.GENERATOR_J);
 
 
             return new Commitment(commit);

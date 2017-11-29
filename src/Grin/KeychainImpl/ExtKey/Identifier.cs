@@ -23,7 +23,7 @@ namespace Grin.KeychainImpl.ExtKey
         {
             var bytes = new byte[IdentifierSize];
             Bytes = bytes;
-            Hex = HexUtil.to_hex(bytes);
+  
 
         }
 
@@ -31,7 +31,7 @@ namespace Grin.KeychainImpl.ExtKey
       private Identifier(byte[] bytes)
         {
             Bytes = bytes;
-            Hex = HexUtil.to_hex(bytes);
+      
         }
 
         
@@ -39,7 +39,7 @@ namespace Grin.KeychainImpl.ExtKey
         // data 
         public byte[] Bytes { get; }
 
-        public string Hex { get; }
+        public string Hex => HexUtil.to_hex(Bytes);
 
         // functions
         public static Identifier Zero()

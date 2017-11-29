@@ -107,6 +107,8 @@ namespace Grin.CoreImpl.Core.Block
             {
                 pow.write(writer);
             }
+
+            Console.WriteLine(height);
         }
 
         public void read(IReader reader)
@@ -122,6 +124,9 @@ namespace Grin.CoreImpl.Core.Block
             difficulty = Difficulty.readnew(reader);
             total_difficulty = Difficulty.readnew(reader);
             pow = Proof.readnew(reader);
+
+            Console.WriteLine(height);
+
         }
 
         public static BlockHeader readnew(IReader reader)

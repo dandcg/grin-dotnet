@@ -153,8 +153,15 @@ namespace Secp256k1Proxy.Tests
             }
             catch (Exception)
             {
-                secp.Verify(msg, sig, pubkeys[0]);
-                throw new Exception("this is not good");
+                try
+                {
+                    secp.Verify(msg, sig, pubkeys[1]);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("this is not good", ex);
+                }
+             
             }
         }
 
