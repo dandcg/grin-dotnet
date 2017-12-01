@@ -31,7 +31,7 @@ namespace Grin.CoreImpl.Core.Hash
             return new Hash(new byte[32]);
         }
 
-        public static Hash readNew(IReader reader)
+        public static Hash readnew(IReader reader)
         {
             var hash = new Hash();
             hash.read(reader);
@@ -41,8 +41,8 @@ namespace Grin.CoreImpl.Core.Hash
 
         public void read(IReader reader)
         {
-            var v = reader.read_fixed_bytes(32);
-            Value = v;
+            Value = reader.read_fixed_bytes(32);
+      
         }
 
 

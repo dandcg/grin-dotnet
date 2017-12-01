@@ -1,4 +1,7 @@
-﻿using System.IO;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
+using Common;
 
 namespace Grin.CoreImpl.Ser
 {
@@ -16,7 +19,7 @@ namespace Grin.CoreImpl.Ser
         {
             var bs = new byte[length];
             source.Read(bs, 0, (int) length);
-            //bs.Print();
+            //Trace.Write($"{bs.Length},");
             return bs;
         }
     }

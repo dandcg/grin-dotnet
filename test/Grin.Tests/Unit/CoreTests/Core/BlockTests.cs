@@ -1,8 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using Common;
 using Grin.CoreImpl.Core.Block;
 using Grin.CoreImpl.Core.Build;
+using Grin.CoreImpl.Core.Hash;
 using Grin.CoreImpl.Core.Transaction;
 using Grin.CoreImpl.Ser;
 using Grin.KeychainImpl;
@@ -222,24 +224,60 @@ namespace Grin.Tests.Unit.CoreTests.Core
 
         }
 
-[Fact]
+
+        [Fact]
+        public void serialize_deserialize_blockheader()
+        {
+            var keychain = Keychain.From_random_seed();
+            var b = new_block(new Transaction[] { }, keychain);
+            // Console.WriteLine(JsonConvert.SerializeObject(b.header, Formatting.Indented));
+            using (var vec = new MemoryStream())
+            {
+                var bw=new BinWriter(vec);
+                var bh1 = b.header;
+                b.header.write(bw);
+
+                vec.Position = 0;
+       
+                var br=new BinReader(vec);
+                var bh2 = BlockHeader.readnew(br);
+
+                Assert.Equal(bh1.version, bh2.version);
+                Assert.Equal(bh1.height, bh2.height);
+                Assert.Equal(bh1.previous.Value, bh2.previous.Value);
+                Assert.Equal(bh1.timestamp.PrecisionSeconds(), bh2.timestamp);
+                Assert.Equal(bh1.utxo_root.Value, bh2.utxo_root.Value);
+                Assert.Equal(bh1.range_proof_root.Value, bh2.range_proof_root.Value);
+                Assert.Equal(bh1.kernel_root.Value, bh2.kernel_root.Value);
+                Assert.Equal(bh1.nonce, bh2.nonce);
+
+
+                Assert.Equal(bh1.difficulty.num, bh2.difficulty.num);
+                Assert.Equal(bh1.total_difficulty.num, bh2.total_difficulty.num);
+
+
+
+                }
+        }
+
+
+
+        [Fact]
         public void serialize_deserialize_block()
         {
             var keychain = Keychain.From_random_seed();
             var b = new_block(new Transaction[] { }, keychain);
-           // Console.WriteLine(JsonConvert.SerializeObject(b.header, Formatting.Indented));
+
             using (var vec = new MemoryStream()) 
             {
                 Ser.serialize(vec, b);
-                vec.Position =1;
+                vec.Position = 0;
                 var b2 = Ser.deserialize(vec, Block.Default());
 
-      
-                //Console.WriteLine(JsonConvert.SerializeObject(b2.header, Formatting.Indented));
-                Assert.Equal(b.inputs, b2.inputs);
-                Assert.Equal(b.outputs, b2.outputs);
-                Assert.Equal(b.kernels, b2.kernels);
-                Assert.Equal(b.header, b2.header);
+                Assert.Equal(b.inputs.Length, b2.inputs.Length);
+                Assert.Equal(b.outputs.Length, b2.outputs.Length);
+                Assert.Equal(b.kernels.Length, b2.kernels.Length);
+               Assert.Equal(b.header.hash().Hex, b2.header.hash().Hex);
             }
         }
     }

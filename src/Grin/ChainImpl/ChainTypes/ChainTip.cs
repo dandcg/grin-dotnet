@@ -66,8 +66,8 @@ namespace Grin.ChainImpl.ChainTypes
         public void read(IReader reader)
         {
             height = reader.read_u64();
-            last_block_h = Hash.readNew(reader);
-            prev_block_h = Hash.readNew(reader);
+            last_block_h = Hash.readnew(reader);
+            prev_block_h = Hash.readnew(reader);
             total_difficulty = Difficulty.readnew(reader);
         }
 

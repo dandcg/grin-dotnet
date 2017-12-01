@@ -370,13 +370,10 @@ namespace Grin.CoreImpl.Core.Block
             var output_len = reader.read_u64();
             var kernel_len = reader.read_u64();
 
+            inputs = Ser.Ser.read_and_verify_sorted<Input>(reader, input_len);
+            outputs = Ser.Ser.read_and_verify_sorted<Output>(reader, output_len);
+            kernels = Ser.Ser.read_and_verify_sorted<TxKernel>(reader, kernel_len);
 
-            //Console.WriteLine(input_len);
-
-            //    inputs = Ser.Ser.read_and_verify_sorted<Input>(reader, input_len);
-            //    outputs = Ser.Ser.read_and_verify_sorted<Output>(reader, output_len);
-            //    kernels = Ser.Ser.read_and_verify_sorted<TxKernel>(reader, kernel_len);
-            //
         }
 
 
@@ -389,7 +386,8 @@ namespace Grin.CoreImpl.Core.Block
 
             if (writer.serialization_mode() != SerializationMode.Hash)
             {
-               // Console.WriteLine(inputs.Length);
+                //Console.WriteLine("{0},{1},{2}", inputs.Length, outputs.Length, kernels.Length);
+
                 writer.write_u64((ulong) inputs.Length);
                 writer.write_u64((ulong) outputs.Length);
                 writer.write_u64((ulong) kernels.Length);

@@ -184,6 +184,12 @@
       <NamedTestSelector>
         <TestName>Grin.Tests.Unit.CoreTests.Core.BlockTests.empty_block_with_coinbase_is_valid</TestName>
       </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Grin.Tests.Unit.CoreTests.Core.BlockTests.serialize_deserialize_blockheader</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Grin.Tests.Unit.CoreTests.Core.BlockTests.serialize_deserialize_block</TestName>
+      </NamedTestSelector>
     </IgnoredTests>
     <ImplicitProjectDependencyPathsRelativeToSolutionDirectory />
     <UseCPUArchitecture>AutoDetect</UseCPUArchitecture>

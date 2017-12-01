@@ -79,7 +79,7 @@ namespace Grin.CoreImpl.Core.Block
                 version = 1,
                 height = 0,
                 previous = Hash.Hash.ZERO_HASH(),
-                timestamp = DateTime.UtcNow,
+                timestamp = DateTime.UtcNow.PrecisionSeconds(),
                 difficulty = Difficulty.From_num(Consensus.MINIMUM_DIFFICULTY),
                 total_difficulty = Difficulty.From_num(Consensus.MINIMUM_DIFFICULTY),
                 utxo_root = Hash.Hash.ZERO_HASH(),
@@ -108,24 +108,24 @@ namespace Grin.CoreImpl.Core.Block
                 pow.write(writer);
             }
 
-            Console.WriteLine(height);
+         
         }
 
         public void read(IReader reader)
         {
             version = reader.read_u16();
             height = reader.read_u64();
-            previous = Hash.Hash.readNew(reader);
+            previous = Hash.Hash.readnew(reader);
             timestamp = reader.read_i64().FromUnixTime();
-            utxo_root = Hash.Hash.readNew(reader);
-            range_proof_root = Hash.Hash.readNew(reader);
-            kernel_root = Hash.Hash.readNew(reader);
+            utxo_root = Hash.Hash.readnew(reader);
+            range_proof_root = Hash.Hash.readnew(reader);
+            kernel_root = Hash.Hash.readnew(reader);
             nonce = reader.read_u64();
             difficulty = Difficulty.readnew(reader);
             total_difficulty = Difficulty.readnew(reader);
             pow = Proof.readnew(reader);
 
-            Console.WriteLine(height);
+          
 
         }
 

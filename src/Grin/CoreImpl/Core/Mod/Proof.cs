@@ -35,7 +35,7 @@ namespace Grin.CoreImpl.Core.Mod
             return new Proof
             {
                 proof_size = proofSize,
-                nonces = new UInt32[] {}
+                nonces = new UInt32[proofSize]
             };
         }
 
