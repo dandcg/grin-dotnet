@@ -164,9 +164,6 @@
         <FixtureName>Grin.Tests.Unit.CoreTests.Core.TransactionTests</FixtureName>
       </FixtureTestSelector>
       <FixtureTestSelector>
-        <FixtureName>Grin.Tests.Unit.CoreTests.Core.ModTests</FixtureName>
-      </FixtureTestSelector>
-      <FixtureTestSelector>
         <FixtureName>Grin.Tests.Unit.KeychainTests.KeychainTests</FixtureName>
       </FixtureTestSelector>
       <NamedTestSelector>

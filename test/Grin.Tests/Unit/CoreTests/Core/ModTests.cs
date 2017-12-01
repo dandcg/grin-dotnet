@@ -3,6 +3,7 @@ using System.IO;
 using Grin.CoreImpl.Core.Block;
 using Grin.CoreImpl.Core.Build;
 using Grin.CoreImpl.Core.Hash;
+using Grin.CoreImpl.Core.Mod;
 using Grin.CoreImpl.Core.Transaction;
 using Grin.CoreImpl.Ser;
 using Grin.KeychainImpl;
@@ -14,6 +15,32 @@ namespace Grin.Tests.Unit.CoreTests.Core
 {
     public class ModTests : IClassFixture<LoggingFixture>
     {
+
+
+        [Fact]
+        public void test_amount_to_hr()
+        {
+            Assert.True(50123456789 == ModHelper.amount_from_hr_string("50.123456789"));
+            Assert.True(50 == ModHelper.amount_from_hr_string(".000000050"));
+            Assert.True(1 == ModHelper.amount_from_hr_string(".000000001"));
+            Assert.True(0 == ModHelper.amount_from_hr_string(".0000000009"));
+            Assert.True(500_000_000_000 == ModHelper.amount_from_hr_string("500"));
+            Assert.True(5_000_000_000_000_000_000 == ModHelper.amount_from_hr_string("5000000000.00000000000"));
+
+        }
+
+        [Fact]
+        public void test_hr_to_amount()
+        {
+            Assert.Equal("50.123456789" ,ModHelper.amount_to_hr_string(50123456789));
+            Assert.Equal("0.000000050" ,ModHelper.amount_to_hr_string(50));
+            Assert.Equal("0.000000001" ,ModHelper.amount_to_hr_string(1));
+            Assert.Equal("500.000000000", ModHelper.amount_to_hr_string(500_000_000_000));
+            Assert.Equal("5000000000.000000000" , ModHelper.amount_to_hr_string(5_000_000_000_000_000_000));
+        }
+
+
+
         [Fact]
         public void test_zero_commit_fails()
         {
