@@ -15,8 +15,6 @@ namespace Grin.Tests.Unit.CoreTests.Core
 {
     public class ModTests : IClassFixture<LoggingFixture>
     {
-
-
         [Fact]
         public void test_amount_to_hr()
         {
@@ -26,19 +24,17 @@ namespace Grin.Tests.Unit.CoreTests.Core
             Assert.True(0 == ModHelper.amount_from_hr_string(".0000000009"));
             Assert.True(500_000_000_000 == ModHelper.amount_from_hr_string("500"));
             Assert.True(5_000_000_000_000_000_000 == ModHelper.amount_from_hr_string("5000000000.00000000000"));
-
         }
 
         [Fact]
         public void test_hr_to_amount()
         {
-            Assert.Equal("50.123456789" ,ModHelper.amount_to_hr_string(50123456789));
-            Assert.Equal("0.000000050" ,ModHelper.amount_to_hr_string(50));
-            Assert.Equal("0.000000001" ,ModHelper.amount_to_hr_string(1));
+            Assert.Equal("50.123456789", ModHelper.amount_to_hr_string(50123456789));
+            Assert.Equal("0.000000050", ModHelper.amount_to_hr_string(50));
+            Assert.Equal("0.000000001", ModHelper.amount_to_hr_string(1));
             Assert.Equal("500.000000000", ModHelper.amount_to_hr_string(500_000_000_000));
-            Assert.Equal("5000000000.000000000" , ModHelper.amount_to_hr_string(5_000_000_000_000_000_000));
+            Assert.Equal("5000000000.000000000", ModHelper.amount_to_hr_string(5_000_000_000_000_000_000));
         }
-
 
 
         [Fact]
@@ -237,99 +233,86 @@ namespace Grin.Tests.Unit.CoreTests.Core
             b.compact().validate(keychain.Secp);
         }
 
-        //[Fact]
-        //        public void reward_with_tx_block()
-        //        {
-        //            var keychain = keychain.Keychain.from_random_seed();
-        //            var key_id = keychain.derive_key_id(1);
+        [Fact]
+        public void reward_with_tx_block()
+        {
+            var keychain = Keychain.From_random_seed();
+            var key_id = keychain.Derive_key_id(1);
 
-        //            var  tx1 = tx2i1o();
-        //            tx1.verify_sig(keychain.secp());
+            var tx1 = tx2i1o();
+            tx1.verify_sig(keychain.Secp);
 
-        //            var b = Block.new(& BlockHeader.default(), vec![& tx1], &keychain, key_id);
-        //            b.compact().validate(keychain.secp());
-        //        }
+            var b = Block.New(BlockHeader.Default(), new[] {tx1}, keychain, key_id);
+            b.compact().validate(keychain.Secp);
+        }
 
-        //[Fact]
-        //        public void simple_block()
-        //        {
-        //            var keychain = keychain.Keychain.from_random_seed();
-        //            var key_id = keychain.derive_key_id(1);
+        [Fact]
+        public void simple_block()
+        {
+            var keychain = Keychain.From_random_seed();
+            var key_id = keychain.Derive_key_id(1);
 
-        //            var  tx1 = tx2i1o();
-        //            var  tx2 = tx1i1o();
+            var tx1 = tx2i1o();
+            var tx2 = tx1i1o();
 
-        //            var b = Block.new(
+            var b = Block.New(
+                BlockHeader.Default(),
+                new[] {tx1, tx2},
+                keychain,
+                key_id
+            );
+            b.validate(keychain.Secp);
+        }
 
-        //                & BlockHeader.default(),
-        //			vec![& tx1, & tx2],
-        //			&keychain,
-        //			key_id,
-        //		);
-        //            b.validate(keychain.secp());
-        //        }
+        [Fact]
+        public void test_block_with_timelocked_tx()
+        {
+            var keychain = Keychain.From_random_seed();
 
-        //[Fact]
-        //        public void test_block_with_timelocked_tx()
-        //        {
-        //            var keychain = keychain.Keychain.from_random_seed();
+            var key_id1 = keychain.Derive_key_id(1);
+            var key_id2 = keychain.Derive_key_id(2);
+            var key_id3 = keychain.Derive_key_id(3);
 
-        //            var key_id1 = keychain.derive_key_id(1);
-        //            var key_id2 = keychain.derive_key_id(2);
-        //            var key_id3 = keychain.derive_key_id(3);
+            // first check we can add a timelocked tx where lock height matches current block height
+            // and that the resulting block is valid
+            var (tx1, _) = Build.transaction(new Func<Context, Append>[]
+                {
+                    c => c.input(5, key_id1.Clone()),
+                    c => c.output(3, key_id2.Clone()),
+                    c => c.with_fee(2),
+                    c => c.with_lock_height(1)
+                },
+                keychain
+            );
+            ;
 
-        //            // first check we can add a timelocked tx where lock height matches current block height
-        //            // and that the resulting block is valid
-        //            var tx1 = build.transaction(
-        //                vec![
-        //                    input(5, key_id1.clone()),
-        //                    output(3, key_id2.clone()),
-        //                    with_fee(2),
-        //                    with_lock_height(1),
+            var b = Block.New(
+                BlockHeader.Default(),
+                new[] {tx1},
+                keychain,
+                key_id3.Clone()
+            );
+            b.validate(keychain.Secp);
 
-        //                ],
-        //                &keychain,
+            // now try adding a timelocked tx where lock height is greater than current block height
+            (tx1, _) = Build.transaction(new Func<Context, Append>[]
+            {
+                c => c.input(5, key_id1.Clone()),
+                c => c.output(3, key_id2.Clone()),
+                c => c.with_fee(2),
+                c => c.with_lock_height(2)
+            }, keychain);
+            ;
+            b = Block.New(BlockHeader.Default(),
+                new[] {tx1},
+                keychain,
+                key_id3.Clone()
+            );
 
-        //            ).map(| (tx, _) | tx)
-        //                ;
+            var ex = Assert.Throws<BlockErrorException>(() => b.validate(keychain.Secp));
 
-        //            var b = Block.new(
-
-        //                & BlockHeader.default(),
-        //			vec![&tx1],
-        //			&keychain,
-        //			key_id3.clone(),
-        //		);
-        //            b.validate(keychain.secp());
-
-        //            // now try adding a timelocked tx where lock height is greater than current block height
-        //            var tx1 = build.transaction(
-        //                vec![
-        //                    input(5, key_id1.clone()),
-        //                    output(3, key_id2.clone()),
-        //                    with_fee(2),
-        //                    with_lock_height(2),
-
-        //                ],
-        //                &keychain,
-
-        //            ).map(| (tx, _) | tx)
-        //                ;
-
-        //            var b = Block.new(
-
-        //                & BlockHeader.default(),
-        //			vec![&tx1],
-        //			&keychain,
-        //			key_id3.clone(),
-        //		);
-        //            match b.validate(keychain.secp()) {
-        //                Err(KernelLockHeight { lock_height: height }) => {
-        //                    Assert.Equal(height, 2);
-        //                }
-        //                _ => panic!("expecting KernelLockHeight error here"),
-        //		}
-        //        }
+            Assert.Equal(BlockError.KernelLockHeight, ex.Error);
+        }
 
         [Fact]
         public void test_verify_1i1o_sig()

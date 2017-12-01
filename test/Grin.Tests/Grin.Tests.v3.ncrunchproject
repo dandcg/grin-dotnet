@@ -122,39 +122,6 @@
         <FixtureName>Grin.Tests.Unit.CoreTests.Core.BuildTests</FixtureName>
       </FixtureTestSelector>
       <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.test_zero_commit_fails</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.tx_double_ser_deser</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.simple_tx_ser_deser</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.simple_tx_ser</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.hash_output</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.blind_tx</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.tx_hash_diff</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.tx_build_exchange</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.test_verify_2i1o_sig</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.test_verify_1i1o_sig</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.reward_empty_block</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
         <TestName>Grin.Tests.Unit.WalletTests.SenderTests.output_commitment_equals_input_commitment_on_spend</TestName>
       </NamedTestSelector>
       <FixtureTestSelector>
@@ -187,6 +154,9 @@
       <NamedTestSelector>
         <TestName>Grin.Tests.Unit.CoreTests.Core.BlockTests.serialize_deserialize_block</TestName>
       </NamedTestSelector>
+      <FixtureTestSelector>
+        <FixtureName>Grin.Tests.Unit.CoreTests.Core.ModTests</FixtureName>
+      </FixtureTestSelector>
     </IgnoredTests>
     <ImplicitProjectDependencyPathsRelativeToSolutionDirectory />
     <UseCPUArchitecture>AutoDetect</UseCPUArchitecture>
