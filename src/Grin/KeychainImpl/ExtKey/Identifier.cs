@@ -22,7 +22,7 @@ namespace Grin.KeychainImpl.ExtKey
             var bytes = new byte[IdentifierSize];
             Bytes = bytes;
         }
-        ` private Identifier(byte[] bytes)
+        private Identifier(byte[] bytes)
         {
             Bytes = bytes;
         }
