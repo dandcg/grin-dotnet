@@ -22,22 +22,22 @@ namespace Grin.WalletImpl.WalletTypes
     {
         public WalletData()
         {
-            outputs = new Dictionary<string, OutputData>();
+            Outputs = new Dictionary<string, OutputData>();
         }
 
         public WalletData(Dictionary<string, OutputData> outputs)
         {
-            this.outputs = outputs;
+            Outputs = outputs;
         }
 
-        public Dictionary<string, OutputData> outputs { get; }
+        public Dictionary<string, OutputData> Outputs { get; }
 
         /// Allows for reading wallet data (without needing to acquire the write lock).
-        public static T read_wallet<T>(string data_file_dir, Func<WalletData, T> f)
+        public static T read_wallet<T>(string dataFileDir, Func<WalletData, T> f)
         {
             // open the wallet readonly and do what needs to be done with it
-            var data_file_path = Path.Combine(data_file_dir, Types.DAT_FILE);
-            var wdat = read_or_create(data_file_path);
+            var dataFilePath = Path.Combine(dataFileDir, Types.DatFile);
+            var wdat = read_or_create(dataFilePath);
             return f(wdat);
         }
 
@@ -48,7 +48,7 @@ namespace Grin.WalletImpl.WalletTypes
         /// Note that due to the impossibility to do an actual file lock easily
         /// across operating systems, this just creates a lock file with a "should
         /// not exist" option.
-        public static T with_wallet<T>(string data_file_dir, Func<WalletData, T> f)
+        public static T with_wallet<T>(string dataFileDir, Func<WalletData, T> f)
 
         {
             //if (activated)
@@ -59,20 +59,20 @@ namespace Grin.WalletImpl.WalletTypes
             //}
 
             // create directory if it doesn't exist
-            Directory.CreateDirectory(data_file_dir);
+            Directory.CreateDirectory(dataFileDir);
 
-            var data_file_path = Path.Combine(data_file_dir, Types.DAT_FILE);
-            var lock_file_path = Path.Combine(data_file_dir, Types.LOCK_FILE);
+            var dataFilePath = Path.Combine(dataFileDir, Types.DatFile);
+            var lockFilePath = Path.Combine(dataFileDir, Types.LockFile);
 
             Log.Information("Acquiring wallet lock ...");
 
 
             FileStream lf = null;
 
-            void action()
+            void Action()
             {
                 Log.Debug("Attempting to acquire wallet lock");
-                lf = File.Open(lock_file_path, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None);
+                lf = File.Open(lockFilePath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None);
             }
 
 
@@ -100,7 +100,7 @@ namespace Grin.WalletImpl.WalletTypes
                 Policy
                     .Handle<IOException>()
                     .WaitAndRetry(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)))
-                    .Execute(action);
+                    .Execute(Action);
             }
             catch (IOException)
             {
@@ -110,9 +110,9 @@ namespace Grin.WalletImpl.WalletTypes
 
 
             // We successfully acquired the lock - so do what needs to be done.
-            var wdat = read_or_create(data_file_path);
+            var wdat = read_or_create(dataFilePath);
             var res = f(wdat);
-            wdat.write(data_file_path);
+            wdat.Write(dataFilePath);
 
             // delete the lock file
             try
@@ -131,53 +131,53 @@ namespace Grin.WalletImpl.WalletTypes
         }
 
         /// Read the wallet data or created a brand new one if it doesn't exist yet
-        public static WalletData read_or_create(string data_file_path)
+        public static WalletData read_or_create(string dataFilePath)
         {
-            if (File.Exists(data_file_path))
+            if (File.Exists(dataFilePath))
             {
-                return read(data_file_path);
+                return Read(dataFilePath);
             }
             // just create a new instance, it will get written afterward
             return new WalletData(new Dictionary<string, OutputData>());
         }
 
         /// Read the wallet data from disk.
-        public static WalletData read(string data_file_path)
+        public static WalletData Read(string dataFilePath)
         {
             try
             {
-                using (var data_file = File.OpenText(data_file_path))
+                using (var dataFile = File.OpenText(dataFilePath))
                 {
                     var serializer = new JsonSerializer();
-                    var ret = (WalletData) serializer.Deserialize(data_file, typeof(WalletData));
+                    var ret = (WalletData) serializer.Deserialize(dataFile, typeof(WalletData));
                     return ret;
                 }
             }
             catch (IOException ex)
             {
-                throw new WalletErrorException(WalletError.WalletData, $"Could not open {data_file_path}: {ex.Message}", ex);
+                throw new WalletErrorException(WalletError.WalletData, $"Could not open {dataFilePath}: {ex.Message}", ex);
             }
             catch (Exception ex)
             {
-                throw new WalletErrorException(WalletError.WalletData, $"Error reading {data_file_path}: {ex.Message}", ex);
+                throw new WalletErrorException(WalletError.WalletData, $"Error reading {dataFilePath}: {ex.Message}", ex);
             }
         }
 
         /// Write the wallet data to disk.
-        public void write(string data_file_path)
+        public void Write(string dataFilePath)
         {
             try
             {
-                using (var data_file = File.CreateText(data_file_path))
+                using (var dataFile = File.CreateText(dataFilePath))
                 {
                     var serializer = new JsonSerializer();
-                    serializer.Serialize(data_file, this);
+                    serializer.Serialize(dataFile, this);
                 }
             }
 
             catch (IOException ex)
             {
-                throw new WalletErrorException(WalletError.WalletData, $"Could not create {data_file_path}: {ex.Message}", ex);
+                throw new WalletErrorException(WalletError.WalletData, $"Could not create {dataFilePath}: {ex.Message}", ex);
             }
             catch (Exception ex)
             {
@@ -190,13 +190,13 @@ namespace Grin.WalletImpl.WalletTypes
         /// unconfirmed coinbase
         public void add_output(OutputData outd)
         {
-            outputs.Add(outd.key_id.HexValue, outd.clone());
+            Outputs.Add(outd.KeyId.HexValue, outd.Clone());
         }
 
         // TODO - careful with this, only for Unconfirmed (maybe Locked)?
         public void delete_output(Identifier id)
         {
-            outputs.Remove(id.HexValue);
+            Outputs.Remove(id.HexValue);
         }
 
 
@@ -204,47 +204,47 @@ namespace Grin.WalletImpl.WalletTypes
         /// TODO - we should track identifier on these outputs (not just n_child)
         public void lock_output(OutputData outd)
         {
-            var outToLock = outputs[outd.key_id.HexValue];
-            if (outToLock?.value == outd.value)
+            var outToLock = Outputs[outd.KeyId.HexValue];
+            if (outToLock?.Value == outd.Value)
             {
                 outToLock.Lock();
             }
         }
 
-        public OutputData get_output(Identifier key_id)
+        public OutputData get_output(Identifier keyId)
         {
-            return outputs[key_id.HexValue];
+            return Outputs[keyId.HexValue];
         }
 
         /// Select spendable coins from the wallet.
         /// Default strategy is to spend the maximum number of outputs (up to max_outputs).
         /// Alternative strategy is to spend smallest outputs first but only as many as necessary.
         /// When we introduce additional strategies we should pass something other than a bool in.
-        public OutputData[] select(
-            Identifier root_key_id,
+        public OutputData[] Select(
+            Identifier rootKeyId,
             ulong amount,
-            ulong current_height,
-            ulong minimum_confirmations,
-            uint max_outputs,
-            bool default_strategy
+            ulong currentHeight,
+            ulong minimumConfirmations,
+            uint maxOutputs,
+            bool defaultStrategy
         )
         {
             // first find all eligible outputs based on number of confirmations
             // sort eligible outputs by increasing value
 
-            var eligible = outputs.Values
-                .Where(o => o.root_key_id == root_key_id && o.eligible_to_spend(current_height, minimum_confirmations))
-                .OrderBy(o => o.key_id.HexValue)
+            var eligible = Outputs.Values
+                .Where(o => o.RootKeyId == rootKeyId && o.eligible_to_spend(currentHeight, minimumConfirmations))
+                .OrderBy(o => o.KeyId.HexValue)
                 .ToArray();
 
 
             // use a sliding window to identify potential sets of possible outputs to spend
-            if (eligible.Length > max_outputs)
+            if (eligible.Length > maxOutputs)
             {
-                foreach (var window in eligible.Tuples((int) max_outputs))
+                foreach (var window in eligible.Tuples((int) maxOutputs))
                 {
                     var eligible2 = window.ToArray();
-                    var outputs2 = select_from(amount, default_strategy, eligible2);
+                    var outputs2 = select_from(amount, defaultStrategy, eligible2);
 
                     if (outputs2.Any())
                     {
@@ -254,7 +254,7 @@ namespace Grin.WalletImpl.WalletTypes
             }
             else
             {
-                var outputs2 = select_from(amount, default_strategy, eligible.Select(s => s.clone()).ToArray());
+                var outputs2 = select_from(amount, defaultStrategy, eligible.Select(s => s.Clone()).ToArray());
                 if (outputs2.Any())
                 {
                     return outputs2;
@@ -263,29 +263,29 @@ namespace Grin.WalletImpl.WalletTypes
 
             // we failed to find a suitable set of outputs to spend,
             // so return the largest amount we can so we can provide guidance on what is possible
-            return eligible.Reverse().Take((int) max_outputs).ToArray();
+            return eligible.Reverse().Take((int) maxOutputs).ToArray();
         }
 
 
         // Select the full list of outputs if we are using the default strategy.
         // Otherwise select just enough outputs to cover the desired amount.
-        public OutputData[] select_from(ulong amount, bool select_all, OutputData[] outputs)
+        public OutputData[] select_from(ulong amount, bool selectAll, OutputData[] outputs)
         {
-            var total = outputs.Select(s => s.value).Aggregate((a, b) => a + b);
+            var total = outputs.Select(s => s.Value).Aggregate((a, b) => a + b);
 
             if (total >= amount)
             {
-                if (select_all)
+                if (selectAll)
                 {
                     return outputs;
                 }
-                ulong selected_amount = 0;
+                ulong selectedAmount = 0;
                 var output2 = new List<OutputData>();
                 foreach (var o in outputs)
                 {
                     output2.Add(o);
-                    var res = selected_amount < amount;
-                    selected_amount += o.value;
+                    var res = selectedAmount < amount;
+                    selectedAmount += o.Value;
                     if (!res)
                     {
                         break;
@@ -299,17 +299,17 @@ namespace Grin.WalletImpl.WalletTypes
 
 
         /// Next child index when we want to create a new output.
-        public uint next_child(Identifier root_key_id)
+        public uint next_child(Identifier rootKeyId)
         {
-            uint max_n = 0;
-            foreach (var o in outputs.Values)
+            uint maxN = 0;
+            foreach (var o in Outputs.Values)
             {
-                if (max_n < o.n_child && o.root_key_id == root_key_id)
+                if (maxN < o.NChild && o.RootKeyId == rootKeyId)
                 {
-                    max_n = o.n_child;
+                    maxN = o.NChild;
                 }
             }
-            return max_n + 1;
+            return maxN + 1;
         }
     }
 }

@@ -1,14 +1,14 @@
 ﻿using System;
 
-namespace Grin.Api.ApiTypes
+namespace Grin.ApiImpl.ApiTypes
 {
     public class ApiBlockOutputs : ICloneable
     {
         /// The block header
-        public ApiBlockHeaderInfo header { get; set; }
+        public ApiBlockHeaderInfo Header { get; set; }
 
         /// A printable version of the outputs
-        public ApiOutputSwitch[] outputs { get; set; }
+        public ApiOutputSwitch[] Outputs { get; set; }
 
         public object Clone()
         {

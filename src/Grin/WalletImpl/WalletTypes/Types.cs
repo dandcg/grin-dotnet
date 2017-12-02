@@ -1,29 +1,28 @@
-using System;
 using Grin.CoreImpl;
 
 namespace Grin.WalletImpl.WalletTypes
 {
     public class Types
     {
-        public const string DAT_FILE = "wallet.dat";
-        public const string LOCK_FILE = "wallet.lock";
-        public const string SEED_FILE = "wallet.seed";
+        public const string DatFile = "wallet.dat";
+        public const string LockFile = "wallet.lock";
+        public const string SeedFile = "wallet.seed";
 
-        public const ulong DEFAULT_BASE_FEE = Consensus.MILLI_GRIN;
+        public const ulong DefaultBaseFee = Consensus.MilliGrin;
 
         /// Transaction fee calculation
-        public static ulong tx_fee(uint input_len, uint output_len, uint? base_fee)
+        public static ulong tx_fee(uint inputLen, uint outputLen, uint? baseFee)
         {
-            var use_base_fee = base_fee ?? DEFAULT_BASE_FEE;
+            var useBaseFee = baseFee ?? DefaultBaseFee;
 
 
 
-           var tx_weight = -1 * ((int) input_len) + 4 * ((int)output_len) + 1;
-            if (tx_weight< 1) {
-                tx_weight = 1;
+           var txWeight = -1 * (int) inputLen + 4 * (int)outputLen + 1;
+            if (txWeight< 1) {
+                txWeight = 1;
             }
 
-            return ((ulong) tx_weight) * use_base_fee;
+            return (ulong) txWeight * useBaseFee;
         }
 
 

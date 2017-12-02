@@ -9,12 +9,12 @@
             Value = value;
         }
 
-        public static ProofMessage empty()
+        public static ProofMessage Empty()
         {
-            return new ProofMessage(new byte[Constants.Constants.MESSAGE_SIZE]);
+            return new ProofMessage(new byte[Constants.Constants.MessageSize]);
         }
 
-        public ProofMessage clone()
+        public ProofMessage Clone()
         {
             return new ProofMessage(Value);
         }

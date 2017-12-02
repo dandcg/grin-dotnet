@@ -21,22 +21,22 @@ namespace Grin.CoreImpl
         /// Define these here, as they should be developer-set, not really tweakable
         /// by users
         /// Automated testing sizeshift
-        public const byte AUTOMATED_TESTING_SIZESHIFT = 10;
+        public const byte AutomatedTestingSizeshift = 10;
 
         /// Automated testing proof size
-        public const uint AUTOMATED_TESTING_PROOF_SIZE = 4;
+        public const uint AutomatedTestingProofSize = 4;
 
         /// User testing sizeshift
-        public const byte USER_TESTING_SIZESHIFT = 16;
+        public const byte UserTestingSizeshift = 16;
 
         /// User testing proof size
-        public const uint USER_TESTING_PROOF_SIZE = 42;
+        public const uint UserTestingProofSize = 42;
 
         /// Automated testing coinbase maturity
-        public const ulong AUTOMATED_TESTING_COINBASE_MATURITY = 3;
+        public const ulong AutomatedTestingCoinbaseMaturity = 3;
 
         /// User testing coinbase maturity
-        public const ulong USER_TESTING_COINBASE_MATURITY = 3;
+        public const ulong UserTestingCoinbaseMaturity = 3;
 
         /// Mining parameter modes
         public enum MiningParameterMode
@@ -66,7 +66,7 @@ namespace Grin.CoreImpl
         }
 
         /// The sizeshift
-        public static byte sizeshift()
+        public static byte Sizeshift()
 
         {
             throw new NotImplementedException();
@@ -81,10 +81,10 @@ namespace Grin.CoreImpl
         }
 
         /// The proofsize
-        public static uint proofsize()
+        public static uint Proofsize()
         {
 
-            return AUTOMATED_TESTING_PROOF_SIZE;
+            return AutomatedTestingProofSize;
 
            // throw new NotImplementedException();
             //        let param_ref = MINING_PARAMETER_MODE.read().unwrap();
@@ -164,7 +164,7 @@ namespace Grin.CoreImpl
         public static uint[] get_genesis_pow()
 
         {
-            return new uint[42]
+            return new uint[]
 
 // TODO: This is diff 26, probably just want a 10: mine one
                 {

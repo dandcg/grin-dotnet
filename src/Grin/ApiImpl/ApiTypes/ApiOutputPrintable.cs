@@ -2,34 +2,34 @@
 using Grin.CoreImpl.Core.Block;
 using Grin.CoreImpl.Core.Transaction;
 
-namespace Grin.Api.ApiTypes
+namespace Grin.ApiImpl.ApiTypes
 {
     public class ApiOutputPrintable : ICloneable
     {
         /// The type of output Coinbase|Transaction
-        public ApiOutputType output_type { get; set; }
+        public ApiOutputType OutputType { get; set; }
 
         /// The homomorphic commitment representing the output's amount (as hex
         /// string)
-        public string commit { get; set; }
+        public string Commit { get; set; }
 
         /// switch commit hash
-        public string switch_commit_hash { get; set; }
+        public string SwitchCommitHash { get; set; }
 
         /// The height of the block creating this output
-        public ulong height { get; set; }
+        public ulong Height { get; set; }
 
         /// The lock height (earliest block this output can be spent)
-        public ulong lock_height { get; set; }
+        public ulong LockHeight { get; set; }
 
         /// Whether the output has been spent
-        public bool spent { get; set; }
+        public bool Spent { get; set; }
 
         /// Rangeproof hash  (as hex string)
-        public string proof_hash { get; set; }
+        public string ProofHash { get; set; }
 
 
-        public static ApiOutputPrintable from_output(Output output, BlockHeader block_header, bool include_proof_hash)
+        public static ApiOutputPrintable from_output(Output output, BlockHeader blockHeader, bool includeProofHash)
         {
             throw new NotImplementedException();
 

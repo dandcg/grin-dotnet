@@ -5,6 +5,6 @@ namespace Grin.WalletImpl.WalletReceiver
     public class TxWrapper
     {
         [JsonProperty("tx_hex")]
-        public string tx_hex { get; set; }
+        public string TxHex { get; set; }
     }
 }

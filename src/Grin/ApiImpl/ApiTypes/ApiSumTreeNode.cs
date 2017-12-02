@@ -1,17 +1,17 @@
 ﻿using System;
 using Grin.ChainImpl;
 
-namespace Grin.Api.ApiTypes
+namespace Grin.ApiImpl.ApiTypes
 {
     /// Wrapper around a list of sumtree nodes, so it can be
     /// presented properly via json
     public class ApiSumTreeNode : ICloneable
     {
         // The hash
-        public string hash { get; set; }
+        public string Hash { get; set; }
 
         // Output (if included)
-        public ApiOutputPrintable output { get; set; }
+        public ApiOutputPrintable Output { get; set; }
 
 
         public static ApiSumTreeNode[] get_last_n_utxo(Chain chain, ulong distance)
@@ -37,7 +37,7 @@ namespace Grin.Api.ApiTypes
             //return_vec
         }
 
-        public static ApiSumTreeNode[] get_last_n_rangeproof(ChainImpl.Chain head, ulong distance)
+        public static ApiSumTreeNode[] get_last_n_rangeproof(Chain head, ulong distance)
 
         {
             throw new NotImplementedException();

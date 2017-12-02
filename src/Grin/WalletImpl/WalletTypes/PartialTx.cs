@@ -13,11 +13,11 @@ namespace Grin.WalletImpl.WalletTypes
     public class PartialTx
     {
         [JsonProperty("amount")]
-        public ulong amount { get; set; }
+        public ulong Amount { get; set; }
         [JsonProperty("blind_sum")]
-        public string blind_sum { get; set; }
+        public string BlindSum { get; set; }
         [JsonProperty("tx")]
-        public string tx { get; set; }
+        public string Tx { get; set; }
 
 
         /// Builds a PartialTx from data sent by a sender (not yet completed by the receiver).
@@ -29,9 +29,9 @@ namespace Grin.WalletImpl.WalletTypes
         {
             return new PartialTx
             {
-                amount = receiveAmount,
-                blind_sum = HexUtil.to_hex(blindSum.Key.Value),
-                tx = HexUtil.to_hex(Ser.Ser_vec(transaction))
+                Amount = receiveAmount,
+                BlindSum = HexUtil.to_hex(blindSum.Key.Value),
+                Tx = HexUtil.to_hex(Ser.Ser_vec(transaction))
             };
         }
 
@@ -39,21 +39,21 @@ namespace Grin.WalletImpl.WalletTypes
         /// factors and the transaction itself.
         public static (ulong amount, BlindingFactor blinding, Transaction tx) read_partial_tx(
             Keychain keychain,
-            PartialTx partial_tx
+            PartialTx partialTx
         )
         {
-            var blind_bin = HexUtil.from_hex(partial_tx.blind_sum);
-            var blinding = BlindingFactor.from_slice(keychain.Secp, blind_bin);
-            var tx_bin = HexUtil.from_hex(partial_tx.tx);
+            var blindBin = HexUtil.from_hex(partialTx.BlindSum);
+            var blinding = BlindingFactor.from_slice(keychain.Secp, blindBin);
+            var txBin = HexUtil.from_hex(partialTx.Tx);
 
-            using (var ms = new MemoryStream(tx_bin))
+            using (var ms = new MemoryStream(txBin))
             {
                 var transaction = Ser.Deserialize(ms, Transaction.Empty());
 
                 //  Error::Format("Could not deserialize transaction, invalid format.".to_string())
 
 
-                return (partial_tx.amount, blinding, transaction);
+                return (partialTx.Amount, blinding, transaction);
             }
         }
     }

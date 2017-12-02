@@ -3,27 +3,27 @@
     public class ProofInfo
     {
         /// Whether the proof is valid or not
-        public bool success { get; set; }
+        public bool Success { get; set; }
 
         /// Value that was used by the commitment
-        public ulong value { get; set; }
+        public ulong Value { get; set; }
 
         /// Message embedded in the proof
-        public ProofMessage message { get; set; }
+        public ProofMessage Message { get; set; }
 
         /// Length of the embedded message (message is "padded" with garbage to fixed number of bytes)
-        public int mlen { get; set; }
+        public int Mlen { get; set; }
 
         /// Min value that was proven
-        public ulong min { get; set; }
+        public ulong Min { get; set; }
 
         /// Max value that was proven
-        public ulong max { get; set; }
+        public ulong Max { get; set; }
 
         /// Exponent used by the proof
-        public int exp { get; set; }
+        public int Exp { get; set; }
 
         /// Mantissa used by the proof
-        public int mantissa { get; set; }
+        public int Mantissa { get; set; }
     }
 }

@@ -7,13 +7,13 @@ namespace Grin.CoreImpl.Core.Hash
     /// A trait for types that have a canonical hash
     public static class Hashed
     {
-        public static Hash hash<T>(this T self) where T : IWriteable
+        public static Hash Hash<T>(this T self) where T : IWriteable
         {
             var hasher = HashWriter.Default();
 
-            self.write(hasher);
+            self.Write(hasher);
 
-            var ret = hasher.finalize();
+            var ret = hasher.FinalizeHash();
 
             return new Hash(ret);
         }
@@ -22,13 +22,13 @@ namespace Grin.CoreImpl.Core.Hash
         {
             var hasher = HashWriter.Default();
 
-            self.write(hasher);
+            self.Write(hasher);
 
             Log.Verbose("Hashing with additional data");
 
-            other.write(hasher);
+            other.Write(hasher);
 
-            var ret = hasher.finalize();
+            var ret = hasher.FinalizeHash();
 
             return new Hash(ret);
         }

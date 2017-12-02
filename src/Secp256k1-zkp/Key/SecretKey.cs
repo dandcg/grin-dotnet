@@ -24,12 +24,12 @@ namespace Secp256k1Proxy.Key
         public byte[] Value { get; }
 
         /// Creates a new random secret key
-        public static SecretKey New(Secp256k1 secp, RandomNumberGenerator rng)
+        public static SecretKey New(Secp256K1 secp, RandomNumberGenerator rng)
         {
-            var data = ByteUtil.get_random_bytes(rng);
+            var data = ByteUtil.Get_random_bytes(rng,32);
             {
                 while (Proxy.secp256k1_ec_seckey_verify(secp.Ctx, data) == 0) {
-                    data = ByteUtil.get_random_bytes(rng);
+                    data = ByteUtil.Get_random_bytes(rng,32);
                 }
             }
             return new SecretKey(data);
@@ -43,11 +43,11 @@ namespace Secp256k1Proxy.Key
 
 
         /// Converts a `SECRET_KEY_SIZE`-byte slice to a secret key
-        public static SecretKey From_slice(Secp256k1 secp, byte[] data)
+        public static SecretKey From_slice(Secp256K1 secp, byte[] data)
         { 
             switch (data.Length)
             {
-                case Constants.Constants.SECRET_KEY_SIZE:
+                case Constants.Constants.SecretKeySize:
 
                
                     if (Proxy.secp256k1_ec_seckey_verify(secp.Ctx,data) == 0)
@@ -65,7 +65,7 @@ namespace Secp256k1Proxy.Key
 
 
         /// Adds one secret key to another, modulo the curve order
-        public void Add_assign(Secp256k1 secp, SecretKey other)
+        public void Add_assign(Secp256K1 secp, SecretKey other)
         {
             if (Proxy.secp256k1_ec_privkey_tweak_add(secp.Ctx, Value, other.Value) != 1)
             {
@@ -75,7 +75,7 @@ namespace Secp256k1Proxy.Key
 
 
         /// Multiplies one secret key by another, modulo the curve order
-        public void Mul_assign(Secp256k1 secp, SecretKey other)
+        public void Mul_assign(Secp256K1 secp, SecretKey other)
         {
             if (Proxy.secp256k1_ec_privkey_tweak_mul(secp.Ctx,  Value, other.Value) != 1)
             {

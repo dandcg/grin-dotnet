@@ -18,9 +18,9 @@ namespace Grin.Tests.Unit.KeychainTests
 
 
         [Fact]
-        public void test_identifier_json_ser_deser()
+        public void Test_identifier_json_ser_deser()
         {
-            var hex = "942b6c0bd43bdcb24f3edfe7fadbc77054ecc4f2";
+            const string hex = "942b6c0bd43bdcb24f3edfe7fadbc77054ecc4f2";
 
             var identifier = Identifier.From_hex(hex);
 
@@ -35,10 +35,10 @@ namespace Grin.Tests.Unit.KeychainTests
 
 
         [Fact]
-        public void extkey_from_seed()
+        public void Extkey_from_seed()
         {
             // TODO More test vectors
-            var s = Secp256k1.New();
+            var s = Secp256K1.New();
             var seed = HexUtil.from_hex("000102030405060708090a0b0c0d0e0f");
             var extk = ExtendedKey.from_seed(s, seed);
             var sec = HexUtil.from_hex("c3f5ae520f474b390a637de4669c84d0ed9bbc21742577fac930834d3c3083dd");
@@ -47,8 +47,8 @@ namespace Grin.Tests.Unit.KeychainTests
 
 
             var identifier = HexUtil.from_hex("83e59c48297b78b34b73");
-            var depth = 0;
-            uint nChild = 0;
+            const int depth = 0;
+            const uint nChild = 0;
 
             Assert.Equal(extk.Key.Value, secretKey.Value);
             Assert.Equal(extk.Identifier(s).Value, Identifier.From_bytes(identifier).Value);
@@ -62,10 +62,10 @@ namespace Grin.Tests.Unit.KeychainTests
         }
 
         [Fact]
-        public void extkey_derivation()
+        public void Extkey_derivation()
         {
             // TODO More test vectors
-            var s = Secp256k1.New();
+            var s = Secp256K1.New();
             var seed = HexUtil.from_hex("000102030405060708090a0b0c0d0e0f");
             var extk = ExtendedKey.from_seed(s, seed);
             var derived = extk.Derive(s, 0);
@@ -75,8 +75,8 @@ namespace Grin.Tests.Unit.KeychainTests
             var chaincode = HexUtil.from_hex("243cb881e1549e714db31d23af45540b13ad07941f64a786bbf3313b4de1df52");
             var rootKeyId = HexUtil.from_hex("83e59c48297b78b34b73");
             var identifier = HexUtil.from_hex("0185adb4d8b730099c93");
-            var depth = 1;
-            uint nChild = 0;
+            const int depth = 1;
+            const uint nChild = 0;
             Assert.Equal(derived.Key.Value, secretKey.Value);
             Assert.Equal(
                 derived.Identifier(s).Value,

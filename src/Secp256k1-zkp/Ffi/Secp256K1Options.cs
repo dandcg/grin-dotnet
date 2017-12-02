@@ -7,18 +7,18 @@ namespace Secp256k1Proxy.Ffi
 
     {
         /// Flag for context to enable no precomputation
-        SECP256K1_START_NONE = (1 << 0) | 0,
+        Secp256K1StartNone = (1 << 0) | 0,
 
         /// Flag for context to enable verification precomputation
-        SECP256K1_START_VERIFY = (1 << 0) | (1 << 8),
+        Secp256K1StartVerify = (1 << 0) | (1 << 8),
 
         /// Flag for context to enable signing precomputation
-        SECP256K1_START_SIGN = (1 << 0) | (1 << 9),
+        Secp256K1StartSign = (1 << 0) | (1 << 9),
 
         /// Flag for keys to indicate uncompressed serialization format
-        SECP256K1_SER_UNCOMPRESSED = (1 << 1) | 0,
+        Secp256K1SerUncompressed = (1 << 1) | 0,
 
         /// Flag for keys to indicate compressed serialization format
-        SECP256K1_SER_COMPRESSED = (1 << 1) | (1 << 8)
+        Secp256K1SerCompressed = (1 << 1) | (1 << 8)
     }
 }

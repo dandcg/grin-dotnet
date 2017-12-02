@@ -5,13 +5,13 @@ namespace Grin.WalletImpl.WalletTypes
     {
         public CbData(string output, string kernel, string keyId)
         {
-            this.output = output;
-            this.kernel = kernel;
-            key_id = keyId;
+            Output = output;
+            Kernel = kernel;
+            KeyId = keyId;
         }
 
-        public string output { get; }
-        public string kernel { get; }
-        public string key_id { get; }
+        public string Output { get; }
+        public string Kernel { get; }
+        public string KeyId { get; }
     }
 }

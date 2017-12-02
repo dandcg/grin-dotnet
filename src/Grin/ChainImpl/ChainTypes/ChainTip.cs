@@ -13,16 +13,16 @@ namespace Grin.ChainImpl.ChainTypes
     public struct ChainTip : IWriteable, IReadable, ICloneable
     {
         /// Height of the tip (max height of the fork)
-        public ulong height { get; set; }
+        public ulong Height { get; set; }
 
         /// Last block pushed to the fork
-        public Hash last_block_h { get; set; }
+        public Hash LastBlockH { get; set; }
 
         /// Block previous to last
-        public Hash prev_block_h { get; set; }
+        public Hash PrevBlockH { get; set; }
 
         /// Total difficulty accumulated on that fork
-        public Difficulty total_difficulty { get; set; }
+        public Difficulty TotalDifficulty { get; set; }
 
         public object Clone()
         {
@@ -34,10 +34,10 @@ namespace Grin.ChainImpl.ChainTypes
         {
             return new ChainTip
             {
-                height = 0,
-                last_block_h = gbh,
-                prev_block_h = gbh,
-                total_difficulty = Difficulty.One()
+                Height = 0,
+                LastBlockH = gbh,
+                PrevBlockH = gbh,
+                TotalDifficulty = Difficulty.One()
             };
         }
 
@@ -46,35 +46,35 @@ namespace Grin.ChainImpl.ChainTypes
         {
             return new ChainTip
             {
-                height = bh.height,
-                last_block_h = bh.hash(),
-                prev_block_h = bh.previous,
-                total_difficulty = bh.total_difficulty.Clone()
+                Height = bh.Height,
+                LastBlockH = bh.Hash(),
+                PrevBlockH = bh.Previous,
+                TotalDifficulty = bh.TotalDifficulty.Clone()
             };
         }
 
 
         /// Serialization of a tip, required to save to datastore.
-        public void write(IWriter writer)
+        public void Write(IWriter writer)
         {
-            writer.write_u64(height);
-            last_block_h.write(writer);
-            prev_block_h.write(writer);
-            total_difficulty.write(writer);
+            writer.write_u64(Height);
+            LastBlockH.Write(writer);
+            PrevBlockH.Write(writer);
+            TotalDifficulty.Write(writer);
         }
 
-        public void read(IReader reader)
+        public void Read(IReader reader)
         {
-            height = reader.read_u64();
-            last_block_h = Hash.readnew(reader);
-            prev_block_h = Hash.readnew(reader);
-            total_difficulty = Difficulty.readnew(reader);
+            Height = reader.read_u64();
+            LastBlockH = Hash.Readnew(reader);
+            PrevBlockH = Hash.Readnew(reader);
+            TotalDifficulty = Difficulty.Readnew(reader);
         }
 
-        public static ChainTip readnew(IReader reader)
+        public static ChainTip Readnew(IReader reader)
         {
             var tip = new ChainTip();
-            tip.read(reader);
+            tip.Read(reader);
             return tip;
         }
     }

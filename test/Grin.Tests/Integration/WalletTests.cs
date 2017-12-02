@@ -13,6 +13,7 @@ namespace Grin.Tests.Integration
 {
     public class WalletTests
     {
+        // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
         private readonly TestServer server;
         private readonly HttpClient client;
 

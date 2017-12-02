@@ -32,9 +32,6 @@
         <TestName>Secp256k1Proxy.Tests.PedersenTests.test_to_two_pubkeys</TestName>
       </NamedTestSelector>
       <NamedTestSelector>
-        <TestName>Secp256k1Proxy.Tests.PedersenTests.test_to_pubkey</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
         <TestName>Secp256k1Proxy.Tests.PedersenTests.test_sign_with_pubkey_from_commitment</TestName>
       </NamedTestSelector>
       <NamedTestSelector>
@@ -86,65 +83,23 @@
         <TestName>Secp256k1Proxy.Tests.LibTests.invalid_pubkey</TestName>
       </NamedTestSelector>
       <NamedTestSelector>
-        <TestName>Secp256k1Proxy.Tests.LibTests.Capabilities</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
         <TestName>Secp256k1Proxy.Tests.LibTests.bad_recovery</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Secp256k1Proxy.Tests.KeyTests.Test_serialize_serde</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Secp256k1Proxy.Tests.KeyTests.Test_serialize</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Secp256k1Proxy.Tests.KeyTests.Test_pubkey_serialize</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Secp256k1Proxy.Tests.KeyTests.Test_pubkey_from_slice_bad_context</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Secp256k1Proxy.Tests.KeyTests.Test_pubkey_from_bad_slice</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Secp256k1Proxy.Tests.KeyTests.Test_out_of_range</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Secp256k1Proxy.Tests.KeyTests.Test_multiplication</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Secp256k1Proxy.Tests.KeyTests.Test_debug_output</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Secp256k1Proxy.Tests.KeyTests.Test_bad_serde_deserialize</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Secp256k1Proxy.Tests.KeyTests.Test_bad_deserialize</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Secp256k1Proxy.Tests.KeyTests.Test_addition</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Secp256k1Proxy.Tests.KeyTests.Test_add_exp_bad_context</TestName>
       </NamedTestSelector>
       <NamedTestSelector>
         <TestName>Secp256k1Proxy.Tests.KeyTests.skey_from_slice</TestName>
       </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Secp256k1Proxy.Tests.KeyTests.Pubkey_hash</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Secp256k1Proxy.Tests.KeyTests.Pubkey_from_slice</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Secp256k1Proxy.Tests.KeyTests.Keypair_slice_round_trip</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Secp256k1Proxy.Tests.KeyTests.Invalid_secret_key</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Secp256k1Proxy.Tests.EcdhTests.Ecdh</TestName>
-      </NamedTestSelector>
+      <FixtureTestSelector>
+        <FixtureName>Secp256k1Proxy.Tests.EcdhTests</FixtureName>
+      </FixtureTestSelector>
+      <FixtureTestSelector>
+        <FixtureName>Secp256k1Proxy.Tests.KeyTests</FixtureName>
+      </FixtureTestSelector>
+      <FixtureTestSelector>
+        <FixtureName>Secp256k1Proxy.Tests.LibTests</FixtureName>
+      </FixtureTestSelector>
+      <FixtureTestSelector>
+        <FixtureName>Secp256k1Proxy.Tests.PedersenTests</FixtureName>
+      </FixtureTestSelector>
     </IgnoredTests>
   </Settings>
 </ProjectConfiguration>

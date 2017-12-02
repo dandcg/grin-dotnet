@@ -1,21 +1,21 @@
 ﻿using System;
 using Grin.CoreImpl.Core.Block;
 
-namespace Grin.Api.ApiTypes
+namespace Grin.ApiImpl.ApiTypes
 {
     public class ApiBlockHeaderInfo : ICloneable
     {
         /// Hash
-        public string hash { get; set; }
+        public string Hash { get; set; }
 
         /// Previous block hash
-        public string previous { get; set; }
+        public string Previous { get; set; }
 
         /// Height
-        public ulong height { get; set; }
+        public ulong Height { get; set; }
 
 
-        public static ApiBlockHeaderInfo from_header(BlockHeader block_header)
+        public static ApiBlockHeaderInfo from_header(BlockHeader blockHeader)
         {
             throw new NotImplementedException();
 

@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO.Pipes;
 using System.Linq;
 using System.Net.Http;
-using Grin.Api.ApiTypes;
 using Grin.ApiImpl.ApiClient;
+using Grin.ApiImpl.ApiTypes;
 using Grin.KeychainImpl;
 using Grin.KeychainImpl.ExtKey;
-using Grin.WalletImpl.WalletClient;
 using Grin.WalletImpl.WalletTypes;
 using Newtonsoft.Json;
 using Secp256k1Proxy.Pedersen;
@@ -19,16 +17,16 @@ namespace Grin.WalletImpl.WalletChecker
     {
         // Transitions a local wallet output from Unconfirmed -> Unspent.
         // Also updates the height and lock_height based on latest from the api.
-        public static void refresh_output(OutputData od, ApiOutput api_out)
+        public static void refresh_output(OutputData od, ApiOutput apiOut)
         {
-            od.height = api_out.height;
-            od.lock_height = api_out.lock_height;
+            od.Height = apiOut.Height;
+            od.LockHeight = apiOut.LockHeight;
 
 
-            switch (od.status)
+            switch (od.Status)
             {
                 case OutputStatus.Unconfirmed:
-                    od.status = OutputStatus.Unspent;
+                    od.Status = OutputStatus.Unspent;
                     break;
             }
         }
@@ -40,11 +38,11 @@ namespace Grin.WalletImpl.WalletChecker
         // Locked -> Spent
         public static void mark_spent_output(OutputData od)
         {
-            switch (od.status)
+            switch (od.Status)
             {
                 case OutputStatus.Unspent:
                 case OutputStatus.Locked:
-                    od.status = OutputStatus.Spent;
+                    od.Status = OutputStatus.Spent;
                     break;
             }
         }
@@ -57,45 +55,45 @@ namespace Grin.WalletImpl.WalletChecker
             Log.Debug("Refreshing wallet outputs");
 
 
-            var wallet_outputs = new Dictionary<string, Identifier>();
+            var walletOutputs = new Dictionary<string, Identifier>();
             var commits = new List<Commitment>();
 
             // build a local map of wallet outputs by commits
             // and a list of outputs we want to query the node for
-            WalletData.read_wallet(config.data_file_dir,
-                wallet_data =>
+            WalletData.read_wallet(config.DataFileDir,
+                walletData =>
                 {
-                    foreach (var op in wallet_data
-                        .outputs
+                    foreach (var op in walletData
+                        .Outputs
                         .Values
-                        .Where(w => w.root_key_id == keychain.Root_key_id() && w.status != OutputStatus.Spent))
+                        .Where(w => w.RootKeyId == keychain.Root_key_id() && w.Status != OutputStatus.Spent))
                     {
-                        var commit = keychain.commit_with_key_index(op.value, op.n_child);
+                        var commit = keychain.commit_with_key_index(op.Value, op.NChild);
                         commits.Add(commit);
-                        wallet_outputs.Add(commit.Hex, op.key_id.Clone());
+                        walletOutputs.Add(commit.Hex, op.KeyId.Clone());
                     }
 
-                    return wallet_data;
+                    return walletData;
                 });
 
             // build the necessary query params -
             // ?id=xxx&id=yyy&id=zzz
-            var query_params = commits.Select(s => $"id={s.Hex}");
+            var queryParams = commits.Select(s => $"id={s.Hex}");
 
-            var query_string = string.Join("&", query_params);
+            var queryString = string.Join("&", queryParams);
 
-            var url = $"{config.check_node_api_http_addr}/v1/chain/utxos/byids?{query_string}";
+            var url = $"{config.CheckNodeApiHttpAddr}/v1/chain/utxos/byids?{queryString}";
 
 
             // build a map of api outputs by commit so we can look them up efficiently
-            var api_outputs = new Dictionary<string, ApiOutput>();
+            var apiOutputs = new Dictionary<string, ApiOutput>();
 
             //HttpClient here
             // todo:asyncification
 
 
  
-            HttpResponseMessage response=null;
+            HttpResponseMessage response;
             try
             {
               response = ApiClient.GetAsync(url).Result;
@@ -122,7 +120,7 @@ namespace Grin.WalletImpl.WalletChecker
 
             foreach (var op in outputs)
             {
-                api_outputs.Add(op.commit.Hex, op);
+                apiOutputs.Add(op.Commit.Hex, op);
             }
 
 
@@ -130,17 +128,17 @@ namespace Grin.WalletImpl.WalletChecker
 // the corresponding api output (if it exists)
 // and refresh it in-place in the wallet.
 // Note: minimizing the time we spend holding the wallet lock.
-            WalletData.with_wallet(config.data_file_dir, wallet_data =>
+            WalletData.with_wallet(config.DataFileDir, walletData =>
             {
                 foreach (var commit in commits)
                 {
-                    var id = wallet_outputs[commit.Hex];
+                    var id = walletOutputs[commit.Hex];
 
-                    if (wallet_data.outputs.TryGetValue(id.HexValue, out var op))
+                    if (walletData.Outputs.TryGetValue(id.HexValue, out var op))
                     {
-                        if (api_outputs.TryGetValue(commit.Hex, out var api_output))
+                        if (apiOutputs.TryGetValue(commit.Hex, out var apiOutput))
                         {
-                            refresh_output(op, api_output);
+                            refresh_output(op, apiOutput);
                         }
                         else
                         {
@@ -148,7 +146,7 @@ namespace Grin.WalletImpl.WalletChecker
                         }
                     }
                 }
-                return wallet_data;
+                return walletData;
             });
 
             return true;
@@ -158,7 +156,7 @@ namespace Grin.WalletImpl.WalletChecker
         {
 
 
-            var uri = $"{config.check_node_api_http_addr}/v1/chain";
+            var uri = $"{config.CheckNodeApiHttpAddr}/v1/chain";
             //todo:asyncification
    
             var response = ApiClient.GetAsync(uri).Result;

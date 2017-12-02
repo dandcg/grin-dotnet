@@ -16,7 +16,7 @@ namespace Grin.CoreImpl.Core.Mod
   
 
         /// Gathers commitments and sum them.
-       public static Commitment sum_commitments(this ICommitted committed ,Secp256k1 secp)
+       public static Commitment sum_commitments(this ICommitted committed ,Secp256K1 secp)
         {
 
             // first, verify each range proof
@@ -47,16 +47,16 @@ namespace Grin.CoreImpl.Core.Mod
             // add the overage as output commitment if positive, as an input commitment if
             // negative
      
-            if (committed.overage() != 0)
+            if (committed.Overage() != 0)
             {
-                var over_commit = secp.commit_value((ulong)Math.Abs(committed.overage()));
-                if (committed.overage() < 0)
+                var overCommit = secp.commit_value((ulong)Math.Abs(committed.Overage()));
+                if (committed.Overage() < 0)
                 {
-                    inputCommits.Add(over_commit);
+                    inputCommits.Add(overCommit);
                 }
                 else
                 {
-                    outputCommits.Add(over_commit);
+                    outputCommits.Add(overCommit);
                 }
             }
 

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Grin.CoreImpl.Core.Hash;
 using Grin.CoreImpl.Core.Target;
 using Grin.CoreImpl.Ser;
@@ -15,17 +14,17 @@ namespace Grin.CoreImpl.Core.Mod
         }
 
         /// The nonces
-        public uint[] nonces { get; private set; }
+        public uint[] Nonces { get; private set; }
         /// The proof size
-        public uint proof_size { get; private set; }
+        public uint ProofSize { get; private set; }
 
         /// Builds a proof with all bytes zeroed out
-        public static Proof New(uint[] in_nonces)
+        public static Proof New(uint[] inNonces)
         {
             return new Proof
             {
-                proof_size = (uint)in_nonces.Length,
-                nonces = in_nonces
+                ProofSize = (uint)inNonces.Length,
+                Nonces = inNonces
             };
         }
 
@@ -34,52 +33,52 @@ namespace Grin.CoreImpl.Core.Mod
         {
             return new Proof
             {
-                proof_size = proofSize,
-                nonces = new uint[proofSize]
+                ProofSize = proofSize,
+                Nonces = new uint[proofSize]
             };
         }
 
 
         /// Converts the proof to a vector of u64s
-        public ulong[] to_u64s()
+        public ulong[] To_u64s()
         {
-            var out_nonces = new ulong[proof_size];
+            var outNonces = new ulong[ProofSize];
 
-            for (var n = 0; n < proof_size; n++)
+            for (var n = 0; n < ProofSize; n++)
             {
-                out_nonces[n] = (ulong) nonces[n];
+                outNonces[n] = Nonces[n];
             }
 
-            return out_nonces;
+            return outNonces;
         }
 
         /// Converts the proof to a vector of u32s
-        public uint[] to_u32s()
+        public uint[] To_u32s()
         {
-            return Clone().nonces;
+            return Clone().Nonces;
         }
 
         /// Converts the proof to a proof-of-work Target so they can be compared.
         /// Hashes the Cuckoo Proof data.
-        public Difficulty to_difficulty()
+        public Difficulty To_difficulty()
         {
-            return Difficulty.From_hash(this.hash());
+            return Difficulty.From_hash(this.Hash());
         }
 
 
 
 
-        public void write(IWriter writer)
+        public void Write(IWriter writer)
         {
-            for (var n=0; n<proof_size; n++)
+            for (var n=0; n<ProofSize; n++)
             {
-                writer.write_u32(nonces[n]);
+                writer.write_u32(Nonces[n]);
             }
         }
 
-        public void read(IReader reader)
+        public void Read(IReader reader)
         {
-            var proofSize =Global.proofsize();
+            var proofSize =Global.Proofsize();
             var pow = new uint[ proofSize];
 
             for (var n = 0; n < proofSize; n++)
@@ -88,24 +87,24 @@ namespace Grin.CoreImpl.Core.Mod
             }
         }
 
-        public static Proof readnew(IReader reader)
+        public static Proof Readnew(IReader reader)
         {
             var proof = new Proof();
-            proof.read(reader);
+            proof.Read(reader);
             return proof;
         }
 
 
         public Proof Clone()
         {
-            var out_nonces = new List<uint>();
+            var outNonces = new List<uint>();
 
-            foreach (var n in nonces)
+            foreach (var n in Nonces)
             {
-                out_nonces.Add(n);
+                outNonces.Add(n);
             }
 
-            return new Proof() {nonces = out_nonces.ToArray(), proof_size = (uint)out_nonces.Count};
+            return new Proof() {Nonces = outNonces.ToArray(), ProofSize = (uint)outNonces.Count};
 
         }
     }

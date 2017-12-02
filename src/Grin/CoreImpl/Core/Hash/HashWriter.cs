@@ -6,29 +6,29 @@ namespace Grin.CoreImpl.Core.Hash
 {
     public class HashWriter : WriterBase
     {
-        public MemoryStream stream { get; private set; }
-        public HMACBlake2B state { get; private set; }
+        public MemoryStream Stream { get; private set; }
+        public HMACBlake2B State { get; private set; }
 
         public static HashWriter Default()
         {
             var state = new HMACBlake2B(null, 32 * 8);
             var stream = new MemoryStream();
 
-            return new HashWriter {state = state, stream = stream};
+            return new HashWriter {State = state, Stream = stream};
         }
 
         /// Consume the `HashWriter`, outputting its current hash into a 32-byte
         /// array
-        public byte[] finalize()
+        public byte[] FinalizeHash()
         {
-            return state.ComputeHash(stream.ToArray());
+            return State.ComputeHash(Stream.ToArray());
         }
 
         /// Consume the `HashWriter`, outputting a `Hash` corresponding to its
         /// current state
         public Hash into_hash()
         {
-            var res = finalize();
+            var res = FinalizeHash();
             return new Hash(res);
         }
 
@@ -40,7 +40,7 @@ namespace Grin.CoreImpl.Core.Hash
 
         public override void write_fixed_bytes(byte[] bs)
         {
-            stream.Write(bs, 0, bs.Length);
+            Stream.Write(bs, 0, bs.Length);
         }
     }
 }

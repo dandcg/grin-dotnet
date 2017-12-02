@@ -2,21 +2,21 @@
 using Grin.CoreImpl.Core.Block;
 using Grin.CoreImpl.Core.Transaction;
 
-namespace Grin.Api.ApiTypes
+namespace Grin.ApiImpl.ApiTypes
 {
     public class ApiOutputSwitch : ICloneable
     {
         /// the commit
-        public string commit { get; set; }
+        public string Commit { get; set; }
 
         /// switch commit hash
-        public byte[] switch_commit_hash { get; set; } //[u8; core::SWITCH_COMMIT_HASH_SIZE],
+        public byte[] SwitchCommitHash { get; set; } //[u8; core::SWITCH_COMMIT_HASH_SIZE],
 
         /// The height of the block creating this output
-        public ulong height { get; set; }
+        public ulong Height { get; set; }
 
 
-        public static ApiOutputSwitch from_output(Output output, BlockHeader block_header)
+        public static ApiOutputSwitch from_output(Output output, BlockHeader blockHeader)
         {
             throw new NotImplementedException();
 

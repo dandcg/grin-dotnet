@@ -7,14 +7,14 @@ using Secp256k1Proxy.Lib;
 
 namespace Secp256k1Proxy.Pedersen
 {
-    public static class Secp256k1PedersonExtensions
+    public static class Secp256K1PedersonExtensions
     {
         /// *** This is a temporary work-around. ***
         /// We do not know which of the two possible public keys from the commit to use,
         /// so here we try both of them and succeed if either works.
         /// This is sub-optimal in terms of performance.
         /// I believe apoelstra has a strategy for fixing this in the secp256k1-zkp lib.
-        public static void verify_from_commit(this Secp256k1 self, Message msg, Signiture sig, Commitment commit)
+        public static void verify_from_commit(this Secp256K1 self, Message msg, Signiture sig, Commitment commit)
         {
             if (self.Caps != ContextFlag.Commit)
                 throw new Exception("IncapableContext");
@@ -38,14 +38,14 @@ namespace Secp256k1Proxy.Pedersen
         }
 
         /// Creates a switch commitment from a blinding factor.
-        public static Commitment switch_commit(this Secp256k1 self, SecretKey blind)
+        public static Commitment switch_commit(this Secp256K1 self, SecretKey blind)
         {
             if (self.Caps != ContextFlag.Commit)
                 throw new Exception("IncapableContext");
 
             var commit = new byte[33];
 
-            Proxy.secp256k1_switch_commit(self.Ctx, commit, blind.Value, Constants.Constants.GENERATOR_J);
+            Proxy.secp256k1_switch_commit(self.Ctx, commit, blind.Value, Constants.Constants.GeneratorJ);
 
 
             return new Commitment(commit);
@@ -53,7 +53,7 @@ namespace Secp256k1Proxy.Pedersen
 
 
         /// Creates a pedersen commitment from a value and a blinding factor
-        public static Commitment commit(this Secp256k1 self, ulong value, SecretKey blind)
+        public static Commitment Commit(this Secp256K1 self, ulong value, SecretKey blind)
         {
             if (self.Caps != ContextFlag.Commit) throw new Exception("IncapableContext");
             var commit = new byte [33];
@@ -64,7 +64,7 @@ namespace Secp256k1Proxy.Pedersen
                 commit,
                 blind.Value,
                 value,
-                Constants.Constants.GENERATOR_H
+                Constants.Constants.GeneratorH
             );
 
             return new Commitment(commit);
@@ -73,7 +73,7 @@ namespace Secp256k1Proxy.Pedersen
 
         /// Convenience method to Create a pedersen commitment only from a value,
         /// with a zero blinding factor
-        public static Commitment commit_value(this Secp256k1 self, ulong value)
+        public static Commitment commit_value(this Secp256K1 self, ulong value)
         {
             if (self.Caps != ContextFlag.Commit)
                 throw new Exception("IncapableContext");
@@ -86,7 +86,7 @@ namespace Secp256k1Proxy.Pedersen
                 commit,
                 zblind,
                 value,
-                Constants.Constants.GENERATOR_H);
+                Constants.Constants.GeneratorH);
 
 
             return new Commitment(commit);
@@ -94,7 +94,7 @@ namespace Secp256k1Proxy.Pedersen
 
         /// Taking vectors of positive and negative commitments as well as an
         /// expected excess, verifies that it all sums to zero.
-        public static bool verify_commit_sum(this Secp256k1 self, Commitment[] positive, Commitment[] negative)
+        public static bool verify_commit_sum(this Secp256K1 self, Commitment[] positive, Commitment[] negative)
         {
             var pos = new byte[positive.Length][];
 
@@ -117,7 +117,7 @@ namespace Secp256k1Proxy.Pedersen
         }
 
         /// Computes the sum of multiple positive and negative pedersen commitments.
-        public static Commitment commit_sum(this Secp256k1 self, Commitment[] positive, Commitment[] negative)
+        public static Commitment commit_sum(this Secp256K1 self, Commitment[] positive, Commitment[] negative)
         {
             var pos = new byte[positive.Length][];
 
@@ -129,7 +129,7 @@ namespace Secp256k1Proxy.Pedersen
             for (var i = 0; i < negative.Length; i++)
                 neg[i] = negative[i].Value;
 
-            var ret = Commitment.blank();
+            var ret = Commitment.Blank();
             var err = Proxy.secp256k1_pedersen_commit_sum(
                 self.Ctx,
                 ret.Value,
@@ -144,7 +144,7 @@ namespace Secp256k1Proxy.Pedersen
 
 
         /// Computes the sum of multiple positive and negative blinding factors.
-        public static SecretKey blind_sum(this Secp256k1 self, SecretKey[] positive, SecretKey[] negative)
+        public static SecretKey blind_sum(this Secp256K1 self, SecretKey[] positive, SecretKey[] negative)
         {
             //var neg = new byte[negative.Length][];
 
@@ -177,12 +177,12 @@ namespace Secp256k1Proxy.Pedersen
         }
 
 
-        public static RangeProof range_proof(this Secp256k1 self, ulong min, ulong value, SecretKey blind,
+        public static RangeProof range_proof(this Secp256K1 self, ulong min, ulong value, SecretKey blind,
             Commitment commit, ProofMessage message)
         {
             var retried = false;
-            var proof = new byte[Constants.Constants.MAX_PROOF_SIZE];
-            var plen = Constants.Constants.MAX_PROOF_SIZE;
+            var proof = new byte[Constants.Constants.MaxProofSize];
+            var plen = Constants.Constants.MaxProofSize;
             // IntPtr proofPtr= Marshal.AllocHGlobal(proof.Length);
 
             var proofPtr = Marshal.AllocCoTaskMem(plen);
@@ -196,7 +196,7 @@ namespace Secp256k1Proxy.Pedersen
             // with the same nonce
             var nonce = blind.Clone();
 
-            var extra_commit = ByteUtil.get_bytes(0, 33);
+            var extraCommit = ByteUtil.Get_bytes(0, 33);
 
             // TODO - confirm this reworked retry logic works as expected
             // pretty sure the original approach retried on success (so twice in total)
@@ -218,9 +218,9 @@ namespace Secp256k1Proxy.Pedersen
                                   value,
                                   message.Value,
                                   message.Value.Length,
-                                  extra_commit,
+                                  extraCommit,
                                   0,
-                                  Constants.Constants.GENERATOR_H) == 1;
+                                  Constants.Constants.GeneratorH) == 1;
 
                 if (success || retried)
                     break;
@@ -237,12 +237,12 @@ namespace Secp256k1Proxy.Pedersen
             return new RangeProof(proof2, plen);
         }
 
-        public static ProofRange verify_range_proof(this Secp256k1 self, Commitment commit, RangeProof proof)
+        public static ProofRange verify_range_proof(this Secp256K1 self, Commitment commit, RangeProof proof)
         {
             ulong min = 0;
             ulong max = 0;
 
-            var extra_commit = ByteUtil.get_bytes(0, 33);
+            var extraCommit = ByteUtil.Get_bytes(0, 33);
 
             var success =
                 Proxy.secp256k1_rangeproof_verify(
@@ -252,28 +252,28 @@ namespace Secp256k1Proxy.Pedersen
                     commit.Value,
                     proof.Proof,
                     proof.Plen,
-                    extra_commit,
+                    extraCommit,
                     0,
-                    Constants.Constants.GENERATOR_H
+                    Constants.Constants.GeneratorH
                 ) == 1;
 
             if (success)
                 return new ProofRange
                 {
-                    min = min,
-                    max = max
+                    Min = min,
+                    Max = max
                 };
             throw new Exception("InvalidRangeProof");
         }
 
-        public static ProofInfo range_proof_info(this Secp256k1 self, RangeProof proof)
+        public static ProofInfo range_proof_info(this Secp256K1 self, RangeProof proof)
         {
             var exp = 0;
             var mantissa = 0;
             ulong min = 0;
             ulong max = 0;
 
-            var extra_commit = new byte [33];
+            var extraCommit = new byte [33];
 
             var success = Proxy.secp256k1_rangeproof_info(
                               self.Ctx,
@@ -283,38 +283,38 @@ namespace Secp256k1Proxy.Pedersen
                               ref max,
                               proof.Proof,
                               proof.Plen,
-                              extra_commit,
+                              extraCommit,
                               0,
-                              Constants.Constants.GENERATOR_H
+                              Constants.Constants.GeneratorH
                           ) == 1;
 
             return new
                 ProofInfo
                 {
-                    success = success,
-                    value = 0,
-                    message = ProofMessage.empty(),
-                    mlen = 0,
-                    min = min,
-                    max = max,
-                    exp = exp,
-                    mantissa = mantissa
+                    Success = success,
+                    Value = 0,
+                    Message = ProofMessage.Empty(),
+                    Mlen = 0,
+                    Min = min,
+                    Max = max,
+                    Exp = exp,
+                    Mantissa = mantissa
                 };
         }
 
-        public static ProofInfo rewind_range_proof(this Secp256k1 self, Commitment commit, RangeProof proof,
+        public static ProofInfo rewind_range_proof(this Secp256K1 self, Commitment commit, RangeProof proof,
             SecretKey nonce)
         {
             ulong value = 0;
             var blind = new byte[32];
 
-            var message = new byte[Constants.Constants.PROOF_MSG_SIZE];
-            var mlen = (ulong)Constants.Constants.PROOF_MSG_SIZE;
+            var message = new byte[Constants.Constants.ProofMsgSize];
+            var mlen = (ulong)Constants.Constants.ProofMsgSize;
             
             ulong min = 0;
             ulong max = 0;
 
-            var extra_commit = new byte[33];
+            var extraCommit = new byte[33];
 
 
             var success = Proxy.secp256k1_rangeproof_rewind(
@@ -329,22 +329,22 @@ namespace Secp256k1Proxy.Pedersen
                               commit.Value,
                               proof.Proof,
                               proof.Plen,
-                              extra_commit,
+                              extraCommit,
                               0,
-                              Constants.Constants.GENERATOR_H
+                              Constants.Constants.GeneratorH
                           ) == 1;
 
 
             return new ProofInfo
             {
-                success = success,
-                value = value,
-                message = ProofMessage.from_bytes(message),
-                mlen = (int)mlen,
-                min = min,
-                max = max,
-                exp = 0,
-                mantissa = 0
+                Success = success,
+                Value = value,
+                Message = ProofMessage.from_bytes(message),
+                Mlen = (int)mlen,
+                Min = min,
+                Max = max,
+                Exp = 0,
+                Mantissa = 0
             };
         }
     }

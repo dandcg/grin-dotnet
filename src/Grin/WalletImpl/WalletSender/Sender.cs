@@ -16,7 +16,7 @@ using Grin.WalletImpl.WalletTypes;
 using Newtonsoft.Json;
 using Serilog;
 
-namespace Grin.WalvarImpl.WalvarSender
+namespace Grin.WalletImpl.WalletSender
 {
     public static class Sender
     {
@@ -28,65 +28,65 @@ namespace Grin.WalvarImpl.WalvarSender
             WalletConfig config,
             Keychain keychain,
             ulong amount,
-            ulong minimum_confirmations,
+            ulong minimumConfirmations,
             string dest,
-            uint max_outputs,
-            bool selection_strategy
+            uint maxOutputs,
+            bool selectionStrategy
         )
         {
             Checker.refresh_outputs(config, keychain);
 
-            var chain_tip = Checker.get_tip_from_node(config);
-            var current_height = chain_tip.height;
+            var chainTip = Checker.get_tip_from_node(config);
+            var currentHeight = chainTip.Height;
 
             // proof of concept - set lock_height on the tx
-            var lock_height = chain_tip.height;
+            var lockHeight = chainTip.Height;
 
 
-            var(tx, blind_sum, coins, change_key) = build_send_tx(
+            var(tx, blindSum, coins, changeKey) = build_send_tx(
                 config,
                 keychain,
                 amount,
-                current_height,
-                minimum_confirmations,
-                lock_height,
-                max_outputs,
-                selection_strategy);
+                currentHeight,
+                minimumConfirmations,
+                lockHeight,
+                maxOutputs,
+                selectionStrategy);
 
-            var partial_tx = PartialTx.build_partial_tx(amount, blind_sum, tx);
+            var partialTx = PartialTx.build_partial_tx(amount, blindSum, tx);
 
             // Closure to acquire walvar lock and lock the coins being spent
             // so we avoid accidental double spend attempt.
             void UpdateWallet()
             {
-                WalletData.with_wallet(config.data_file_dir, wallet_data =>
+                WalletData.with_wallet(config.DataFileDir, walletData =>
                 {
                     foreach (var coin in coins)
                     {
-                        wallet_data.lock_output(coin);
+                        walletData.lock_output(coin);
                     }
-                    return wallet_data;
+                    return walletData;
                 });
             }
 
             // Closure to acquire walvar lock and devare the change output in case of tx failure.
             void RollbackWallet()
             {
-                WalletData.with_wallet(config.data_file_dir, walletData =>
+                WalletData.with_wallet(config.DataFileDir, walletData =>
                 {
                     Log.Information("cleaning up unused change output from walvar");
-                    walletData.delete_output(change_key);
+                    walletData.delete_output(changeKey);
                     return walletData;
                 });
             }
 
             if (dest == "stdout")
             {
-                var json_tx = JsonConvert.SerializeObject(partial_tx, Formatting.Indented);
+                var jsonTx = JsonConvert.SerializeObject(partialTx, Formatting.Indented);
 
                 UpdateWallet();
 
-                Console.WriteLine(json_tx);
+                Console.WriteLine(jsonTx);
             }
             else if (dest.StartsWith("http"))
             {
@@ -96,7 +96,7 @@ namespace Grin.WalvarImpl.WalvarSender
 
                 try
                 {
-                    Client.send_partial_tx(url, partial_tx);
+                    Client.send_partial_tx(url, partialTx);
                     UpdateWallet();
                 }
                 catch
@@ -118,65 +118,65 @@ namespace Grin.WalvarImpl.WalvarSender
             WalletConfig config,
             Keychain keychain,
             ulong amount,
-            ulong current_height,
-            ulong minimum_confirmations,
-            ulong lock_height,
-            uint max_outputs,
-            bool default_strategy
+            ulong currentHeight,
+            ulong minimumConfirmations,
+            ulong lockHeight,
+            uint maxOutputs,
+            bool defaultStrategy
         )
         {
-            var key_id = keychain.Root_key_id().Clone();
+            var keyId = keychain.Root_key_id().Clone();
 
 // select some spendable coins from the walvar
-            var coins = WalletData.read_wallet(config.data_file_dir,
-                walletData => walletData.select(
-                    key_id.Clone(),
+            var coins = WalletData.read_wallet(config.DataFileDir,
+                walletData => walletData.Select(
+                    keyId.Clone(),
                     amount,
-                    current_height,
-                    minimum_confirmations,
-                    max_outputs,
-                    default_strategy));
+                    currentHeight,
+                    minimumConfirmations,
+                    maxOutputs,
+                    defaultStrategy));
             // build transaction skevaron with inputs and change
 
-            var( partsArray, change_key) = inputs_and_change(coins, config, keychain, amount);
+            var( partsArray, changeKey) = inputs_and_change(coins, config, keychain, amount);
 
             var parts = partsArray.ToList();
             // This is more proof of concept than anything but here we set lock_height
             // on tx being sent (based on current chain height via api).
-            parts.Add(c => c.with_lock_height(lock_height));
+            parts.Add(c => c.with_lock_height(lockHeight));
 
 
-            var(tx, blind) = Build.transaction(parts.ToArray(), keychain);
+            var(tx, blind) = Build.Transaction(parts.ToArray(), keychain);
 
 
-            return (tx, blind, coins, change_key);
+            return (tx, blind, coins, changeKey);
         }
 
         public static void issue_burn_tx(
             WalletConfig config,
             Keychain keychain,
             ulong amount,
-            ulong minimum_confirmations,
-            uint max_outputs
+            ulong minimumConfirmations,
+            uint maxOutputs
         )
         {
             keychain = Keychain.Burn_enabled(keychain, Identifier.Zero());
 
-            var chain_tip = Checker.get_tip_from_node(config);
-            var current_height = chain_tip.height;
+            var chainTip = Checker.get_tip_from_node(config);
+            var currentHeight = chainTip.Height;
 
             var _ = Checker.refresh_outputs(config, keychain);
 
-            var key_id = keychain.Root_key_id();
+            var keyId = keychain.Root_key_id();
 
 // select some spendable coins from the walvar
             var coins = WalletData.read_wallet(
-                config.data_file_dir, walletData => walletData.select(
-                    key_id.Clone(),
+                config.DataFileDir, walletData => walletData.Select(
+                    keyId.Clone(),
                     amount,
-                    current_height,
-                    minimum_confirmations,
-                    max_outputs,
+                    currentHeight,
+                    minimumConfirmations,
+                    maxOutputs,
                     false));
 
 
@@ -188,17 +188,20 @@ namespace Grin.WalvarImpl.WalvarSender
 
             // add burn output and fees
             var fee = Types.tx_fee((uint) coins.Length, 2, null);
-            parts.Add(c => c.output(amount - fee, Identifier.Zero()));
+            parts.Add(c => c.Output(amount - fee, Identifier.Zero()));
 
             // finalize the burn transaction and send
-            var(tx_burn, _) = Build.transaction(parts.ToArray(), keychain);
-            tx_burn.validate(keychain.Secp);
+            var(txBurn, _) = Build.Transaction(parts.ToArray(), keychain);
+            txBurn.Validate(keychain.Secp);
 
-            var tx_hex = HexUtil.to_hex(Ser.Ser_vec(tx_burn));
+            var txHex = HexUtil.to_hex(Ser.Ser_vec(txBurn));
 
-            var url = $"{config.check_node_api_http_addr}/v1/pool/push";
+            var url = $"{config.CheckNodeApiHttpAddr}/v1/pool/push";
 
-            var httpResponseMessage = ApiClient.PostAsync(url, new TxWrapper {tx_hex = tx_hex}).Result;
+            var res = ApiClient.PostAsync(url, new TxWrapper {TxHex = txHex}).Result;
+
+            Log.Debug("{StatusCode}",res.StatusCode);
+
         }
 
         public static (Func<Context, Append>[] appends, Identifier keyid) inputs_and_change(
@@ -213,7 +216,7 @@ namespace Grin.WalvarImpl.WalvarSender
             var parts = new List<Func<Context, Append>>();
 
             // calculate the total across all inputs, and how much is left
-            var total = coins.Select(s => s.value).Aggregate((a, b) => a + b);
+            var total = coins.Select(s => s.Value).Aggregate((a, b) => a + b);
             if (total < amount)
             {
                 throw new WalletErrorException(WalletError.NotEnoughFunds);
@@ -234,22 +237,22 @@ namespace Grin.WalvarImpl.WalvarSender
             // build inputs using the appropriate derived key_ids
             foreach (var coin in coins)
             {
-                var key_id = keychain.Derive_key_id(coin.n_child);
-                parts.Add(c => c.input(coin.value, key_id));
+                var keyId = keychain.Derive_key_id(coin.NChild);
+                parts.Add(c => c.Input(coin.Value, keyId));
             }
 
             // track the output representing our change
-            var change_key = WalletData.with_wallet(config.data_file_dir,
+            var changeKey = WalletData.with_wallet(config.DataFileDir,
                 walletData =>
                 {
-                    var root_key_id = keychain.Root_key_id();
-                    var change_derivation = walletData.next_child(root_key_id.Clone());
-                    var changekey = keychain.Derive_key_id(change_derivation);
+                    var rootKeyId = keychain.Root_key_id();
+                    var changeDerivation = walletData.next_child(rootKeyId.Clone());
+                    var changekey = keychain.Derive_key_id(changeDerivation);
 
                     walletData.add_output(new OutputData(
-                        root_key_id.Clone(),
+                        rootKeyId.Clone(),
                         changekey.Clone(),
-                        change_derivation,
+                        changeDerivation,
                         change,
                         OutputStatus.Unconfirmed,
                         0,
@@ -260,10 +263,10 @@ namespace Grin.WalvarImpl.WalvarSender
                 });
 
 
-            parts.Add(c => c.output(change, change_key.Clone()));
+            parts.Add(c => c.Output(change, changeKey.Clone()));
 
 
-            return (parts.ToArray(), change_key);
+            return (parts.ToArray(), changeKey);
         }
     }
 }

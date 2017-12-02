@@ -14,7 +14,7 @@ namespace Secp256k1Proxy.Ecdh
             Value = value;
         }
 
-        public static SharedSecret New(Secp256k1 secp, PublicKey point, SecretKey scalar)
+        public static SharedSecret New(Secp256K1 secp, PublicKey point, SecretKey scalar)
 
         {
             var sharedSecretBytes = new byte[32];

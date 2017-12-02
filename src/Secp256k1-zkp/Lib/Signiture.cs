@@ -14,7 +14,7 @@ namespace Secp256k1Proxy.Lib
 
 
         /// Converts a DER-encoded byte slice to a signature
-        public static Signiture from_der(Secp256k1 secp, byte[] data)
+        public static Signiture from_der(Secp256K1 secp, byte[] data)
 
         {
             var ret = new byte[64];
@@ -31,7 +31,7 @@ namespace Secp256k1Proxy.Lib
         }
 
         /// Converts a 64-byte compact-encoded byte slice to a signature
-        public static Signiture from_compact(Secp256k1 secp, byte[] data)
+        public static Signiture from_compact(Secp256K1 secp, byte[] data)
         {
 
             var ret = new byte[64];
@@ -58,7 +58,7 @@ namespace Secp256k1Proxy.Lib
         /// only useful for validating signatures in the Bitcoin blockchain from before
         /// 2016. It should never be used in new applications. This library does not
         /// support serializing to this "format"
-        public static Signiture from_der_lax(Secp256k1 secp, byte[] data)
+        public static Signiture from_der_lax(Secp256K1 secp, byte[] data)
         {
 
             var ret = new byte[64];
@@ -90,7 +90,7 @@ namespace Secp256k1Proxy.Lib
         /// valid. (For example, parsing the historic Bitcoin blockchain requires
         /// this.) For these applications we provide this normalization function,
         /// which ensures that the s value lies in the lower half of its range.
-        public void normalize_s(Secp256k1 secp)
+        public void normalize_s(Secp256K1 secp)
         {
 
             // Ignore return value, which indicates whether the sig
@@ -100,17 +100,17 @@ namespace Secp256k1Proxy.Lib
         }
 
 
-        public byte[] serialize_der(Secp256k1 secp)
+        public byte[] serialize_der(Secp256K1 secp)
         {
             var ret = new byte[72];
-            long ret_len = ret.Length;
+            long retLen = ret.Length;
 
-            var err = Proxy.secp256k1_ecdsa_signature_serialize_der(secp.Ctx, ret,ref ret_len,Value);
+            var err = Proxy.secp256k1_ecdsa_signature_serialize_der(secp.Ctx, ret,ref retLen,Value);
 
             if (err == 1)
             {
 
-                Array.Resize(ref ret,(int) ret_len);
+                Array.Resize(ref ret,(int) retLen);
 
                 return ret;
 
@@ -119,7 +119,7 @@ namespace Secp256k1Proxy.Lib
 
         }
 
-        public byte[] serialize_compact(Secp256k1 secp)
+        public byte[] serialize_compact(Secp256K1 secp)
         {
             var ret = new byte[64];
       

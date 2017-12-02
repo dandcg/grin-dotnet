@@ -42,7 +42,7 @@ namespace Grin.KeychainImpl.ExtKey
             return new Identifier(new byte[IdentifierSize]);
         }
 
-        public static Identifier From_key_id(Secp256k1 secp, PublicKey pubKey)
+        public static Identifier From_key_id(Secp256K1 secp, PublicKey pubKey)
         {
             var bytes = pubKey.serialize_vec(secp, true);
             var hashAlgorithm = new HMACBlake2B(null, IdentifierSize * 8);

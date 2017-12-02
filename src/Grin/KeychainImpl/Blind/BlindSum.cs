@@ -9,10 +9,10 @@ namespace Grin.KeychainImpl.Blind
         {
         }
 
-        public List<Identifier> positive_key_ids { get; } = new List<Identifier>();
-        public List<Identifier> negative_key_ids { get; } = new List<Identifier>();
-        public List<BlindingFactor> positive_blinding_factors { get; } = new List<BlindingFactor>();
-        public List<BlindingFactor>negative_blinding_factors { get; } = new List<BlindingFactor>();
+        public List<Identifier> PositiveKeyIds { get; } = new List<Identifier>();
+        public List<Identifier> NegativeKeyIds { get; } = new List<Identifier>();
+        public List<BlindingFactor> PositiveBlindingFactors { get; } = new List<BlindingFactor>();
+        public List<BlindingFactor>NegativeBlindingFactors { get; } = new List<BlindingFactor>();
 
 
         public static BlindSum New()
@@ -20,29 +20,29 @@ namespace Grin.KeychainImpl.Blind
             return new BlindSum();
         }
 
-        public BlindSum add_key_id(Identifier key_id)
+        public BlindSum add_key_id(Identifier keyId)
         {
-            positive_key_ids.Add(key_id);
+            PositiveKeyIds.Add(keyId);
             return this;
         }
 
-        public BlindSum sub_key_id(Identifier key_id)
+        public BlindSum sub_key_id(Identifier keyId)
         {
-            negative_key_ids.Add(key_id);
+            NegativeKeyIds.Add(keyId);
             return this;
         }
 
         /// Adds the provided key to the sum of blinding factors.
         public BlindSum add_blinding_factor(BlindingFactor blind)
         {
-            positive_blinding_factors.Add(blind);
+            PositiveBlindingFactors.Add(blind);
             return this;
         }
 
         /// Subtractss the provided key to the sum of blinding factors.
         public BlindSum sub_blinding_factor(BlindingFactor blind)
         {
-            negative_blinding_factors.Add(blind);
+            NegativeBlindingFactors.Add(blind);
             return this;
         }
     }

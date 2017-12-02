@@ -42,8 +42,8 @@ namespace Grin.WalletImpl.WalletTypes
         public Keychain derive_keychain(string password)
         {
             var key = Encoding.ASCII.GetBytes(password);
-            var blake2b = new HMACBlake2B(key, 64 * 8);
-            var seed = blake2b.ComputeHash(Value);
+            var blake2B = new HMACBlake2B(key, 64 * 8);
+            var seed = blake2B.ComputeHash(Value);
             var result = Keychain.From_seed(seed);
 
             return result;
@@ -52,30 +52,30 @@ namespace Grin.WalletImpl.WalletTypes
         public static WalletSeed init_new()
 
         {
-            var seed = ByteUtil.get_random_bytes(RandomNumberGenerator.Create(), 32);
+            var seed = ByteUtil.Get_random_bytes(RandomNumberGenerator.Create(),32);
             return new WalletSeed(seed);
         }
 
-        public static WalletSeed init_file(WalletConfig wallet_config)
+        public static WalletSeed init_file(WalletConfig walletConfig)
         {
             // create directory if it doesn't exist
-            Directory.CreateDirectory(wallet_config.data_file_dir);
+            Directory.CreateDirectory(walletConfig.DataFileDir);
 
 
-            var seed_file_path = Path.Combine(wallet_config.data_file_dir,Types.SEED_FILE);
+            var seedFilePath = Path.Combine(walletConfig.DataFileDir,Types.SeedFile);
 
 
-            Log.Debug("Generating wallet seed file at: {seed_file_path}", seed_file_path);
+            Log.Debug("Generating wallet seed file at: {seed_file_path}", seedFilePath);
 
 
-            if (File.Exists(seed_file_path))
+            if (File.Exists(seedFilePath))
             {
                 throw new Exception("Wallet seed file already exists!");
             }
 
             var seed = init_new();
 
-            using (var seedFile = File.CreateText(seed_file_path))
+            using (var seedFile = File.CreateText(seedFilePath))
             {
                 seedFile.Write(seed.to_hex());
             }
@@ -84,28 +84,28 @@ namespace Grin.WalletImpl.WalletTypes
             return seed;
         }
 
-        public static WalletSeed from_file(WalletConfig wallet_config)
+        public static WalletSeed from_file(WalletConfig walletConfig)
         {
             // create directory if it doesn't exist
-            Directory.CreateDirectory(wallet_config.data_file_dir);
+            Directory.CreateDirectory(walletConfig.DataFileDir);
 
 
-            var seed_file_path = Path.Combine(wallet_config.data_file_dir, Types.SEED_FILE);
+            var seedFilePath = Path.Combine(walletConfig.DataFileDir, Types.SeedFile);
                 
-            Log.Debug("Using wallet seed at: {seed_file_path}", seed_file_path);
+            Log.Debug("Using wallet seed at: {seed_file_path}", seedFilePath);
 
-            if (File.Exists(seed_file_path))
+            if (File.Exists(seedFilePath))
             {
-                using (var file = File.Open(seed_file_path, FileMode.Open, FileAccess.Read, FileShare.None))
+                using (var file = File.Open(seedFilePath, FileMode.Open, FileAccess.Read, FileShare.None))
                 using (var sr = new StreamReader(file))
                 {
                     var hex = sr.ReadToEnd();
-                    var wallet_seed = from_hex(hex);
-                    return wallet_seed;
+                    var walletSeed = from_hex(hex);
+                    return walletSeed;
                 }
             }
 
-            return init_file(wallet_config);
+            return init_file(walletConfig);
 
             //Log.Error("Run: \"grin wallet init\" to initialize a new wallet.");
             //throw new Exception("wallet seed file does not yet exist (grin wallet init)");

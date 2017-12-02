@@ -1,4 +1,4 @@
-﻿namespace Grin.Api.ApiTypes
+﻿namespace Grin.ApiImpl.ApiTypes
 {
     public enum ApiOutputType
     {

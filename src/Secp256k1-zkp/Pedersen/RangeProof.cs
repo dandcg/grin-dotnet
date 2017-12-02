@@ -14,10 +14,10 @@ namespace Secp256k1Proxy.Pedersen
             Plen = plen;
         }
 
-        public static RangeProof zero()
+        public static RangeProof Zero()
         {
             return new RangeProof(
-                new byte[Constants.Constants.MAX_PROOF_SIZE],
+                new byte[Constants.Constants.MaxProofSize],
                 0);
         }
 

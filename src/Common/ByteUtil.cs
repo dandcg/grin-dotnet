@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
 
 namespace Common
 {
@@ -9,12 +8,12 @@ namespace Common
     {
 
 
-        public static byte[] get_bytes(byte value, int length)
+        public static byte[] Get_bytes(byte value, int length)
         {
             var bytes = new byte[length];
 
 
-            for (int i = 0; i < bytes.Length; i++)
+            for (var i = 0; i < bytes.Length; i++)
                 bytes[i] = value;
 
             return bytes;
@@ -22,7 +21,7 @@ namespace Common
         }
 
 
-        public static byte[] get_random_bytes(RandomNumberGenerator rng, uint len=32)
+        public static byte[] Get_random_bytes(RandomNumberGenerator rng, uint len)
 
         {
             var rw = new byte[len];
@@ -32,11 +31,11 @@ namespace Common
 
         public static byte[] Combine(params byte[][] arrays)
         {
-            byte[] rv = new byte[arrays.Sum(a => a.Length)];
-            int offset = 0;
-            foreach (byte[] array in arrays)
+            var rv = new byte[arrays.Sum(a => a.Length)];
+            var offset = 0;
+            foreach (var array in arrays)
             {
-                System.Buffer.BlockCopy(array, 0, rv, offset, array.Length);
+                Buffer.BlockCopy(array, 0, rv, offset, array.Length);
                 offset += array.Length;
             }
             return rv;

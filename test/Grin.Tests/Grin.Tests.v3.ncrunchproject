@@ -146,94 +146,10 @@
         <TestName>Grin.Tests.Unit.KeychainTests.KeychainTests.test_key_derivation</TestName>
       </NamedTestSelector>
       <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.KeychainTests.ExtKeyTests.test_identifier_json_ser_deser</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.KeychainTests.ExtKeyTests.extkey_from_seed</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.KeychainTests.ExtKeyTests.extkey_derivation</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.CoreTests.Core.TransactionTests.test_output_value_recovery</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.CoreTests.Core.TransactionTests.test_output_ser_deser</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.CoreTests.Core.TransactionTests.test_kernel_ser_deser</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.Tx_hash_diff</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.Tx_double_ser_deser</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.Tx_build_exchange</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.Test_zero_commit_fails</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.Test_verify_2i1o_sig</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.Test_verify_1i1o_sig</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.Test_hr_to_amount</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.Test_block_with_timelocked_tx</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.Test_amount_to_hr</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.Simple_tx_ser_deser</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.Simple_tx_ser</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.Simple_block</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.Reward_with_tx_block</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.Reward_empty_block</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.Hash_output</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.Blind_tx</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
         <TestName>Grin.Tests.Unit.CoreTests.Core.BuildTests.blind_simpler_tx</TestName>
       </NamedTestSelector>
       <NamedTestSelector>
         <TestName>Grin.Tests.Unit.CoreTests.Core.BuildTests.blind_simple_tx</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.CoreTests.Core.BlockTests.Serialize_deserialize_block</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.CoreTests.Core.BlockTests.Remove_coinbase_output_flag</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.CoreTests.Core.BlockTests.Remove_coinbase_kernel_flag</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.CoreTests.Core.BlockTests.Mergeable_blocks</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.CoreTests.Core.BlockTests.Empty_block_with_coinbase_is_valid</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.CoreTests.Core.BlockTests.Compactable_block</TestName>
       </NamedTestSelector>
       <NamedTestSelector>
         <TestName>Grin.Tests.Integration.WalletTests.ReceiveCoinbase</TestName>

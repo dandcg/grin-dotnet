@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using Secp256k1Proxy.Helpers;
-using Secp256k1Proxy.Key;
 
 namespace Secp256k1Proxy.Ffi
 {
@@ -245,9 +244,9 @@ namespace Secp256k1Proxy.Ffi
         //        extra_commit_len: size_t,
         //		gen: *const c_uchar
         //	) -> c_int;
-        public static extern int secp256k1_rangeproof_rewind(IntPtr selfCtx, byte[] blind_out, ref ulong value,
+        public static extern int secp256k1_rangeproof_rewind(IntPtr selfCtx, byte[] blindOut, ref ulong value,
             byte[] message, ref ulong mlen, byte[] nonce, ref ulong min, ref ulong max, byte[] commit,
-            byte[] proofProof, int proofPlen, byte[] extra_commit, int extra_commit_len, byte[] generatorH);
+            byte[] proofProof, int proofPlen, byte[] extraCommit, int extraCommitLen, byte[] generatorH);
         
 
         [DllImport(LibName)]
@@ -262,8 +261,8 @@ namespace Secp256k1Proxy.Ffi
         //        extra_commit_len: size_t,
         //		gen: *const c_uchar
         //	) -> c_int;
-        public static extern int secp256k1_rangeproof_verify(IntPtr ctx, ref ulong min_value, ref ulong max_value,
-            byte[] commit, byte[] proof, int plen, byte[] extra_commit, int extra_commit_len, byte[] gen);
+        public static extern int secp256k1_rangeproof_verify(IntPtr ctx, ref ulong minValue, ref ulong maxValue,
+            byte[] commit, byte[] proof, int plen, byte[] extraCommit, int extraCommitLen, byte[] gen);
       
 
         [DllImport(LibName)]
@@ -284,9 +283,9 @@ namespace Secp256k1Proxy.Ffi
         //        extra_commit_len: size_t,
         //		gen: *const c_uchar
         //	) -> c_int;
-        public static extern int secp256k1_rangeproof_sign(IntPtr selfCtx,  IntPtr proof, ref int plen, ulong min_value,
-            byte[] commit, byte[] blind, byte[] nonce, int exp, int min_bits, ulong value, byte[] message,
-            int msg_len, byte[] extra_commit, int extra_commit_len, byte[] gen);
+        public static extern int secp256k1_rangeproof_sign(IntPtr selfCtx,  IntPtr proof, ref int plen, ulong minValue,
+            byte[] commit, byte[] blind, byte[] nonce, int exp, int minBits, ulong value, byte[] message,
+            int msgLen, byte[] extraCommit, int extraCommitLen, byte[] gen);
 
 
  

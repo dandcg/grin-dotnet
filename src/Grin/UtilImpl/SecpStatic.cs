@@ -6,12 +6,12 @@ namespace Grin.UtilImpl
     public static class SecpStatic
     {
         private static readonly object SyncRoot = new object();
-        private  static readonly Secp256k1 SecpInst = Secp256k1.WithCaps(ContextFlag.Commit);
+        private  static readonly Secp256K1 SecpInst = Secp256K1.WithCaps(ContextFlag.Commit);
 
         /// Returns the static instance, but calls randomize on it as well
         /// (Recommended to avoid side channel attacks
 
-        public static Secp256k1 Instance
+        public static Secp256K1 Instance
         {
             get
             {

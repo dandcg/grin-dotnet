@@ -15,10 +15,10 @@ namespace Secp256k1Proxy.Lib
         {
             switch (data.Length)
             {
-                case Constants.Constants.MESSAGE_SIZE:
+                case Constants.Constants.MessageSize:
 
-                    var ret = new byte[Constants.Constants.MESSAGE_SIZE];
-                    Array.Copy(data, ret, Constants.Constants.MESSAGE_SIZE);
+                    var ret = new byte[Constants.Constants.MessageSize];
+                    Array.Copy(data, ret, Constants.Constants.MessageSize);
                     return new Message(data);
 
 

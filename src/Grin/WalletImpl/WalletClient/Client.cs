@@ -12,14 +12,14 @@ namespace Grin.WalletImpl.WalletClient
     {
         /// Call the wallet API to create a coinbase output for the given block_fees.
         /// Will retry based on default "retry forever with backoff" behavior.
-        public static CbData create_coinbase(string url, BlockFees block_fees)
+        public static CbData create_coinbase(string url, BlockFees blockFees)
         {
             return retry_backoff_forever(
                 () =>
                 {
                     try
                     {
-                        var res = single_create_coinbase(url, block_fees);
+                        var res = single_create_coinbase(url, blockFees);
                         return res;
                     }
                     catch (Exception e)
@@ -40,14 +40,14 @@ namespace Grin.WalletImpl.WalletClient
                 .Execute(action);
         }
 
-        public static void send_partial_tx(string url, PartialTx partial_tx)
+        public static void send_partial_tx(string url, PartialTx partialTx)
         {
-            single_send_partial_tx(url, partial_tx);
+            single_send_partial_tx(url, partialTx);
         }
 
-        public static void single_send_partial_tx(string url, PartialTx partial_tx)
+        public static void single_send_partial_tx(string url, PartialTx partialTx)
         {
-            var req = ApiClient.PostAsync(url, partial_tx).Result;
+            var req = ApiClient.PostAsync(url, partialTx).Result;
 
             if (req.IsSuccessStatusCode)
             {
@@ -61,9 +61,9 @@ namespace Grin.WalletImpl.WalletClient
         }
 
         /// Makes a single request to the wallet API to create a new coinbase output.
-        public static CbData single_create_coinbase(string url, BlockFees block_fees)
+        public static CbData single_create_coinbase(string url, BlockFees blockFees)
         {
-            var req = ApiClient.PostAsync(url, block_fees).Result;
+            var req = ApiClient.PostAsync(url, blockFees).Result;
 
             if (req.IsSuccessStatusCode)
             {

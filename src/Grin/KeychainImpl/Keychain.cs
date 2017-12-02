@@ -15,19 +15,19 @@ namespace Grin.KeychainImpl
 {
     public class Keychain
     {
-        public Secp256k1 Secp { get; }
+        public Secp256K1 Secp { get; }
         public ExtendedKey Extkey { get; }
         public Dictionary<string, SecretKey> KeyOverrides { get; }
         public ConcurrentDictionary<string, uint> KeyDerivationCache { get; }
 
 
-        private Keychain(Secp256k1 secp, ExtendedKey extkey, Dictionary<string, SecretKey> keyOverrides,
-            ConcurrentDictionary<string, uint> key_derivation_cache)
+        private Keychain(Secp256K1 secp, ExtendedKey extkey, Dictionary<string, SecretKey> keyOverrides,
+            ConcurrentDictionary<string, uint> keyDerivationCache)
         {
             Secp = secp;
             Extkey = extkey;
             KeyOverrides = keyOverrides;
-            KeyDerivationCache = key_derivation_cache;
+            KeyDerivationCache = keyDerivationCache;
         }
 
 
@@ -47,7 +47,7 @@ namespace Grin.KeychainImpl
 
         public static Keychain From_seed(byte[] seed)
         {
-            var secp = Secp256k1.WithCaps(ContextFlag.Commit);
+            var secp = Secp256K1.WithCaps(ContextFlag.Commit);
             var extkey = ExtendedKey.from_seed(secp, seed);
             var keychain = new Keychain(
                     secp,
@@ -149,7 +149,7 @@ namespace Grin.KeychainImpl
         public Commitment Commit(ulong amount, Identifier keyId)
         {
             var skey = Derived_key(keyId);
-            var commit = Secp.commit(amount, skey);
+            var commit = Secp.Commit(amount, skey);
 
             return commit;
         }
@@ -158,7 +158,7 @@ namespace Grin.KeychainImpl
         {
 
             var skey = derived_key_from_index(derivation);
-            var commit = Secp.commit(amount, skey);
+            var commit = Secp.Commit(amount, skey);
             return commit;
 
         }
@@ -189,11 +189,11 @@ namespace Grin.KeychainImpl
 
         public BlindingFactor Blind_sum(BlindSum blindSum)
         {
-            var posKeys = blindSum.positive_key_ids.Select(Derived_key).ToList();
-            var negKeys = blindSum.negative_key_ids.Select(Derived_key).ToList();
+            var posKeys = blindSum.PositiveKeyIds.Select(Derived_key).ToList();
+            var negKeys = blindSum.NegativeKeyIds.Select(Derived_key).ToList();
 
-            posKeys.AddRange(blindSum.positive_blinding_factors.Select(pbf => pbf.Key));
-            negKeys.AddRange(blindSum.negative_blinding_factors.Select(nbf => nbf.Key));
+            posKeys.AddRange(blindSum.PositiveBlindingFactors.Select(pbf => pbf.Key));
+            negKeys.AddRange(blindSum.NegativeBlindingFactors.Select(nbf => nbf.Key));
 
             var blinding = Secp.blind_sum(posKeys.ToArray(), negKeys.ToArray());
 

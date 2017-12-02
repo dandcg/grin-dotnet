@@ -33,32 +33,32 @@ namespace Grin.CoreImpl.Core.Build
         /// with_fee(1)], keychain).unwrap();
         /// let (tx2, _) = build::transaction(vec![initial_tx(tx1), with_excess(sum),
         /// output_rand(2)], keychain).unwrap();
-        public static (Transaction.Transaction transaction, BlindingFactor blindingFactor) transaction(Func<Context,Append>[] elems,Keychain keychain)
+        public static (Transaction.Transaction transaction, BlindingFactor blindingFactor) Transaction(Func<Context,Append>[] elems,Keychain keychain)
 
         {
-            var tx = Transaction.Transaction.Empty();
+            var tx = Core.Transaction.Transaction.Empty();
             var sum = BlindSum.New();
             var ctx = new Context(keychain,tx,sum);
 
             foreach (var elem in elems)
             {
                 var append = elem(ctx);
-                tx = ctx.Tx = append.Transaction.clone();
+                tx = ctx.Tx = append.Transaction.Clone();
                 sum = ctx.Sum = append.Blind;
             }
 
-            var blind_sum = ctx.Keychain.Blind_sum(sum);
-            var msg = Message.from_slice(TransactionHelper.kernel_sig_msg(tx.fee, tx.lock_height));
-            var sig = ctx.Keychain.Sign_with_blinding(msg, blind_sum);
-            tx.excess_sig = sig.serialize_der(ctx.Keychain.Secp);
+            var blindSum = ctx.Keychain.Blind_sum(sum);
+            var msg = Message.from_slice(TransactionHelper.kernel_sig_msg(tx.Fee, tx.LockHeight));
+            var sig = ctx.Keychain.Sign_with_blinding(msg, blindSum);
+            tx.ExcessSig = sig.serialize_der(ctx.Keychain.Secp);
 
-            return (tx, blind_sum);
+            return (tx, blindSum);
         }
 
         /// Sets an initial transaction to add to when building a new transaction.
         public static Append initial_tx(this Context build, Transaction.Transaction tx)
         {
-            return new Append(tx.clone(), build.Sum);
+            return new Append(tx.Clone(), build.Sum);
         }
 
         /// Sets a known excess value on the transaction being built. Usually used in
@@ -66,46 +66,46 @@ namespace Grin.CoreImpl.Core.Build
         /// by adding to a pre-existing one.
         public static Append with_excess(this Context build, BlindingFactor excess)
         {
-            return new Append(build.Tx, build.Sum.add_blinding_factor(excess.clone()));
+            return new Append(build.Tx, build.Sum.add_blinding_factor(excess.Clone()));
         }
 
         /// Adds an output with the provided value and key identifier from the
         /// keychain.
-        public static Append output(this Context build, ulong value, Identifier key_id)
+        public static Append Output(this Context build, ulong value, Identifier keyId)
         {
-            var commit = build.Keychain.Commit(value, key_id);
-            var switch_commit = build.Keychain.Switch_commit(key_id);
-            var switch_commit_hash = SwitchCommitHash.From_switch_commit(switch_commit);
+            var commit = build.Keychain.Commit(value, keyId);
+            var switchCommit = build.Keychain.Switch_commit(keyId);
+            var switchCommitHash = SwitchCommitHash.From_switch_commit(switchCommit);
             Log.Verbose(
                 "Builder - Pedersen Commit is: {commit}, Switch Commit is: {switch_commit}",
                 commit,
-                switch_commit
+                switchCommit
             );
             Log.Verbose(
                 "Builder - Switch Commit Hash is: {switch_commit_hash}",
-                switch_commit_hash
+                switchCommitHash
             );
-            var msg = ProofMessage.empty();
-            var rproof = build.Keychain.Range_proof(value, key_id, commit, msg);
+            var msg = ProofMessage.Empty();
+            var rproof = build.Keychain.Range_proof(value, keyId, commit, msg);
 
             return new Append(
                 build.Tx.with_output(new Output
                 {
-                    Features = OutputFeatures.DEFAULT_OUTPUT,
+                    Features = OutputFeatures.DefaultOutput,
                     Commit = commit,
-                    SwitchCommitHash = switch_commit_hash,
+                    SwitchCommitHash = switchCommitHash,
                     Proof = rproof
                 })
                 ,
-                build.Sum.add_key_id(key_id.Clone()));
+                build.Sum.add_key_id(keyId.Clone()));
         }
 
         /// Adds an input with the provided value and blinding key to the transaction
         /// being built.
-        public static Append input(this Context build, ulong value, Identifier key_id)
+        public static Append Input(this Context build, ulong value, Identifier keyId)
         {
-          var commit = build.Keychain.Commit(value, key_id);
-            return new Append(build.Tx.with_input(new Input(commit)), build.Sum.sub_key_id(key_id.Clone()));
+          var commit = build.Keychain.Commit(value, keyId);
+            return new Append(build.Tx.with_input(new Input(commit)), build.Sum.sub_key_id(keyId.Clone()));
         }
 
         /// Sets the fee on the transaction being built.
@@ -115,9 +115,9 @@ namespace Grin.CoreImpl.Core.Build
         }
 
         /// Sets the lock_height on the transaction being built.
-        public static Append with_lock_height(this Context build, ulong lock_height)
+        public static Append with_lock_height(this Context build, ulong lockHeight)
         {
-            return new Append(build.Tx.with_lock_height(lock_height), build.Sum);
+            return new Append(build.Tx.with_lock_height(lockHeight), build.Sum);
         
         }
 

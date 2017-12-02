@@ -22,18 +22,18 @@ namespace Grin.WalletImpl.WalletInfo
             var result = Checker.refresh_outputs(config, keychain);
 
 
-            WalletData.read_wallet(config.data_file_dir, walletData =>
+            WalletData.read_wallet(config.DataFileDir, walletData =>
             {
                 ulong currentHeight;
 
                 try
                 {
                     var tip = Checker.get_tip_from_node(config);
-                    currentHeight = tip.height;
+                    currentHeight = tip.Height;
                 }
                 catch
                 {
-                    currentHeight = walletData.outputs.Any() ? walletData.outputs.Values.Max(m => m.height) : 0;
+                    currentHeight = walletData.Outputs.Any() ? walletData.Outputs.Values.Max(m => m.Height) : 0;
                 }
 
 
@@ -43,25 +43,25 @@ namespace Grin.WalletImpl.WalletInfo
                 ulong lockedTotal = 0;
 
 
-                foreach (var op in walletData.outputs.Values.Where(w => w.root_key_id == keychain.Root_key_id()))
+                foreach (var op in walletData.Outputs.Values.Where(w => w.RootKeyId == keychain.Root_key_id()))
 
 
                 {
-                    if (op.status == OutputStatus.Unspent)
+                    if (op.Status == OutputStatus.Unspent)
                     {
-                        unspentTotal += op.value;
-                        if (op.lock_height > currentHeight)
+                        unspentTotal += op.Value;
+                        if (op.LockHeight > currentHeight)
                         {
-                            unspentButLockedTotal += op.value;
+                            unspentButLockedTotal += op.Value;
                         }
                     }
-                    if (op.status == OutputStatus.Unconfirmed && !op.is_coinbase)
+                    if (op.Status == OutputStatus.Unconfirmed && !op.IsCoinbase)
                     {
-                        unconfirmedTotal += op.value;
+                        unconfirmedTotal += op.Value;
                     }
-                    if (op.status == OutputStatus.Locked)
+                    if (op.Status == OutputStatus.Locked)
                     {
-                        lockedTotal += op.value;
+                        lockedTotal += op.Value;
                     }
                 }
                 

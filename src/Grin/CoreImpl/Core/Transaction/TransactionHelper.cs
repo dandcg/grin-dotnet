@@ -5,11 +5,11 @@ namespace Grin.CoreImpl.Core.Transaction
     public static class TransactionHelper
     {
         /// The size to use for the stored blake2 hash of a switch_commitment
-        public const uint SWITCH_COMMIT_HASH_SIZE = 20;
+        public const uint SwitchCommitHashSize = 20;
 
 
         /// Construct msg bytes from tx fee and lock_height
-        public static byte[] kernel_sig_msg(ulong fee, ulong lock_height)
+        public static byte[] kernel_sig_msg(ulong fee, ulong lockHeight)
         {
             var bytes = new byte[32];
 
@@ -19,7 +19,7 @@ namespace Grin.CoreImpl.Core.Transaction
                 Array.Reverse(feeBytes);
             }
 
-            var lockHeightBytes = BitConverter.GetBytes(lock_height);
+            var lockHeightBytes = BitConverter.GetBytes(lockHeight);
             if (BitConverter.IsLittleEndian)
             {
                 Array.Reverse(lockHeightBytes);

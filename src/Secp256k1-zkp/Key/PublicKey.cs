@@ -26,7 +26,7 @@ namespace Secp256k1Proxy.Key
         }
 
         /// Creates a public key directly from a slice
-        public static PublicKey from_slice(Secp256k1 secp, byte[] data)
+        public static PublicKey from_slice(Secp256K1 secp, byte[] data)
         {
             if (data != null)
 
@@ -43,7 +43,7 @@ namespace Secp256k1Proxy.Key
             throw new Exception("InvalidPublicKey");
         }
         /// Creates a new public key from a secret key.
-        public static PublicKey from_secret_key(Secp256k1 secp, SecretKey sk)
+        public static PublicKey from_secret_key(Secp256K1 secp, SecretKey sk)
         {
 
             if (secp.Caps == ContextFlag.VerifyOnly || secp.Caps == ContextFlag.None)
@@ -70,7 +70,7 @@ namespace Secp256k1Proxy.Key
 
         public static PublicKey New()
         {
-            return new PublicKey(ByteUtil.get_bytes(0,64));
+            return new PublicKey(ByteUtil.Get_bytes(0,64));
         }
 
 
@@ -84,15 +84,15 @@ namespace Secp256k1Proxy.Key
         /// it up to one bit.
         
         [HandleProcessCorruptedStateExceptions]
-        public byte[] serialize_vec(Secp256k1 secp, bool isCompressed)
+        public byte[] serialize_vec(Secp256K1 secp, bool isCompressed)
         {
 
-            long retLen = Constants.Constants.PUBLIC_KEY_SIZE;
-            var ret = new byte[Constants.Constants.PUBLIC_KEY_SIZE];
+            long retLen = Constants.Constants.PublicKeySize;
+            var ret = new byte[Constants.Constants.PublicKeySize];
             
             var compressed = (uint) (isCompressed
-                ? Secp256K1Options.SECP256K1_SER_COMPRESSED
-                : Secp256K1Options.SECP256K1_SER_UNCOMPRESSED);
+                ? Secp256K1Options.Secp256K1SerCompressed
+                : Secp256K1Options.Secp256K1SerUncompressed);
             
                 var err = Proxy.secp256k1_ec_pubkey_serialize(secp.Ctx, ret, ref retLen, Value, compressed);
             
@@ -107,7 +107,7 @@ namespace Secp256k1Proxy.Key
 
         }
 
-        public void add_exp_assign(Secp256k1 secp, SecretKey other)
+        public void add_exp_assign(Secp256K1 secp, SecretKey other)
         {
             if (secp.Caps == ContextFlag.SignOnly || secp.Caps == ContextFlag.None)
             {
@@ -124,7 +124,7 @@ namespace Secp256k1Proxy.Key
 
         }
 
-        public void mul_assign(Secp256k1 secp, SecretKey other)
+        public void mul_assign(Secp256K1 secp, SecretKey other)
         {
              if (secp.Caps == ContextFlag.SignOnly || secp.Caps == ContextFlag.None)
             {

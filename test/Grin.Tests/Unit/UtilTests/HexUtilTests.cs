@@ -6,7 +6,7 @@ namespace Grin.Tests.Unit.UtilTests
     public class HexUtilTests
     {
         [Fact]
-        public void test_from_hex()
+        public void Test_from_hex()
         {
             Assert.Equal(HexUtil.from_hex("00000000"), new byte[] {0, 0, 0, 0});
             Assert.Equal(HexUtil.from_hex("0a0b0c0d"), new byte[] {10, 11, 12, 13});
@@ -14,7 +14,7 @@ namespace Grin.Tests.Unit.UtilTests
         }
 
         [Fact]
-        public void test_to_hex()
+        public void Test_to_hex()
         {
             Assert.Equal("00000000", HexUtil.to_hex(new byte[] {0, 0, 0, 0}));
             Assert.Equal("0a0b0c0d", HexUtil.to_hex(new byte[] {10, 11, 12, 13}));

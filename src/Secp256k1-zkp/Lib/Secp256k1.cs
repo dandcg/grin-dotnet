@@ -6,58 +6,58 @@ using Secp256k1Proxy.Key;
 
 namespace Secp256k1Proxy.Lib
 {
-    public class Secp256k1
+    public class Secp256K1
     {
         public IntPtr Ctx { get; set; }
 
         public ContextFlag Caps { get; set; }
 
 
-        private Secp256k1(IntPtr ctx , ContextFlag caps)
+        private Secp256K1(IntPtr ctx , ContextFlag caps)
         {
             Ctx = ctx;
             Caps = caps;
         }
 
         /// Creates a new Secp256k1 context
-        public static Secp256k1 New()
+        public static Secp256K1 New()
         {
             return WithCaps(ContextFlag.Full);
         }
 
         /// Creates a new Secp256k1 context with the specified capabilities
-        public static Secp256k1 WithCaps(ContextFlag caps)
+        public static Secp256K1 WithCaps(ContextFlag caps)
         {
             
-            var flag = Secp256K1Options.SECP256K1_START_NONE;
+            var flag = Secp256K1Options.Secp256K1StartNone;
 
             switch (caps)
             {
                 case ContextFlag.None:
-                    flag = Secp256K1Options.SECP256K1_START_NONE;
+                    flag = Secp256K1Options.Secp256K1StartNone;
 
                     break;
 
                 case ContextFlag.SignOnly:
-                    flag = Secp256K1Options.SECP256K1_START_SIGN;
+                    flag = Secp256K1Options.Secp256K1StartSign;
                     break;
 
                 case ContextFlag.VerifyOnly:
-                    flag = Secp256K1Options.SECP256K1_START_VERIFY;
+                    flag = Secp256K1Options.Secp256K1StartVerify;
                     break;
 
                 case ContextFlag.Full:
                 case ContextFlag.Commit:
-                    flag = Secp256K1Options.SECP256K1_START_SIGN | Secp256K1Options.SECP256K1_START_VERIFY;
+                    flag = Secp256K1Options.Secp256K1StartSign | Secp256K1Options.Secp256K1StartVerify;
                     break;
             }
 
             var ctx = Proxy.secp256k1_context_create((uint) flag);
-            return new Secp256k1(ctx,caps);
+            return new Secp256K1(ctx,caps);
         }
 
         /// Creates a new Secp256k1 context with no capabilities (just de/serialization)
-        public static Secp256k1 WithoutCaps()
+        public static Secp256K1 WithoutCaps()
         {
             return WithCaps(ContextFlag.None);
         }
@@ -66,7 +66,7 @@ namespace Secp256k1Proxy.Lib
         /// see comment in libsecp256k1 commit d2275795f by Gregory Maxwell
         public void Randomize(RandomNumberGenerator rng)
         {
-            var seed = ByteUtil.get_random_bytes(rng);
+            var seed = ByteUtil.Get_random_bytes(rng,32);
 
             var err = Proxy.secp256k1_context_randomize(Ctx, seed);
 

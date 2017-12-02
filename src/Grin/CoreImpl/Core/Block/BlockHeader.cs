@@ -18,52 +18,52 @@ namespace Grin.CoreImpl.Core.Block
         {
             return new BlockHeader
             {
-                version = version,
-                height = height,
-                previous = previous.Clone(),
-                timestamp = timestamp,
-                utxo_root = utxo_root.Clone(),
-                range_proof_root = range_proof_root.Clone(),
-                kernel_root = kernel_root.Clone(),
-                nonce = nonce,
-                pow = pow.Clone(),
-                difficulty = difficulty.Clone(),
-                total_difficulty = total_difficulty.Clone()
+                Version = Version,
+                Height = Height,
+                Previous = Previous.Clone(),
+                Timestamp = Timestamp,
+                UtxoRoot = UtxoRoot.Clone(),
+                RangeProofRoot = RangeProofRoot.Clone(),
+                KernelRoot = KernelRoot.Clone(),
+                Nonce = Nonce,
+                Pow = Pow.Clone(),
+                Difficulty = Difficulty.Clone(),
+                TotalDifficulty = TotalDifficulty.Clone()
             };
         }
 
         /// Version of the block
-        public ushort version { get; internal set; }
+        public ushort Version { get; internal set; }
 
         /// Height of this block since the genesis block (height 0)
-        public ulong height { get; internal set; }
+        public ulong Height { get; internal set; }
 
         /// Hash of the block previous to this in the chain.
-        public Hash.Hash previous { get; internal set; }
+        public Hash.Hash Previous { get; internal set; }
 
         /// Timestamp at which the block was built.
-        public DateTime timestamp { get; internal set; }
+        public DateTime Timestamp { get; internal set; }
 
         /// Merklish root of all the commitments in the UTXO set
-        public Hash.Hash utxo_root { get; internal set; }
+        public Hash.Hash UtxoRoot { get; internal set; }
 
         /// Merklish root of all range proofs in the UTXO set
-        public Hash.Hash range_proof_root { get; internal set; }
+        public Hash.Hash RangeProofRoot { get; internal set; }
 
         /// Merklish root of all transaction kernels in the UTXO set
-        public Hash.Hash kernel_root { get; internal set; }
+        public Hash.Hash KernelRoot { get; internal set; }
 
         /// Nonce increment used to mine this block.
-        public ulong nonce { get; internal set; }
+        public ulong Nonce { get; internal set; }
 
         /// Proof of work data.
-        public Proof pow { get; internal set; }
+        public Proof Pow { get; internal set; }
 
         /// Difficulty used to mine the block.
-        public Difficulty difficulty { get; internal set; }
+        public Difficulty Difficulty { get; internal set; }
 
         /// Total accumulated difficulty since genesis block
-        public Difficulty total_difficulty { get; internal set; }
+        public Difficulty TotalDifficulty { get; internal set; }
 
         public static BlockHeader New()
         {
@@ -72,67 +72,67 @@ namespace Grin.CoreImpl.Core.Block
 
         public static BlockHeader Default()
         {
-            var proofSize = Global.proofsize();
+            var proofSize = Global.Proofsize();
 
             return new BlockHeader
             {
-                version = 1,
-                height = 0,
-                previous = Hash.Hash.ZERO_HASH(),
-                timestamp = DateTime.UtcNow.PrecisionSeconds(),
-                difficulty = Difficulty.From_num(Consensus.MINIMUM_DIFFICULTY),
-                total_difficulty = Difficulty.From_num(Consensus.MINIMUM_DIFFICULTY),
-                utxo_root = Hash.Hash.ZERO_HASH(),
-                range_proof_root = Hash.Hash.ZERO_HASH(),
-                kernel_root = Hash.Hash.ZERO_HASH(),
-                nonce = 0,
-                pow = Proof.Zero(proofSize)
+                Version = 1,
+                Height = 0,
+                Previous = Hash.Hash.ZERO_HASH(),
+                Timestamp = DateTime.UtcNow.PrecisionSeconds(),
+                Difficulty = Difficulty.From_num(Consensus.MinimumDifficulty),
+                TotalDifficulty = Difficulty.From_num(Consensus.MinimumDifficulty),
+                UtxoRoot = Hash.Hash.ZERO_HASH(),
+                RangeProofRoot = Hash.Hash.ZERO_HASH(),
+                KernelRoot = Hash.Hash.ZERO_HASH(),
+                Nonce = 0,
+                Pow = Proof.Zero(proofSize)
             };
         }
 
-        public void write(IWriter writer)
+        public void Write(IWriter writer)
         {
-            writer.write_u16(version);
-            writer.write_u64(height);
-            previous.write(writer);
-            writer.write_i64(timestamp.ToUnixTime());
-            utxo_root.write(writer);
-            range_proof_root.write(writer);
-            kernel_root.write(writer);
-            writer.write_u64(nonce);
-            difficulty.write(writer);
-            total_difficulty.write(writer);
+            writer.write_u16(Version);
+            writer.write_u64(Height);
+            Previous.Write(writer);
+            writer.write_i64(Timestamp.ToUnixTime());
+            UtxoRoot.Write(writer);
+            RangeProofRoot.Write(writer);
+            KernelRoot.Write(writer);
+            writer.write_u64(Nonce);
+            Difficulty.Write(writer);
+            TotalDifficulty.Write(writer);
 
             if (writer.serialization_mode() != SerializationMode.Hash)
             {
-                pow.write(writer);
+                Pow.Write(writer);
             }
 
          
         }
 
-        public void read(IReader reader)
+        public void Read(IReader reader)
         {
-            version = reader.read_u16();
-            height = reader.read_u64();
-            previous = Hash.Hash.readnew(reader);
-            timestamp = reader.read_i64().FromUnixTime();
-            utxo_root = Hash.Hash.readnew(reader);
-            range_proof_root = Hash.Hash.readnew(reader);
-            kernel_root = Hash.Hash.readnew(reader);
-            nonce = reader.read_u64();
-            difficulty = Difficulty.readnew(reader);
-            total_difficulty = Difficulty.readnew(reader);
-            pow = Proof.readnew(reader);
+            Version = reader.read_u16();
+            Height = reader.read_u64();
+            Previous = Hash.Hash.Readnew(reader);
+            Timestamp = reader.read_i64().FromUnixTime();
+            UtxoRoot = Hash.Hash.Readnew(reader);
+            RangeProofRoot = Hash.Hash.Readnew(reader);
+            KernelRoot = Hash.Hash.Readnew(reader);
+            Nonce = reader.read_u64();
+            Difficulty = Difficulty.Readnew(reader);
+            TotalDifficulty = Difficulty.Readnew(reader);
+            Pow = Proof.Readnew(reader);
 
           
 
         }
 
-        public static BlockHeader readnew(IReader reader)
+        public static BlockHeader Readnew(IReader reader)
         {
             var bh = new BlockHeader();
-            bh.read(reader);
+            bh.Read(reader);
             return bh;
         }
     }

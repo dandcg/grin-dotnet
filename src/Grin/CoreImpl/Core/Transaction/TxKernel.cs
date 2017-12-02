@@ -13,62 +13,62 @@ namespace Grin.CoreImpl.Core.Transaction
     public class TxKernel : IWriteable, IReadable
     {
         /// Options for a kernel's structure or use
-        public KernelFeatures features { get; set; }
+        public KernelFeatures Features { get; set; }
 
         /// Fee originally included in the transaction this proof is for.
-        public ulong fee { get; set; }
+        public ulong Fee { get; set; }
 
         /// This kernel is not valid earlier than lock_height blocks
         /// The max lock_height of all *inputs* to this transaction
-        public ulong lock_height { get; set; }
+        public ulong LockHeight { get; set; }
 
         /// Remainder of the sum of all transaction commitments. If the transaction
         /// is well formed, amounts components should sum to zero and the excess
         /// is hence a valid public key.
-        public Commitment excess { get; set; }
+        public Commitment Excess { get; set; }
 
         /// The signature proving the excess is a valid public key, which signs
         /// the transaction fee.
-        public byte[] excess_sig { get; set; }
+        public byte[] ExcessSig { get; set; }
 
 
         /// Verify the transaction proof validity. Entails handling the commitment
         /// as a public key and checking the signature verifies with the fee as
         /// message.
-        public void verify(Secp256k1 secp)
+        public void Verify(Secp256K1 secp)
         {
-            var msg = Message.from_slice(TransactionHelper.kernel_sig_msg(fee, lock_height));
-            var sig = Signiture.from_der(secp, excess_sig);
-            secp.verify_from_commit(msg, sig, excess);
+            var msg = Message.from_slice(TransactionHelper.kernel_sig_msg(Fee, LockHeight));
+            var sig = Signiture.from_der(secp, ExcessSig);
+            secp.verify_from_commit(msg, sig, Excess);
         }
 
-        public void write(IWriter writer)
+        public void Write(IWriter writer)
         {
-            writer.write_u8((byte) features);
-            writer.write_u64(fee);
-            writer.write_u64(lock_height);
-            excess.WriteCommitment(writer);
-            writer.write_bytes(excess_sig);
+            writer.write_u8((byte) Features);
+            writer.write_u64(Fee);
+            writer.write_u64(LockHeight);
+            Excess.WriteCommitment(writer);
+            writer.write_bytes(ExcessSig);
         }
 
-        public void read(IReader reader)
+        public void Read(IReader reader)
         {
-            features = (KernelFeatures) reader.read_u8();
-            fee = reader.read_u64();
-            lock_height = reader.read_u64();
-            excess = Ser.Ser.ReadCommitment(reader);
-            excess_sig = reader.read_vec();
+            Features = (KernelFeatures) reader.read_u8();
+            Fee = reader.read_u64();
+            LockHeight = reader.read_u64();
+            Excess = Ser.Ser.ReadCommitment(reader);
+            ExcessSig = reader.read_vec();
         }
 
         public TxKernel Clone()
         {
             return new TxKernel()
             {
-                excess =excess.Clone(),
-                excess_sig = excess_sig.ToArray(),
-                features = features,
-                fee=fee,
-                lock_height = lock_height
+                Excess =Excess.Clone(),
+                ExcessSig = ExcessSig.ToArray(),
+                Features = Features,
+                Fee=Fee,
+                LockHeight = LockHeight
 
 
             };

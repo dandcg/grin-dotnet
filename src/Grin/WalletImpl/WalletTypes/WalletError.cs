@@ -19,7 +19,7 @@ namespace Grin.WalletImpl.WalletTypes
         Format, //(String),
 
         /// An IO Error
-        IOError, //(io::Error),
+        IoError, //(io::Error),
 
         /// Error when contacting a node through its API
         Node, //(api::Error),

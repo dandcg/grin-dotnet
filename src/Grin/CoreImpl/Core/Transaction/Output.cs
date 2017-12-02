@@ -34,7 +34,7 @@ namespace Grin.CoreImpl.Core.Transaction
 
 
         /// Validates the range proof using the commitment
-        public void Verify_proof(Secp256k1 secp)
+        public void Verify_proof(Secp256K1 secp)
         {
             secp.verify_range_proof(Commit, Proof);
         }
@@ -45,27 +45,27 @@ namespace Grin.CoreImpl.Core.Transaction
         {
             var pi = keychain.Rewind_range_proof(keyId, Commit, Proof);
 
-            if (pi.success)
+            if (pi.Success)
             {
-                return pi.value;
+                return pi.Value;
             }
 
             return null;
         }
 
-        public void read(IReader reader)
+        public void Read(IReader reader)
         {
             Features = (OutputFeatures) reader.read_u8();
             Commit = Ser.Ser.ReadCommitment(reader);
-            SwitchCommitHash = SwitchCommitHash.readnew(reader);
+            SwitchCommitHash = SwitchCommitHash.Readnew(reader);
             Proof = Ser.Ser.ReadRangeProof(reader);
         }
 
-        public void write(IWriter writer)
+        public void Write(IWriter writer)
         {
             writer.write_u8((byte) Features);
             Commit.WriteCommitment(writer);
-            SwitchCommitHash.write(writer);
+            SwitchCommitHash.Write(writer);
 
             if (writer.serialization_mode() == SerializationMode.Full)
             {

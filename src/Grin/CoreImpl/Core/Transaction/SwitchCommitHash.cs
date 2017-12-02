@@ -13,49 +13,49 @@ namespace Grin.CoreImpl.Core.Transaction
         public override string ToString()
         {
 
-            return hash.AsString();
+            return Hash.AsString();
 
         }
 
         /// simple hash
-        public byte[] hash { get; private set; } //: [u8; SWITCH_COMMIT_HASH_SIZE],
+        public byte[] Hash { get; private set; } //: [u8; SWITCH_COMMIT_HASH_SIZE],
 
         public static SwitchCommitHash From_switch_commit(Commitment switchCommit)
         {
-            var hashAlgorithm = new HMACBlake2B(null, (int) TransactionHelper.SWITCH_COMMIT_HASH_SIZE * 8);
-            var switch_commit_hash = hashAlgorithm.ComputeHash(switchCommit.Value);
+            var hashAlgorithm = new HMACBlake2B(null, (int) TransactionHelper.SwitchCommitHashSize * 8);
+            var switchCommitHash = hashAlgorithm.ComputeHash(switchCommit.Value);
 
 
-            var h = new byte[TransactionHelper.SWITCH_COMMIT_HASH_SIZE];
-            for (var i = 0; i < TransactionHelper.SWITCH_COMMIT_HASH_SIZE; i++)
+            var h = new byte[TransactionHelper.SwitchCommitHashSize];
+            for (var i = 0; i < TransactionHelper.SwitchCommitHashSize; i++)
             {
-                h[i] = switch_commit_hash[i];
+                h[i] = switchCommitHash[i];
             }
-            return new SwitchCommitHash {hash = h};
+            return new SwitchCommitHash {Hash = h};
         }
 
-        public static SwitchCommitHash readnew(IReader reader)
+        public static SwitchCommitHash Readnew(IReader reader)
 
         {
             var sch = new SwitchCommitHash();
-            sch.read(reader);
+            sch.Read(reader);
             return sch;
         }
 
 
-        public void read(IReader reader)
+        public void Read(IReader reader)
         {
-            hash = reader.read_fixed_bytes(TransactionHelper.SWITCH_COMMIT_HASH_SIZE);
+            Hash = reader.read_fixed_bytes(TransactionHelper.SwitchCommitHashSize);
         }
 
-        public void write(IWriter writer)
+        public void Write(IWriter writer)
         {
-            writer.write_fixed_bytes(hash);
+            writer.write_fixed_bytes(Hash);
         }
 
         public SwitchCommitHash Clone()
         {
-            return new SwitchCommitHash(){hash=hash.ToArray()};
+            return new SwitchCommitHash(){Hash=Hash.ToArray()};
         }
 
     }

@@ -7,9 +7,9 @@ namespace Grin.CoreImpl.Core.Transaction
     public enum OutputFeatures : byte
     {
         /// No flags
-        DEFAULT_OUTPUT = 0b00000000,
+        DefaultOutput = 0b00000000,
 
         /// Output is a coinbase output, must not be spent until maturity
-        COINBASE_OUTPUT = 0b00000001
+        CoinbaseOutput = 0b00000001
     }
 }

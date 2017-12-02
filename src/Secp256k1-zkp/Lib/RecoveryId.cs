@@ -28,7 +28,7 @@ namespace Secp256k1Proxy.Lib
             }
         }
 
-        public RecoveryId clone()
+        public RecoveryId Clone()
         {
             var rcid=new RecoveryId(Value);
             return rcid;

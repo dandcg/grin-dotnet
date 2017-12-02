@@ -2,7 +2,7 @@
 {
     public class ProofRange
     {
-        public ulong min { get; set; }
-        public ulong max { get; set; }
+        public ulong Min { get; set; }
+        public ulong Max { get; set; }
     }
 }

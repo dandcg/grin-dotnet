@@ -22,8 +22,8 @@ namespace Grin.WalletImpl.WalletReceiver
     {
         public WalletReceiver(WalletConfig config, Keychain keychain)
         {
-            this.Config = config;
-            this.Keychain = keychain;
+            Config = config;
+            Keychain = keychain;
         }
 
         public WalletConfig Config { get; }
@@ -60,9 +60,11 @@ namespace Grin.WalletImpl.WalletReceiver
             
             //todo:asyncification
             
-            var uri = $"{config.check_node_api_http_addr}/v1/pool/push";
+            var uri = $"{config.CheckNodeApiHttpAddr}/v1/pool/push";
 
-            var res = ApiClient.PostAsync(uri, new JsonContent(new TxWrapper {tx_hex = txHex})).Result;
+            var res = ApiClient.PostAsync(uri, new JsonContent(new TxWrapper {TxHex = txHex})).Result;
+            
+            Log.Debug("{statusCode}",res.StatusCode);
             // var res = ApiClient.PostAsync(uri, new JsonContent(new TxWrapper(){tx_hex=tx_hex})).Result;
             
             //let url = format!("{}/v1/pool/push", config.check_node_api_http_addr.as_str());
@@ -79,15 +81,15 @@ namespace Grin.WalletImpl.WalletReceiver
         )
 
         {
-            return WalletData.read_wallet(config.data_file_dir, walletData =>
+            return WalletData.read_wallet(config.DataFileDir, walletData =>
             {
                 var existing = walletData.get_output(keyId);
 
                 if (existing != null)
 
                 {
-                    var keyId2 = existing.key_id.Clone();
-                    var derivation = existing.n_child;
+                    var keyId2 = existing.KeyId.Clone();
+                    var derivation = existing.NChild;
 
                     return (keyId2, derivation);
                 }
@@ -114,7 +116,7 @@ namespace Grin.WalletImpl.WalletReceiver
             Keychain keychain
         )
         {
-            var res = WalletData.read_wallet(config.data_file_dir,
+            var res = WalletData.read_wallet(config.DataFileDir,
                 walletData =>
                 {
                     var rootKeyId = keychain.Root_key_id();
@@ -149,7 +151,7 @@ namespace Grin.WalletImpl.WalletReceiver
 
             // Now acquire the wallet lock and write the new output.
             var fees = blockFees;
-            WalletData.with_wallet(config.data_file_dir, walletData =>
+            WalletData.with_wallet(config.DataFileDir, walletData =>
             {
                 // track the new output and return the stuff needed for reward
                 var opd = new OutputData(
@@ -201,27 +203,27 @@ namespace Grin.WalletImpl.WalletReceiver
             // double check the fee amount included in the partial tx
             // we don't necessarily want to just trust the sender
             // we could just overwrite the fee here (but we won't) due to the ecdsa sig
-            var fee = Types.tx_fee((uint) partial.inputs.Length, (uint) partial.outputs.Length + 1, null);
+            var fee = Types.tx_fee((uint) partial.Inputs.Length, (uint) partial.Outputs.Length + 1, null);
 
-            if (fee != partial.fee)
+            if (fee != partial.Fee)
             {
-                throw new WalletErrorException(WalletError.FeeDispute).Data("sender_fee", partial.fee)
+                throw new WalletErrorException(WalletError.FeeDispute).Data("sender_fee", partial.Fee)
                     .Data("recipient_fee", fee);
             }
 
             var outAmount = amount - fee;
 
 
-            var (txFinal, _) = Build.transaction(new Func<Context, Append>[]
+            var (txFinal, _) = Build.Transaction(new Func<Context, Append>[]
                 {
                     c => c.initial_tx(partial),
                     c => c.with_excess(blinding),
-                    c => c.output(outAmount, keyId.Clone())
+                    c => c.Output(outAmount, keyId.Clone())
                 }
                 , keychain);
 
             // make sure the resulting transaction is valid (could have been lied to on excess).
-            txFinal.validate(keychain.Secp);
+            txFinal.Validate(keychain.Secp);
 
             // operate within a lock on wallet data
 
@@ -235,7 +237,7 @@ namespace Grin.WalletImpl.WalletReceiver
                 0,
                 false);
 
-            WalletData.with_wallet(config.data_file_dir,
+            WalletData.with_wallet(config.DataFileDir,
                 walletData =>
                 {
                     walletData.add_output(opd);

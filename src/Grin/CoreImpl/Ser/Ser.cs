@@ -21,7 +21,7 @@ namespace Grin.CoreImpl.Ser
             for (ulong i = 0; i < count; i++)
             {
                 var t = new T();
-                t.read(reader);
+                t.Read(reader);
                 result.Add(t);
             }
 
@@ -38,7 +38,7 @@ namespace Grin.CoreImpl.Ser
         {
             var reader = new BinReader(source);
 
-            t.read(reader);
+            t.Read(reader);
 
             return t;
         }
@@ -47,7 +47,7 @@ namespace Grin.CoreImpl.Ser
         public static void Serialize<T>(Stream sink, T thing) where T : IWriteable
         {
             var writer = new BinWriter(sink);
-            thing.write(writer);
+            thing.Write(writer);
         }
 
         /// Utility function to serialize a writeable directly in memory using a byte[]
@@ -63,7 +63,7 @@ namespace Grin.CoreImpl.Ser
 
         public static Commitment ReadCommitment(IReader reader)
         {
-            var a = reader.read_fixed_bytes(Constants.PEDERSEN_COMMITMENT_SIZE);
+            var a = reader.read_fixed_bytes(Constants.PedersenCommitmentSize);
             return Commitment.from_vec(a);
         }
 
@@ -75,7 +75,7 @@ namespace Grin.CoreImpl.Ser
 
         public static RangeProof ReadRangeProof(IReader reader)
         {
-            var p = reader.read_limited_vec(Constants.MAX_PROOF_SIZE);
+            var p = reader.read_limited_vec(Constants.MaxProofSize);
             return new RangeProof(p, p.Length);
         }
 

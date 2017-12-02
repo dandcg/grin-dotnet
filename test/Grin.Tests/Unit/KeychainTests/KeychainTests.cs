@@ -1,5 +1,4 @@
 ﻿using Grin.KeychainImpl;
-using Secp256k1Proxy;
 using Secp256k1Proxy.Constants;
 using Secp256k1Proxy.Lib;
 using Secp256k1Proxy.Pedersen;
@@ -10,9 +9,9 @@ namespace Grin.Tests.Unit.KeychainTests
     public class KeychainTests : IClassFixture<LoggingFixture>
     {
         [Fact]
-        public void test_key_derivation()
+        public void Test_key_derivation()
         {
-            var secp = Secp256k1.WithCaps(ContextFlag.Commit);
+            var secp = Secp256K1.WithCaps(ContextFlag.Commit);
 
             var keychain = Keychain.From_random_seed();
 
@@ -33,22 +32,22 @@ namespace Grin.Tests.Unit.KeychainTests
 
 
         [Fact]
-        public void test_rewind_range_proof()
+        public void Test_rewind_range_proof()
         {
             var keychain = Keychain.From_random_seed();
             var keyId = keychain.Derive_key_id(1);
             var commit = keychain.Commit(5, keyId);
-            var msg = ProofMessage.empty();
+            var msg = ProofMessage.Empty();
 
             var proof = keychain.Range_proof(5, keyId, commit, msg);
             var proofInfo = keychain.Rewind_range_proof(keyId, commit, proof);
 
-            Assert.True(proofInfo.success);
-            Assert.Equal<ulong>(5, proofInfo.value);
+            Assert.True(proofInfo.Success);
+            Assert.Equal<ulong>(5, proofInfo.Value);
 
 
-            var pm1 = proofInfo.message;
-            var pm2 = ProofMessage.from_bytes(new byte[Constants.PROOF_MSG_SIZE]);
+            var pm1 = proofInfo.Message;
+            var pm2 = ProofMessage.from_bytes(new byte[Constants.ProofMsgSize]);
 
             // now check the recovered message is "empty" (but not truncated) i.e. all zeroes
 
@@ -58,20 +57,20 @@ namespace Grin.Tests.Unit.KeychainTests
 
             // cannot rewind with a different nonce
             proofInfo = keychain.Rewind_range_proof(keyId2, commit, proof);
-            Assert.False(proofInfo.success);
-            Assert.Equal<ulong>(0, proofInfo.value);
+            Assert.False(proofInfo.Success);
+            Assert.Equal<ulong>(0, proofInfo.Value);
 
             // cannot rewind with a commitment to the same value using a different key
             var commit2 = keychain.Commit(5, keyId2);
             proofInfo = keychain.Rewind_range_proof(keyId, commit2, proof);
-            Assert.False(proofInfo.success);
-            Assert.Equal<ulong>(0, proofInfo.value);
+            Assert.False(proofInfo.Success);
+            Assert.Equal<ulong>(0, proofInfo.Value);
 
             // cannot rewind with a commitment to a different value
             var commit3 = keychain.Commit(4, keyId);
             proofInfo = keychain.Rewind_range_proof(keyId, commit3, proof);
-            Assert.False(proofInfo.success);
-            Assert.Equal<ulong>(0, proofInfo.value);
+            Assert.False(proofInfo.Success);
+            Assert.Equal<ulong>(0, proofInfo.Value);
         }
     }
 }

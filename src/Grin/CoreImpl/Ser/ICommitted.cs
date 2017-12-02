@@ -1,5 +1,4 @@
-﻿using System;
-using Grin.CoreImpl.Core.Transaction;
+﻿using Grin.CoreImpl.Core.Transaction;
 
 namespace Grin.CoreImpl.Ser
 {
@@ -10,7 +9,7 @@ namespace Grin.CoreImpl.Ser
 
         Output[] outputs_committed();
 
-        long overage();
+        long Overage();
 
     }
 }

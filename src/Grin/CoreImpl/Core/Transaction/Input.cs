@@ -19,12 +19,12 @@ namespace Grin.CoreImpl.Core.Transaction
  
         public Commitment Commitment { get; private set; }
 
-        public void read(IReader reader)
+        public void Read(IReader reader)
         {
             Commitment = Ser.Ser.ReadCommitment(reader);
         }
 
-        public void write(IWriter writer)
+        public void Write(IWriter writer)
         {
             Commitment.WriteCommitment(writer);
         }

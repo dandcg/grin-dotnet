@@ -5,17 +5,17 @@ namespace Grin.CoreImpl.Core.Pmmr
 {
     public class NullSum : ISummable, IWriteable, IReadable
     {
-        public void write(IWriter writer)
+        public void Write(IWriter writer)
         {
             throw new NotImplementedException();
         }
 
-        public void read(IReader reader)
+        public void Read(IReader reader)
         {
             throw new NotImplementedException();
         }
 
-        public Sum sum()
+        public Sum Sum()
         {
             throw new NotImplementedException();
         }

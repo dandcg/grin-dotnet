@@ -19,7 +19,7 @@ namespace Secp256k1Proxy.Lib
             return new RecoverableSigniture(ret);
         }
 
-        public static RecoverableSigniture From_compact(Secp256k1 secp, byte[] data, RecoveryId recid)
+        public static RecoverableSigniture From_compact(Secp256K1 secp, byte[] data, RecoveryId recid)
         {
             if (data.Length != 64)
             {
@@ -36,7 +36,7 @@ namespace Secp256k1Proxy.Lib
         }
 
 
-        public Signiture To_standard(Secp256k1 secp)
+        public Signiture To_standard(Secp256K1 secp)
         {
             var ret = new byte[65];
 
@@ -49,7 +49,7 @@ namespace Secp256k1Proxy.Lib
             throw new Exception("This should never happen!");
         }
 
-        public (RecoveryId, byte[]) Serialize_compact(Secp256k1 secp)
+        public (RecoveryId, byte[]) Serialize_compact(Secp256K1 secp)
         {
             var ret = new byte[64];
             var recid = 0;

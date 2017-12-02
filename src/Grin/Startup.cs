@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Grin.KeychainImpl;
+﻿using Grin.KeychainImpl;
 using Grin.WalletImpl.WalletHandlers;
 using Grin.WalletImpl.WalletReceiver;
 using Grin.WalletImpl.WalletTypes;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Grin
@@ -19,9 +14,7 @@ namespace Grin
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-
-
-
+            
             services.AddMvc();
 
             var location = System.Reflection.Assembly.GetEntryAssembly().Location;
@@ -29,8 +22,8 @@ namespace Grin
 
 
             var walletConfig = WalletConfig.Default();
-            walletConfig.check_node_api_http_addr = "http://localhost:13413";
-            walletConfig.data_file_dir = directory;
+            walletConfig.CheckNodeApiHttpAddr = "http://localhost:13413";
+            walletConfig.DataFileDir = directory;
 
             var walletSeed = WalletSeed.from_file(walletConfig);
             var keychain =Keychain.From_seed(walletSeed.Value);
@@ -38,8 +31,8 @@ namespace Grin
             services.AddSingleton(pr => walletConfig);
             services.AddSingleton(pr => keychain);
 
-            services.AddSingleton<CoinbaseHandler>(pr=>new CoinbaseHandler(walletConfig, keychain));
-            services.AddSingleton<WalletReceiver>(pr => new WalletReceiver(walletConfig, keychain));
+            services.AddSingleton(pr=>new CoinbaseHandler(walletConfig, keychain));
+            services.AddSingleton(pr => new WalletReceiver(walletConfig, keychain));
         }
 
 

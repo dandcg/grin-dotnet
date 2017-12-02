@@ -33,7 +33,7 @@ namespace Grin.KeychainImpl.ExtKey
         public SecretKey Key { get; set; }
 
 
-        public static ExtendedKey from_slice(Secp256k1 secp, byte[] slice)
+        public static ExtendedKey from_slice(Secp256K1 secp, byte[] slice)
         {
             // TODO change when ser. ext. size is fixed
             if (slice.Length != 79)
@@ -59,7 +59,7 @@ namespace Grin.KeychainImpl.ExtKey
         }
 
         /// Creates a new extended master key from a seed
-        public static ExtendedKey from_seed(Secp256k1 secp, byte[] seed)
+        public static ExtendedKey from_seed(Secp256K1 secp, byte[] seed)
         {
             switch (seed.Length)
             {
@@ -99,7 +99,7 @@ namespace Grin.KeychainImpl.ExtKey
         /// Return the identifier of the key
         /// which is the blake2b (10 byte) digest of the PublicKey
         // corresponding to the underlying SecretKey
-        public Identifier Identifier(Secp256k1 secp)
+        public Identifier Identifier(Secp256K1 secp)
         {
             // get public key from private
             var keyId = PublicKey.from_secret_key(secp, Key);
@@ -108,7 +108,7 @@ namespace Grin.KeychainImpl.ExtKey
         }
 
         /// Derive an extended key from an extended key
-        public ExtendedKey Derive(Secp256k1 secp, uint n)
+        public ExtendedKey Derive(Secp256K1 secp, uint n)
 
         {
             var nBytes = BitConverter.GetBytes(n);

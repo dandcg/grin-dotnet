@@ -12,7 +12,7 @@ namespace Grin.Tests.Unit.CoreTests.Core
     public class TransactionTests : IClassFixture<LoggingFixture>
     {
         [Fact]
-        public void test_kernel_ser_deser()
+        public void Test_kernel_ser_deser()
         {
             var keychain = Keychain.From_random_seed();
             var keyId = keychain.Derive_key_id(1);
@@ -23,11 +23,11 @@ namespace Grin.Tests.Unit.CoreTests.Core
 
             var kernel = new TxKernel
             {
-                features = KernelFeatures.DEFAULT_KERNEL,
-                lock_height = 0,
-                excess = commit,
-                excess_sig = sig,
-                fee = 10
+                Features = KernelFeatures.DefaultKernel,
+                LockHeight = 0,
+                Excess = commit,
+                ExcessSig = sig,
+                Fee = 10
             };
 
             var stream = new MemoryStream();
@@ -40,20 +40,20 @@ namespace Grin.Tests.Unit.CoreTests.Core
             stream.Position = 0;
 
             var kernel2 = Ser.Deserialize(stream, new TxKernel());
-            Assert.Equal(KernelFeatures.DEFAULT_KERNEL, kernel2.features);
-            Assert.Equal<ulong>(0, kernel2.lock_height);
-            Assert.Equal(commit.Value, kernel2.excess.Value);
-            Assert.Equal(sig, kernel2.excess_sig);
-            Assert.Equal<ulong>(10, kernel2.fee);
+            Assert.Equal(KernelFeatures.DefaultKernel, kernel2.Features);
+            Assert.Equal<ulong>(0, kernel2.LockHeight);
+            Assert.Equal(commit.Value, kernel2.Excess.Value);
+            Assert.Equal(sig, kernel2.ExcessSig);
+            Assert.Equal<ulong>(10, kernel2.Fee);
 
             //// now check a kernel with lock_height serializes/deserializes correctly
             kernel = new TxKernel
             {
-                features = KernelFeatures.DEFAULT_KERNEL,
-                lock_height = 100,
-                excess = commit,
-                excess_sig = sig,
-                fee = 10
+                Features = KernelFeatures.DefaultKernel,
+                LockHeight = 100,
+                Excess = commit,
+                ExcessSig = sig,
+                Fee = 10
             };
             
             stream = new MemoryStream();
@@ -66,26 +66,26 @@ namespace Grin.Tests.Unit.CoreTests.Core
             stream.Position = 0;
 
             kernel2 = Ser.Deserialize(stream, new TxKernel());
-            Assert.Equal(KernelFeatures.DEFAULT_KERNEL, kernel2.features);
-            Assert.Equal<ulong>(100, kernel2.lock_height);
-            Assert.Equal(commit.Value, kernel2.excess.Value);
-            Assert.Equal(sig, kernel2.excess_sig);
-            Assert.Equal<ulong>(10, kernel2.fee);
+            Assert.Equal(KernelFeatures.DefaultKernel, kernel2.Features);
+            Assert.Equal<ulong>(100, kernel2.LockHeight);
+            Assert.Equal(commit.Value, kernel2.Excess.Value);
+            Assert.Equal(sig, kernel2.ExcessSig);
+            Assert.Equal<ulong>(10, kernel2.Fee);
         }
 
         [Fact]
-        public void test_output_ser_deser()
+        public void Test_output_ser_deser()
         {
             var keychain = Keychain.From_random_seed();
             var keyIdSet = keychain.Derive_key_id(1);
             var commit = keychain.Commit(5, keyIdSet);
             var switchCommit = keychain.Switch_commit(keyIdSet);
             var switchCommitHash = SwitchCommitHash.From_switch_commit(switchCommit);
-            var msg = ProofMessage.empty();
+            var msg = ProofMessage.Empty();
             var proof = keychain.Range_proof(5, keyIdSet, commit, msg);
 
             var outp = new Output { 
-                Features= OutputFeatures.DEFAULT_OUTPUT,
+                Features= OutputFeatures.DefaultOutput,
                 Commit= commit,
                 SwitchCommitHash= switchCommitHash,
                 Proof= proof
@@ -102,13 +102,13 @@ namespace Grin.Tests.Unit.CoreTests.Core
 
             var dout = Ser.Deserialize(stream, new Output());
 
-            Assert.Equal(OutputFeatures.DEFAULT_OUTPUT, dout.Features);
+            Assert.Equal(OutputFeatures.DefaultOutput, dout.Features);
             Assert.Equal(outp.Commit.Value , dout.Commit.Value);
             Assert.Equal(outp.Proof.Proof, dout.Proof.Proof);
         }
 
         [Fact]
-        public void test_output_value_recovery()
+        public void Test_output_value_recovery()
         {
             var keychain = Keychain.From_random_seed();
             var keyId = keychain.Derive_key_id(1);
@@ -116,12 +116,12 @@ namespace Grin.Tests.Unit.CoreTests.Core
             var commit = keychain.Commit(1003, keyId);
             var switchCommit = keychain.Switch_commit(keyId);
             var switchCommitHash = SwitchCommitHash.From_switch_commit(switchCommit);
-            var msg = ProofMessage.empty();
+            var msg = ProofMessage.Empty();
             var proof = keychain.Range_proof(1003, keyId, commit, msg);
 
             var output = new Output
             {
-                Features = OutputFeatures.DEFAULT_OUTPUT,
+                Features = OutputFeatures.DefaultOutput,
                 Commit = commit,
                 SwitchCommitHash = switchCommitHash,
                 Proof = proof

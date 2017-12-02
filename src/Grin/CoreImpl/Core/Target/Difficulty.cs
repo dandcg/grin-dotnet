@@ -15,9 +15,9 @@ namespace Grin.CoreImpl.Core.Target
     public class Difficulty : IWriteable, IReadable
     {
         /// The target is the 32-bytes hash block hashes must be lower than.
-        public static readonly byte[] MAX_TARGET = {0xf, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
+        public static readonly byte[] MaxTarget = {0xf, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
 
-        public ulong num { get; private set; }
+        public ulong Num { get; private set; }
 
         private Difficulty()
         {
@@ -25,7 +25,7 @@ namespace Grin.CoreImpl.Core.Target
 
         private Difficulty(ulong num)
         {
-            this.num = num;
+            Num = num;
         }
 
         /// Difficulty of zero, which is invalid (no target can be
@@ -44,9 +44,9 @@ namespace Grin.CoreImpl.Core.Target
         }
 
         /// Minimum difficulty according to our consensus rules.
-        public static Difficulty minimum()
+        public static Difficulty Minimum()
         {
-            return new Difficulty(Consensus.MINIMUM_DIFFICULTY); 
+            return new Difficulty(Consensus.MinimumDifficulty); 
           
         }
 
@@ -63,44 +63,44 @@ namespace Grin.CoreImpl.Core.Target
         /// provided hash.
         public static Difficulty From_hash(Hash.Hash hash)
         {
-            var mt = MAX_TARGET;
+            var mt = MaxTarget;
             mt.BigEndian();
-            var max_target = BitConverter.ToUInt64(mt, 0);
+            var maxTarget = BitConverter.ToUInt64(mt, 0);
 
             // Use the first 64 bits of the given hash
-            var in_vec = hash.Value.Take(8).ToArray();
-            in_vec.BigEndian();
-            var num = BitConverter.ToUInt64(in_vec, 0);
-            return new Difficulty(max_target / num);
+            var inVec = hash.Value.Take(8).ToArray();
+            inVec.BigEndian();
+            var num = BitConverter.ToUInt64(inVec, 0);
+            return new Difficulty(maxTarget / num);
         }
 
 
         /// Converts the difficulty into a u64
         public ulong into_num()
         {
-            return num;
+            return Num;
         }
 
 
     public Difficulty Clone()
         {
-            return new Difficulty(num);
+            return new Difficulty(Num);
         }
 
-        public void write(IWriter writer)
+        public void Write(IWriter writer)
         {
-            writer.write_u64(num);
+            writer.write_u64(Num);
         }
 
-        public void read(IReader reader)
+        public void Read(IReader reader)
         {
-            num = reader.read_u64();
+            Num = reader.read_u64();
         }
 
-        public static Difficulty readnew(IReader reader)
+        public static Difficulty Readnew(IReader reader)
         {
             var d = new Difficulty();
-            d.read(reader);
+            d.Read(reader);
             return d;
         }
 

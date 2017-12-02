@@ -1,22 +1,22 @@
 ﻿using System;
 using Grin.ChainImpl;
 
-namespace Grin.Api.ApiTypes
+namespace Grin.ApiImpl.ApiTypes
 {
     /// Sumtrees
     public class ApiSumTrees : ICloneable
     {
         /// UTXO Root Hash
-        public string utxo_root_hash { get; set; }
+        public string UtxoRootHash { get; set; }
 
         // UTXO Root Sum
-        public string utxo_root_sum { get; set; }
+        public string UtxoRootSum { get; set; }
 
         // Rangeproof root hash
-        public string range_proof_root_hash { get; set; }
+        public string RangeProofRootHash { get; set; }
 
         // Kernel set root hash
-        public string kernel_root_hash { get; set; }
+        public string KernelRootHash { get; set; }
 
         public static ApiSumTrees from_head(Chain head)
         {
@@ -36,10 +36,10 @@ namespace Grin.Api.ApiTypes
         {
             return new ApiSumTrees
             {
-                utxo_root_hash = utxo_root_hash,
-                utxo_root_sum = utxo_root_sum,
-                range_proof_root_hash = range_proof_root_hash,
-                kernel_root_hash = kernel_root_hash
+                UtxoRootHash = UtxoRootHash,
+                UtxoRootSum = UtxoRootSum,
+                RangeProofRootHash = RangeProofRootHash,
+                KernelRootHash = KernelRootHash
             };
         }
     }

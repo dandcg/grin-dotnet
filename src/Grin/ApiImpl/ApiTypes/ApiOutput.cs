@@ -3,31 +3,31 @@ using Grin.CoreImpl.Core.Block;
 using Grin.CoreImpl.Core.Transaction;
 using Secp256k1Proxy.Pedersen;
 
-namespace Grin.Api.ApiTypes
+namespace Grin.ApiImpl.ApiTypes
 {
     public struct ApiOutput : ICloneable
     {
         /// The type of output Coinbase|Transaction
-        public ApiOutputType output_type { get; set; }
+        public ApiOutputType OutputType { get; set; }
 
         /// The homomorphic commitment representing the output's amount
-        public Commitment commit { get; set; }
+        public Commitment Commit { get; set; }
 
         /// switch commit hash
-        public SwitchCommitHash switch_commit_hash { get; set; }
+        public SwitchCommitHash SwitchCommitHash { get; set; }
 
         /// A proof that the commitment is in the right range
-        public RangeProof proof { get; set; }
+        public RangeProof Proof { get; set; }
 
         /// The height of the block creating this output
-        public ulong height { get; set; }
+        public ulong Height { get; set; }
 
         /// The lock height (earliest block this output can be spent)
-        public ulong lock_height { get; set; }
+        public ulong LockHeight { get; set; }
 
 
-        public static ApiOutput from_output(Output output, BlockHeader block_header, bool include_proof,
-            bool include_switch)
+        public static ApiOutput from_output(Output output, BlockHeader blockHeader, bool includeProof,
+            bool includeSwitch)
         {
             throw new NotImplementedException();
 

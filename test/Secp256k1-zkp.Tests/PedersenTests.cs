@@ -11,15 +11,15 @@ namespace Secp256k1Proxy.Tests
     public class PedersenTests
     {
         [Fact]
-        public void test_verify_commit_sum_zero_keys()
+        public void Test_verify_commit_sum_zero_keys()
         {
 
-            var secp = Secp256k1.WithCaps(ContextFlag.Commit);
+            var secp = Secp256K1.WithCaps(ContextFlag.Commit);
 
             Commitment Commit(ulong value)
             {
                 var blinding = SecretKey.ZeroKey;
-                return secp.commit(value, blinding);
+                return secp.Commit(value, blinding);
             }
 
             Assert.True(secp.verify_commit_sum(
@@ -46,13 +46,13 @@ namespace Secp256k1Proxy.Tests
 
 
         [Fact]
-        public void test_verify_commit_sum_one_keys()
+        public void Test_verify_commit_sum_one_keys()
         {
-            var secp = Secp256k1.WithCaps(ContextFlag.Commit);
+            var secp = Secp256K1.WithCaps(ContextFlag.Commit);
 
             Commitment Commit(ulong value, SecretKey blinding)
             {
-               return secp.commit(value, blinding);
+               return secp.Commit(value, blinding);
             }
 
             Assert.True(secp.verify_commit_sum(
@@ -72,42 +72,42 @@ namespace Secp256k1Proxy.Tests
             //// to get these to verify we need to
             //// use the same "sum" of blinding factors on both sides
 
-            var two_key = secp.blind_sum(new []{SecretKey.OneKey, SecretKey.OneKey},new SecretKey[]{} );
+            var twoKey = secp.blind_sum(new []{SecretKey.OneKey, SecretKey.OneKey},new SecretKey[]{} );
 
             Assert.True(secp.verify_commit_sum(
                 new[] { Commit(3, SecretKey.OneKey), Commit(2, SecretKey.OneKey) },
-                new[] { Commit(5, two_key) }));
+                new[] { Commit(5, twoKey) }));
 
         }
 
         [Fact]
-        public void test_verify_commit_sum_random_keys()
+        public void Test_verify_commit_sum_random_keys()
         {
-            var secp = Secp256k1.WithCaps(ContextFlag.Commit);
+            var secp = Secp256K1.WithCaps(ContextFlag.Commit);
 
             Commitment Commit(ulong value, SecretKey blinding)
             {
-                return secp.commit(value, blinding);
+                return secp.Commit(value, blinding);
             }
 
-            var blind_pos = SecretKey.New(secp, RandomNumberGenerator.Create());
-            var blind_neg = SecretKey.New(secp, RandomNumberGenerator.Create());
+            var blindPos = SecretKey.New(secp, RandomNumberGenerator.Create());
+            var blindNeg = SecretKey.New(secp, RandomNumberGenerator.Create());
 
             // now construct blinding factor to net out appropriately
-           var blind_sum = secp.blind_sum(new[] { blind_pos}, new[] { blind_neg});
+           var blindSum = secp.blind_sum(new[] { blindPos}, new[] { blindNeg});
 
            secp.verify_commit_sum(
-               new []{Commit(101, blind_pos)},
-               new[] {Commit(75, blind_neg), Commit(26, blind_sum)}
+               new []{Commit(101, blindPos)},
+               new[] {Commit(75, blindNeg), Commit(26, blindSum)}
                );
         }
 
        [Fact]
-        public void test_to_two_pubkeys()
+        public void Test_to_two_pubkeys()
         {
-            var secp = Secp256k1.WithCaps(ContextFlag.Commit);
+            var secp = Secp256K1.WithCaps(ContextFlag.Commit);
             var blinding = SecretKey.New(secp, RandomNumberGenerator.Create());
-            var commit = secp.commit(5, blinding);
+            var commit = secp.Commit(5, blinding);
 
             Assert.Equal(2,commit.to_two_pubkeys(secp).Length);
  
@@ -118,26 +118,26 @@ namespace Secp256k1Proxy.Tests
         // provide an api to extract a public key from a commitment
         public void test_to_pubkey()
         {
-            var secp = Secp256k1.WithCaps(ContextFlag.Commit);
+            var secp = Secp256K1.WithCaps(ContextFlag.Commit);
             var blinding = SecretKey.New(secp, RandomNumberGenerator.Create());
-            var commit = secp.commit(5, blinding);
+            var commit = secp.Commit(5, blinding);
 
             Assert.Throws<Exception>(() =>
             {
-                var pubkey = commit.to_pubkey(secp);
+                commit.to_pubkey(secp);
             });
 
         }
 
 
         [Fact]
-        public void test_sign_with_pubkey_from_commitment()
+        public void Test_sign_with_pubkey_from_commitment()
         {
-            var secp = Secp256k1.WithCaps(ContextFlag.Commit);
+            var secp = Secp256K1.WithCaps(ContextFlag.Commit);
             var blinding = SecretKey.New(secp, RandomNumberGenerator.Create());
-            var commit = secp.commit(0, blinding);
+            var commit = secp.Commit(0, blinding);
 
-            var msgBytes = ByteUtil.get_random_bytes(RandomNumberGenerator.Create());
+            var msgBytes = ByteUtil.Get_random_bytes(RandomNumberGenerator.Create(),32);
 
             var msg = Message.from_slice(msgBytes);
 
@@ -166,77 +166,77 @@ namespace Secp256k1Proxy.Tests
         }
 
         [Fact]
-        public void test_commit_sum()
+        public void Test_commit_sum()
         {
-            var secp = Secp256k1.WithCaps(ContextFlag.Commit);
+            var secp = Secp256K1.WithCaps(ContextFlag.Commit);
 
             Commitment Commit(ulong value, SecretKey blinding)
             {
-                return secp.commit(value, blinding);
+                return secp.Commit(value, blinding);
             }
 
-            var blind_a = SecretKey.New( secp, RandomNumberGenerator.Create());
-            var blind_b = SecretKey.New( secp, RandomNumberGenerator.Create());
+            var blindA = SecretKey.New( secp, RandomNumberGenerator.Create());
+            var blindB = SecretKey.New( secp, RandomNumberGenerator.Create());
 
-            var commit_a = Commit(3, blind_a);
-            var commit_b = Commit(2, blind_b);
+            var commitA = Commit(3, blindA);
+            var commitB = Commit(2, blindB);
 
-            var blind_c = secp.blind_sum(new []{blind_a, blind_b},new SecretKey[]{});
+            var blindC = secp.blind_sum(new []{blindA, blindB},new SecretKey[]{});
 
-            var commit_c = Commit(3 + 2, blind_c);
+            var commitC = Commit(3 + 2, blindC);
 
-            var commit_d = secp.commit_sum(new[] { commit_a, commit_b}, new Commitment[] { });
+            var commitD = secp.commit_sum(new[] { commitA, commitB}, new Commitment[] { });
 
-            Assert.Equal(commit_c.Value, commit_d.Value);
+            Assert.Equal(commitC.Value, commitD.Value);
 
-            var blind_e = secp.blind_sum(new[]{blind_a}, new[] {blind_b});
+            var blindE = secp.blind_sum(new[]{blindA}, new[] {blindB});
 
-            var commit_e = Commit(3 - 2, blind_e);
+            var commitE = Commit(3 - 2, blindE);
 
-            var commit_f = secp.commit_sum(new[] { commit_a}, new[] { commit_b});
+            var commitF = secp.commit_sum(new[] { commitA}, new[] { commitB});
 
-            Assert.Equal(commit_e.Value, commit_f.Value);
+            Assert.Equal(commitE.Value, commitF.Value);
 
         }
 
         [Fact]
-        public void test_range_proof()
+        public void Test_range_proof()
         {
-            var secp = Secp256k1.WithCaps(ContextFlag.Commit);
+            var secp = Secp256K1.WithCaps(ContextFlag.Commit);
             var blinding = SecretKey.New(secp, RandomNumberGenerator.Create());
-            var commit = secp.commit(7, blinding);
-            var msg = ProofMessage.empty();
-            var range_proof = secp.range_proof(0, 7, blinding, commit, msg.clone());
-            var proof_range = secp.verify_range_proof(commit, range_proof);
+            var commit = secp.Commit(7, blinding);
+            var msg = ProofMessage.Empty();
+            var rangeProof = secp.range_proof(0, 7, blinding, commit, msg.Clone());
+            var proofRange = secp.verify_range_proof(commit, rangeProof);
 
-            Assert.Equal<ulong>(0,proof_range.min);
+            Assert.Equal<ulong>(0,proofRange.Min);
 
-            var  proof_info = secp.range_proof_info(range_proof);
-            Assert.True(proof_info.success);
-            Assert.Equal<ulong>(0, proof_info.min);
+            var  proofInfo = secp.range_proof_info(rangeProof);
+            Assert.True(proofInfo.Success);
+            Assert.Equal<ulong>(0, proofInfo.Min);
 
             //// check we get no information back for the value here
-            Assert.Equal<ulong>(0, proof_info.value);
+            Assert.Equal<ulong>(0, proofInfo.Value);
 
-            proof_info = secp.rewind_range_proof(commit, range_proof, blinding);
-            Assert.True(proof_info.success);
-            Assert.Equal<ulong>(0, proof_info.min);
-            Assert.Equal<ulong>(7, proof_info.value);
+            proofInfo = secp.rewind_range_proof(commit, rangeProof, blinding);
+            Assert.True(proofInfo.Success);
+            Assert.Equal<ulong>(0, proofInfo.Min);
+            Assert.Equal<ulong>(7, proofInfo.Value);
 
             //// check we cannot rewind a range proof without the original nonce
-            var bad_nonce = SecretKey.New( secp, RandomNumberGenerator.Create());
-            var bad_info = secp.rewind_range_proof(commit, range_proof, bad_nonce);
-            Assert.False(bad_info.success);
-            Assert.Equal<ulong>(0,bad_info.value);
+            var badNonce = SecretKey.New( secp, RandomNumberGenerator.Create());
+            var badInfo = secp.rewind_range_proof(commit, rangeProof, badNonce);
+            Assert.False(badInfo.Success);
+            Assert.Equal<ulong>(0,badInfo.Value);
 
             //// check we can construct and verify a range proof on value 0
-             commit = secp.commit(0, blinding);
-            range_proof = secp.range_proof(0, 0, blinding, commit, msg);
-            secp.verify_range_proof(commit, range_proof);
-             proof_info = secp.rewind_range_proof(commit, range_proof, blinding.Clone());
-            Assert.True(proof_info.success);
-            Assert.Equal<ulong>(0,proof_info.min);
-            Assert.Equal<ulong>(0,proof_info.value);
+             commit = secp.Commit(0, blinding);
+            rangeProof = secp.range_proof(0, 0, blinding, commit, msg);
+            secp.verify_range_proof(commit, rangeProof);
+             proofInfo = secp.rewind_range_proof(commit, rangeProof, blinding.Clone());
+            Assert.True(proofInfo.Success);
+            Assert.Equal<ulong>(0,proofInfo.Min);
+            Assert.Equal<ulong>(0,proofInfo.Value);
         }
 
 

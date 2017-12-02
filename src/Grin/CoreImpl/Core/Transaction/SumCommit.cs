@@ -9,25 +9,25 @@ namespace Grin.CoreImpl.Core.Transaction
     public class SumCommit : IWriteable, IReadable
     {
         /// Output commitment
-        public Commitment commit { get; private set; }
+        public Commitment Commit { get; private set; }
 
         /// Secp256k1 used to sum
-        public Secp256k1 secp { get; private set; }
+        public Secp256K1 Secp { get; private set; }
 
 
-        public void write(IWriter writer)
+        public void Write(IWriter writer)
         {
-            commit.WriteCommitment(writer);
+            Commit.WriteCommitment(writer);
         }
 
-        public void read(IReader reader)
+        public void Read(IReader reader)
         {
-            secp = Secp256k1.WithCaps(ContextFlag.Commit);
-            commit = Ser.Ser.ReadCommitment(reader);
+            Secp = Secp256K1.WithCaps(ContextFlag.Commit);
+            Commit = Ser.Ser.ReadCommitment(reader);
         }
 
 
-        public SumCommit add(SumCommit other)
+        public SumCommit Add(SumCommit other)
 
         {
             throw new NotImplementedException();

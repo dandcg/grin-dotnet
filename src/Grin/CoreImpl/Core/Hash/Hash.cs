@@ -31,22 +31,22 @@ namespace Grin.CoreImpl.Core.Hash
             return new Hash(new byte[32]);
         }
 
-        public static Hash readnew(IReader reader)
+        public static Hash Readnew(IReader reader)
         {
             var hash = new Hash();
-            hash.read(reader);
+            hash.Read(reader);
             return hash;
         }
 
 
-        public void read(IReader reader)
+        public void Read(IReader reader)
         {
             Value = reader.read_fixed_bytes(32);
       
         }
 
 
-        public void write(IWriter writer)
+        public void Write(IWriter writer)
         {
             writer.write_fixed_bytes(Value);
         }

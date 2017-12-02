@@ -6,6 +6,6 @@
     public interface IReadable
     {
         /// Reads the data necessary to this Readable from the provided reader
-        void read(IReader reader);
+        void Read(IReader reader);
     }
 }

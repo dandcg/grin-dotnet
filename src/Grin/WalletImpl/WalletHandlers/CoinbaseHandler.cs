@@ -11,21 +11,21 @@ namespace Grin.WalletImpl.WalletHandlers
     {
         public CoinbaseHandler(WalletConfig config, Keychain keychain)
         {
-            this.config = config;
-            this.keychain = keychain;
+            Config = config;
+            Keychain = keychain;
         }
 
-        public WalletConfig config { get;  }
-        public Keychain keychain { get; }
+        public WalletConfig Config { get;  }
+        public Keychain Keychain { get; }
 
 
       
      public CbData build_coinbase(BlockFees bf)
         {
 
-            var (outp, kern, block_fees) = WalletReceiver.WalletReceiver.receive_coinbase(
-                                             config,
-                                             keychain,
+            var (outp, kern, blockFees) = WalletReceiver.WalletReceiver.receive_coinbase(
+                                             Config,
+                                             Keychain,
                                              bf);
 
             //                             ).map_err(|e| {
@@ -38,7 +38,7 @@ namespace Grin.WalletImpl.WalletHandlers
             //     api::Error::Internal(format!("Error serializing output: {:?}", e))
 
             // })?;
-            var out_bin = Ser.Ser_vec(outp);
+            var outBin = Ser.Ser_vec(outp);
 
             // let kern_bin = ser::ser_vec(&kern).map_err(| e | {
 
@@ -46,7 +46,7 @@ namespace Grin.WalletImpl.WalletHandlers
 
             // })?;
 
-            var kern_bin = Ser.Ser_vec(kern);
+            var kernBin = Ser.Ser_vec(kern);
 
             //    let key_id_bin = match block_fees.key_id_set {
 
@@ -63,9 +63,9 @@ namespace Grin.WalletImpl.WalletHandlers
             //    };
 
 
-            var key_id_bin = block_fees.KeyId != null ? block_fees.KeyId.Value : new byte[Identifier.IdentifierSize];
+            var keyIdBin = blockFees.KeyId != null ? blockFees.KeyId.Value : new byte[Identifier.IdentifierSize];
 
-            return new CbData(HexUtil.to_hex(out_bin), HexUtil.to_hex(kern_bin), HexUtil.to_hex(key_id_bin));
+            return new CbData(HexUtil.to_hex(outBin), HexUtil.to_hex(kernBin), HexUtil.to_hex(keyIdBin));
        
     }
 

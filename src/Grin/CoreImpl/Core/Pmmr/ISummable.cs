@@ -6,7 +6,7 @@
     {
 
         /// Obtain the sum of the element
-        Sum sum();
+        Sum Sum();
         /// Length of the Sum type when serialized. Can be used as a hint by
         /// underlying storages.
         uint sum_len();

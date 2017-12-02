@@ -10,52 +10,52 @@ namespace Grin.WalletImpl.WalletTypes
     {
 
 
-        public OutputData(Identifier root_key_id, Identifier key_id, uint n_child, ulong value, OutputStatus status,
-            ulong height, ulong lock_height, bool is_coinbase)
+        public OutputData(Identifier rootKeyId, Identifier keyId, uint nChild, ulong value, OutputStatus status,
+            ulong height, ulong lockHeight, bool isCoinbase)
         {
-            this.root_key_id = root_key_id;
-            this.key_id = key_id;
-            this.n_child = n_child;
-            this.value = value;
-            this.status = status;
-            this.height = height;
-            this.lock_height = lock_height;
-            this.is_coinbase = is_coinbase;
+            RootKeyId = rootKeyId;
+            KeyId = keyId;
+            NChild = nChild;
+            Value = value;
+            Status = status;
+            Height = height;
+            LockHeight = lockHeight;
+            IsCoinbase = isCoinbase;
         }
 
         /// Root key_id_set that the key for this output is derived from
-        public Identifier root_key_id { get; set; }
+        public Identifier RootKeyId { get; set; }
 
         /// Derived key for this output
-        public Identifier key_id { get; set; }
+        public Identifier KeyId { get; set; }
 
         /// How many derivations down from the root key
-        public uint n_child { get; set; }
+        public uint NChild { get; set; }
 
         /// Commitment of the output, necessary to rebuild the commitment
-        public ulong value { get; set; }
+        public ulong Value { get; set; }
 
         /// Current status of the output
-        public OutputStatus status { get;  set; }
+        public OutputStatus Status { get;  set; }
 
         /// Height of the output
-        public ulong height { get; set; }
+        public ulong Height { get; set; }
 
         /// Height we are locked until
-        public ulong lock_height { get; set; }
+        public ulong LockHeight { get; set; }
 
         /// Is this a coinbase output? Is it subject to coinbase locktime?
-        public bool is_coinbase { get; set; }
+        public bool IsCoinbase { get; set; }
 
-        public OutputData clone()
+        public OutputData Clone()
         {
-            return new OutputData(root_key_id.Clone(),key_id.Clone(),n_child,value,status,height, lock_height,is_coinbase);
+            return new OutputData(RootKeyId.Clone(),KeyId.Clone(),NChild,Value,Status,Height, LockHeight,IsCoinbase);
         }
 
         /// Lock a given output to avoid conflicting use
         public void Lock()
         {
-            status = OutputStatus.Locked;
+            Status = OutputStatus.Locked;
         }
 
         /// How many confirmations has this output received?
@@ -63,46 +63,46 @@ namespace Grin.WalletImpl.WalletTypes
         /// cut-through
         /// so we do not actually know how many confirmations this output had (and
         /// never will).
-        public ulong num_confirmations(ulong current_height)
+        public ulong num_confirmations(ulong currentHeight)
         {
-            if (status == OutputStatus.Unconfirmed)
+            if (Status == OutputStatus.Unconfirmed)
             {
                 return 0;
             }
-            if (status == OutputStatus.Spent && height == 0)
+            if (Status == OutputStatus.Spent && Height == 0)
             {
                 return 0;
             }
-            return 1+(current_height - height);
+            return 1+(currentHeight - Height);
         }
 
         /// Check if output is eligible to spend based on state and height and confirmations
         public bool eligible_to_spend(
-            ulong current_height,
-            ulong minimum_confirmations
+            ulong currentHeight,
+            ulong minimumConfirmations
         )
         {
             if (new[]
             {
                 OutputStatus.Spent,
                 OutputStatus.Locked
-            }.Contains(status))
+            }.Contains(Status))
             {
                 return false;
             }
-            if (status == OutputStatus.Unconfirmed && is_coinbase)
+            if (Status == OutputStatus.Unconfirmed && IsCoinbase)
             {
                 return false;
             }
-            if (lock_height > current_height)
+            if (LockHeight > currentHeight)
             {
                 return false;
             }
-            if (status == OutputStatus.Unspent && height + num_confirmations(current_height) >= minimum_confirmations)
+            if (Status == OutputStatus.Unspent && Height + num_confirmations(currentHeight) >= minimumConfirmations)
             {
                 return true;
             }
-            if (status == OutputStatus.Unconfirmed && minimum_confirmations == 0)
+            if (Status == OutputStatus.Unconfirmed && minimumConfirmations == 0)
             {
                 return true;
             }

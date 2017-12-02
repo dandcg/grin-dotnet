@@ -2,6 +2,6 @@
 {
     public interface IWriteable
     {
-        void write(IWriter writer);
+        void Write(IWriter writer);
     }
 }

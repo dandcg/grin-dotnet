@@ -16,7 +16,7 @@
         /// Kernel not valid due to lock_height exceeding block header height
         KernelLockHeight, 
         /// The lock_height causing this validation error
-        lock_height,
+        LockHeight,
         /// Underlying tx related error
         Transaction,
         /// Underlying Secp256k1 error (signature validation or invalid public key typically)

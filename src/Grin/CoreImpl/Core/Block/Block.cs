@@ -24,26 +24,26 @@ namespace Grin.CoreImpl.Core.Block
         }
 
         /// The header with metadata and commitments to the rest of the data
-        public BlockHeader header { get; private set; }
+        public BlockHeader Header { get; private set; }
 
         /// List of transaction inputs
-        public Input[] inputs { get; private set; }
+        public Input[] Inputs { get; private set; }
 
         /// List of transaction outputs
-        public Output[] outputs { get; private set; }
+        public Output[] Outputs { get; private set; }
 
         /// List of transaction kernels and associated proofs
-        public TxKernel[] kernels { get; private set; }
+        public TxKernel[] Kernels { get; private set; }
 
         /// Default properties for a block, everything zeroed out and empty vectors.
         public static Block Default()
         {
             return new Block
             {
-                header = BlockHeader.Default(),
-                inputs = null,
-                outputs = null,
-                kernels = null
+                Header = BlockHeader.Default(),
+                Inputs = null,
+                Outputs = null,
+                Kernels = null
             };
         }
 
@@ -55,7 +55,7 @@ namespace Grin.CoreImpl.Core.Block
         /// Only used in tests (to be confirmed, may be wrong here).
         public static Block New(BlockHeader prev, Transaction.Transaction[] txs, Keychain keychain, Identifier keyId)
         {
-            var txfees = txs.Select(s => s.fee).ToArray();
+            var txfees = txs.Select(s => s.Fee).ToArray();
 
             ulong fees = 0;
 
@@ -65,25 +65,25 @@ namespace Grin.CoreImpl.Core.Block
             }
 
 
-            var (reward_out, reward_proof) = Reward_output(keychain, keyId, fees);
-            var block = with_reward(prev, txs, reward_out, reward_proof);
+            var (rewardOut, rewardProof) = Reward_output(keychain, keyId, fees);
+            var block = with_reward(prev, txs, rewardOut, rewardProof);
             return block;
         }
 
         /// Builds a new block ready to mine from the header of the previous block,
         /// a vector of transactions and the reward information. Checks
         /// that all transactions are valid and calculates the Merkle tree.
-        public static Block with_reward(BlockHeader prev, Transaction.Transaction[] txs, Output reward_out,
-            TxKernel reward_kern)
+        public static Block with_reward(BlockHeader prev, Transaction.Transaction[] txs, Output rewardOut,
+            TxKernel rewardKern)
         {
             // note: the following reads easily but may not be the most efficient due to
             // repeated iterations, revisit if a problem
-            var secp = Secp256k1.WithCaps(ContextFlag.Commit);
+            var secp = Secp256K1.WithCaps(ContextFlag.Commit);
 
             // validate each transaction and gather their kernels
 
             var kernels = txs.Select(tx => tx.verify_sig(secp)).ToList();
-            kernels.Add(reward_kern);
+            kernels.Add(rewardKern);
 
             // build vectors with all inputs and all outputs, ordering them by hash
             // needs to be a fold so we don't end up with a vector of vectors and we
@@ -93,52 +93,46 @@ namespace Grin.CoreImpl.Core.Block
             var outputs = new List<Output>();
             foreach (var tx in txs)
             {
-                foreach (var i in tx.inputs)
-                {
-                    inputs.Add(i.Clone());
-                }
+                inputs.AddRange(tx.Inputs.Select(i => i.Clone()));
 
-                foreach (var o in tx.outputs)
-                {
-                    outputs.Add(o.Clone());
-                }
+                outputs.AddRange(tx.Outputs.Select(o => o.Clone()));
             }
 
-            outputs.Add(reward_out);
+            outputs.Add(rewardOut);
 
             // calculate the overall Merkle tree and fees
 
             var bh = BlockHeader.Default();
 
-            bh.height = prev.height + 1;
-            bh.previous = prev.hash();
-            bh.timestamp = DateTime.UtcNow;
+            bh.Height = prev.Height + 1;
+            bh.Previous = prev.Hash();
+            bh.Timestamp = DateTime.UtcNow;
 
-            bh.total_difficulty =
-                Difficulty.From_num(prev.pow.Clone().to_difficulty().num + prev.total_difficulty.Clone().num);
+            bh.TotalDifficulty =
+                Difficulty.From_num(prev.Pow.Clone().To_difficulty().Num + prev.TotalDifficulty.Clone().Num);
 
             var b = new Block
             {
-                header = bh,
-                inputs = inputs.ToArray(),
-                outputs = outputs.ToArray(),
-                kernels = kernels.ToArray()
+                Header = bh,
+                Inputs = inputs.ToArray(),
+                Outputs = outputs.ToArray(),
+                Kernels = kernels.ToArray()
             };
 
-            return b.compact();
+            return b.Compact();
         }
 
 
         // Blockhash, computed using only the header
-        public Hash.Hash hash()
+        public Hash.Hash Hash()
         {
-            return header.hash();
+            return Header.Hash();
         }
 
         /// Sum of all fees (inputs less outputs) in the block
         public ulong total_fees()
         {
-            return kernels.Select(k => k.fee).Aggregate((t, t1) => t + t1);
+            return Kernels.Select(k => k.Fee).Aggregate((t, t1) => t + t1);
         }
 
         /// Matches any output with a potential spending input, eliminating them
@@ -149,41 +143,41 @@ namespace Grin.CoreImpl.Core.Block
         /// if a block contains a new coinbase output and
         /// is a transaction spending a previous coinbase
         /// we do not want to compact these away
-        public Block compact()
+        public Block Compact()
         {
-            var in_set = new HashSet<string>();
+            var inSet = new HashSet<string>();
 
-            foreach (var i in inputs)
+            foreach (var i in Inputs)
             {
-                in_set.Add(i.Commitment.Hex);
+                inSet.Add(i.Commitment.Hex);
             }
 
 
-            var out_set = new HashSet<string>();
+            var outSet = new HashSet<string>();
 
-            foreach (var o in outputs.Where(w => !w.Features.HasFlag(OutputFeatures.COINBASE_OUTPUT)))
+            foreach (var o in Outputs.Where(w => !w.Features.HasFlag(OutputFeatures.CoinbaseOutput)))
             {
-                out_set.Add(o.Commit.Hex);
+                outSet.Add(o.Commit.Hex);
             }
 
 
-            var commitments_to_compact = in_set.Intersect(out_set);
+            var commitmentsToCompact = inSet.Intersect(outSet);
 
-            var new_inputs = inputs.Where(w => !commitments_to_compact.Contains(w.Commitment.Hex))
+            var newInputs = Inputs.Where(w => !commitmentsToCompact.Contains(w.Commitment.Hex))
                 .Select(s => s.Clone());
 
-            var new_outputs = outputs.Where(w => !commitments_to_compact.Contains(w.Commit.Hex)).Select(s => s.Clone());
+            var newOutputs = Outputs.Where(w => !commitmentsToCompact.Contains(w.Commit.Hex)).Select(s => s.Clone());
 
 
-            var new_kernels = kernels.Select(s => s.Clone());
+            var newKernels = Kernels.Select(s => s.Clone());
 
 
             var b = new Block
             {
-                header = header.Clone(),
-                inputs = new_inputs.ToArray(),
-                outputs = new_outputs.ToArray(),
-                kernels = new_kernels.ToArray()
+                Header = Header.Clone(),
+                Inputs = newInputs.ToArray(),
+                Outputs = newOutputs.ToArray(),
+                Kernels = newKernels.ToArray()
             };
 
             return b;
@@ -192,27 +186,27 @@ namespace Grin.CoreImpl.Core.Block
         /// Merges the 2 blocks, essentially appending the inputs, outputs and
         /// kernels.
         /// Also performs a compaction on the result.
-        public Block merge(Block other)
+        public Block Merge(Block other)
 
         {
-            var all_inputs = inputs.Select(s => s.Clone()).ToList();
-            all_inputs.AddRange(other.inputs.Select(s => s.Clone()));
+            var allInputs = Inputs.Select(s => s.Clone()).ToList();
+            allInputs.AddRange(other.Inputs.Select(s => s.Clone()));
 
-            var all_outputs = outputs.Select(s => s.Clone()).ToList();
-            all_outputs.AddRange(other.outputs.Select(s => s.Clone()));
+            var allOutputs = Outputs.Select(s => s.Clone()).ToList();
+            allOutputs.AddRange(other.Outputs.Select(s => s.Clone()));
 
-            var all_kernels = kernels.Select(s => s.Clone()).ToList();
-            all_kernels.AddRange(other.kernels.Select(s => s.Clone()));
+            var allKernels = Kernels.Select(s => s.Clone()).ToList();
+            allKernels.AddRange(other.Kernels.Select(s => s.Clone()));
 
             var b = new Block
             {
                 // compact will fix the merkle tree
-                header = header.Clone(),
+                Header = Header.Clone(),
 
-                inputs = all_inputs.ToArray(),
-                outputs = all_outputs.ToArray(),
-                kernels = all_kernels.ToArray()
-            }.compact();
+                Inputs = allInputs.ToArray(),
+                Outputs = allOutputs.ToArray(),
+                Kernels = allKernels.ToArray()
+            }.Compact();
 
             return b;
         }
@@ -222,9 +216,9 @@ namespace Grin.CoreImpl.Core.Block
         /// trees, reward, etc.
         /// 
         /// TODO - performs various verification steps - discuss renaming this to "verify"
-        public void validate(Secp256k1 secp)
+        public void Validate(Secp256K1 secp)
         {
-            if (Consensus.Exceeds_weight((uint) inputs.Length, (uint) outputs.Length, (uint) kernels.Length))
+            if (Consensus.Exceeds_weight((uint) Inputs.Length, (uint) Outputs.Length, (uint) Kernels.Length))
             {
                 throw new BlockErrorException(BlockError.WeightExceeded);
             }
@@ -235,42 +229,42 @@ namespace Grin.CoreImpl.Core.Block
         /// Verifies the sum of input/output commitments match the sum in kernels
         /// and that all kernel signatures are valid.
         /// TODO - when would we skip_sig? Is this needed or used anywhere?
-        public void verify_kernels(Secp256k1 secp, bool skip_sig)
+        public void verify_kernels(Secp256K1 secp, bool skipSig)
 
         {
-            foreach (var k in kernels)
+            foreach (var k in Kernels)
             {
-                if ((k.fee & 1) != 0)
+                if ((k.Fee & 1) != 0)
                 {
                     //throw new BlockErrorException(BlockError.OddKernelFee);
                 }
 
-                if (k.lock_height > header.height)
+                if (k.LockHeight > Header.Height)
 
                 {
-                    throw new BlockErrorException(BlockError.KernelLockHeight).Data("lock_height", k.lock_height);
+                    throw new BlockErrorException(BlockError.KernelLockHeight).Data("lock_height", k.LockHeight);
                 }
 
 
                 // sum all inputs and outs commitments
-                var io_sum = this.sum_commitments(secp);
+                var ioSum = this.sum_commitments(secp);
 
-// sum all kernels commitments
-                var proof_commits = kernels.Select(s => s.excess).ToArray();
-                var proof_sum = secp.commit_sum(proof_commits, new Commitment[] { });
+                // sum all kernels commitments
+                var proofCommits = Kernels.Select(s => s.Excess).ToArray();
+                var proofSum = secp.commit_sum(proofCommits, new Commitment[] { });
 
                 // both should be the same
-                if (proof_sum.Hex != io_sum.Hex)
+                if (proofSum.Hex != ioSum.Hex)
                 {
                     throw new BlockErrorException(BlockError.KernelSumMismatch);
                 }
 
                 // verify all signatures with the commitment as pk
-                if (!skip_sig)
+                if (!skipSig)
                 {
-                    foreach (var proof in kernels)
+                    foreach (var proof in Kernels)
                     {
-                        proof.verify(secp);
+                        proof.Verify(secp);
                     }
                 }
             }
@@ -283,28 +277,28 @@ namespace Grin.CoreImpl.Core.Block
         //   the coinbase-marked kernels.
         public void verify_coinbase()
         {
-            var cb_outs = outputs.Where(w => w.Features.HasFlag(OutputFeatures.COINBASE_OUTPUT)).Select(s => s.Commit)
+            var cbOuts = Outputs.Where(w => w.Features.HasFlag(OutputFeatures.CoinbaseOutput)).Select(s => s.Commit)
                 .ToArray();
 
-            var cb_kerns = kernels.Where(w => w.features.HasFlag(KernelFeatures.COINBASE_KERNEL)).Select(s => s.excess)
+            var cbKerns = Kernels.Where(w => w.Features.HasFlag(KernelFeatures.CoinbaseKernel)).Select(s => s.Excess)
                 .ToArray();
 
             var secp = SecpStatic.Instance;
 
-            Commitment out_adjust_sum;
-            Commitment kerns_sum;
+            Commitment outAdjustSum;
+            Commitment kernsSum;
             try
             {
-                var over_commit = secp.commit_value(Consensus.Reward(total_fees()));
-                out_adjust_sum = secp.commit_sum(cb_outs, new[] {over_commit});
-                kerns_sum = secp.commit_sum(cb_kerns, new Commitment[] { });
+                var overCommit = secp.commit_value(Consensus.Reward(total_fees()));
+                outAdjustSum = secp.commit_sum(cbOuts, new[] {overCommit});
+                kernsSum = secp.commit_sum(cbKerns, new Commitment[] { });
             }
             catch (Exception ex)
             {
                 throw new BlockErrorException(BlockError.Secp, ex);
             }
 
-            if (kerns_sum.Hex != out_adjust_sum.Hex)
+            if (kernsSum.Hex != outAdjustSum.Hex)
             {
                 throw new BlockErrorException(BlockError.CoinbaseSumMismatch);
             }
@@ -316,45 +310,45 @@ namespace Grin.CoreImpl.Core.Block
             var secp = keychain.Secp;
 
             var commit = keychain.Commit(Consensus.Reward(fees), keyId);
-            var switch_commit = keychain.Switch_commit(keyId);
-            var switch_commit_hash = SwitchCommitHash.From_switch_commit(switch_commit);
+            var switchCommit = keychain.Switch_commit(keyId);
+            var switchCommitHash = SwitchCommitHash.From_switch_commit(switchCommit);
 
             Log.Verbose(
                 "Block reward - Pedersen Commit is: {commit}, Switch Commit is: {switch_commit}",
                 commit,
-                switch_commit
+                switchCommit
             );
 
             Log.Verbose(
                 "Block reward - Switch Commit Hash is: {  switch_commit_hash}",
-                switch_commit_hash
+                switchCommitHash
             );
 
-            var msg = ProofMessage.empty();
+            var msg = ProofMessage.Empty();
             var rproof = keychain.Range_proof(Consensus.Reward(fees), keyId, commit, msg);
 
             var output = new Output
             {
-                Features = OutputFeatures.COINBASE_OUTPUT,
+                Features = OutputFeatures.CoinbaseOutput,
                 Commit = commit,
-                SwitchCommitHash = switch_commit_hash,
+                SwitchCommitHash = switchCommitHash,
                 Proof = rproof
             };
 
-            var over_commit = secp.commit_value(Consensus.Reward(fees));
-            var out_commit = output.Commit;
-            var excess = secp.commit_sum(new[] {out_commit}, new[] {over_commit});
+            var overCommit = secp.commit_value(Consensus.Reward(fees));
+            var outCommit = output.Commit;
+            var excess = secp.commit_sum(new[] {outCommit}, new[] {overCommit});
 
-            var msg2 = Message.from_slice(new byte[Constants.MESSAGE_SIZE]);
+            var msg2 = Message.from_slice(new byte[Constants.MessageSize]);
             var sig = keychain.Sign(msg2, keyId);
 
             var proof = new TxKernel
             {
-                features = KernelFeatures.COINBASE_KERNEL,
-                excess = excess,
-                excess_sig = sig.serialize_der(secp),
-                fee = 0,
-                lock_height = 0
+                Features = KernelFeatures.CoinbaseKernel,
+                Excess = excess,
+                ExcessSig = sig.serialize_der(secp),
+                Fee = 0,
+                LockHeight = 0
             };
             return (output, proof);
         }
@@ -362,17 +356,17 @@ namespace Grin.CoreImpl.Core.Block
 
         /// Implementation of Readable for a block, defines how to read a full block
         /// from a binary stream.
-        public void read(IReader reader)
+        public void Read(IReader reader)
         {
-            header = BlockHeader.readnew(reader);
+            Header = BlockHeader.Readnew(reader);
 
-            var input_len = reader.read_u64();
-            var output_len = reader.read_u64();
-            var kernel_len = reader.read_u64();
+            var inputLen = reader.read_u64();
+            var outputLen = reader.read_u64();
+            var kernelLen = reader.read_u64();
 
-            inputs = Ser.Ser.Read_and_verify_sorted<Input>(reader, input_len);
-            outputs = Ser.Ser.Read_and_verify_sorted<Output>(reader, output_len);
-            kernels = Ser.Ser.Read_and_verify_sorted<TxKernel>(reader, kernel_len);
+            Inputs = Ser.Ser.Read_and_verify_sorted<Input>(reader, inputLen);
+            Outputs = Ser.Ser.Read_and_verify_sorted<Output>(reader, outputLen);
+            Kernels = Ser.Ser.Read_and_verify_sorted<TxKernel>(reader, kernelLen);
 
         }
 
@@ -380,55 +374,55 @@ namespace Grin.CoreImpl.Core.Block
         /// Implementation of Writeable for a block, defines how to write the block to a
         /// binary writer. Differentiates between writing the block for the purpose of
         /// full serialization and the one of just extracting a hash.
-        public void write(IWriter writer)
+        public void Write(IWriter writer)
         {
-            header.write(writer);
+            Header.Write(writer);
 
             if (writer.serialization_mode() != SerializationMode.Hash)
             {
                 //Console.WriteLine("{0},{1},{2}", inputs.Length, outputs.Length, kernels.Length);
 
-                writer.write_u64((ulong) inputs.Length);
-                writer.write_u64((ulong) outputs.Length);
-                writer.write_u64((ulong) kernels.Length);
+                writer.write_u64((ulong) Inputs.Length);
+                writer.write_u64((ulong) Outputs.Length);
+                writer.write_u64((ulong) Kernels.Length);
 
 
                 // Consensus rule that everything is sorted in lexicographical order on the wire.
 
 
-                var inputsSorted = inputs.OrderBy(o => o.hash().Hex);
+                var inputsSorted = Inputs.OrderBy(o => o.Hash().Hex);
                 foreach (var input in inputsSorted)
                 {
-                    input.write(writer);
+                    input.Write(writer);
                 }
 
-                var outputsSorted = outputs.OrderBy(o => o.hash().Hex);
+                var outputsSorted = Outputs.OrderBy(o => o.Hash().Hex);
                 foreach (var output in outputsSorted)
                 {
-                    output.write(writer);
+                    output.Write(writer);
                 }
 
-                var kernelsSorted = kernels.OrderBy(o => o.hash().Hex);
+                var kernelsSorted = Kernels.OrderBy(o => o.Hash().Hex);
                 foreach (var kernel in kernelsSorted)
                 {
-                    kernel.write(writer);
+                    kernel.Write(writer);
                 }
             }
         }
 
         public Input[] inputs_commited()
         {
-            return inputs;
+            return Inputs;
         }
 
         public Output[] outputs_committed()
         {
-            return outputs;
+            return Outputs;
         }
 
-        public long overage()
+        public long Overage()
         {
-            return (long) total_fees() / 2 - (long) Consensus.REWARD;
+            return (long) total_fees() / 2 - (long) Consensus.RewardAmount;
         }
     }
 }
