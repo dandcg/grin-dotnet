@@ -63,7 +63,7 @@ namespace Grin.WalletImpl.WalletHandlers
             //    };
 
 
-            var key_id_bin = block_fees.KeyId != null ? block_fees.KeyId.Bytes : new byte[Identifier.IdentifierSize];
+            var key_id_bin = block_fees.KeyId != null ? block_fees.KeyId.Value : new byte[Identifier.IdentifierSize];
 
             return new CbData(HexUtil.to_hex(out_bin), HexUtil.to_hex(kern_bin), HexUtil.to_hex(key_id_bin));
        

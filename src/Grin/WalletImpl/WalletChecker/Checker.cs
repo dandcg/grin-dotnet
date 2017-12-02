@@ -136,7 +136,7 @@ namespace Grin.WalletImpl.WalletChecker
                 {
                     var id = wallet_outputs[commit.Hex];
 
-                    if (wallet_data.outputs.TryGetValue(id.Hex, out var op))
+                    if (wallet_data.outputs.TryGetValue(id.HexValue, out var op))
                     {
                         if (api_outputs.TryGetValue(commit.Hex, out var api_output))
                         {

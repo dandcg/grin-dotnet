@@ -10,7 +10,7 @@ namespace Grin.KeychainImpl.ExtKey
     {
         public override string ToString()
         {
-            return Hex;
+            return HexValue;
         }
 
         // const
@@ -20,20 +20,20 @@ namespace Grin.KeychainImpl.ExtKey
         public Identifier()
         {
             var bytes = new byte[IdentifierSize];
-            Bytes = bytes;
+            Value = bytes;
         }
-        private Identifier(byte[] bytes)
+        private Identifier(byte[] value)
         {
-            Bytes = bytes;
+            Value = value;
         }
 
         // data 
-        public byte[] Bytes { get; private set; }
+        public byte[] Value { get; private set; }
 
-        public string Hex
+        public string HexValue
         {
-            get => HexUtil.to_hex(Bytes);
-            set => Bytes = HexUtil.from_hex(value);
+            get => HexUtil.to_hex(Value);
+            set => Value = HexUtil.from_hex(value);
         }
 
         // functions
@@ -69,7 +69,7 @@ namespace Grin.KeychainImpl.ExtKey
         
         public Identifier Clone()
         {
-            return From_bytes(Bytes.ToArray());
+            return From_bytes(Value.ToArray());
         }
     }
 }

@@ -41,7 +41,7 @@ namespace Grin.KeychainImpl
         public static Keychain Burn_enabled(Keychain keychain, Identifier burnKeyId)
         {
             var keyOverridesNew =
-                new Dictionary<string, SecretKey> {{burnKeyId.Hex, SecretKey.From_slice(keychain.Secp, new byte[32])}};
+                new Dictionary<string, SecretKey> {{burnKeyId.HexValue, SecretKey.From_slice(keychain.Secp, new byte[32])}};
             return new Keychain(keychain.Secp, keychain.Extkey.Clone(), keyOverridesNew, keychain.KeyDerivationCache);
         }
 
@@ -85,7 +85,7 @@ namespace Grin.KeychainImpl
             Log.Verbose("Derived Key by key_id: {key_id}", keyId);
 
             // first check our overrides and just return the key if we have one in there
-            KeyOverrides.TryGetValue(keyId.Hex, out var sk);
+            KeyOverrides.TryGetValue(keyId.HexValue, out var sk);
 
             if (sk != null)
             {
@@ -98,7 +98,7 @@ namespace Grin.KeychainImpl
 
             var cache = KeyDerivationCache;
 
-            if (cache.TryGetValue(keyId.Hex, out var derivation))
+            if (cache.TryGetValue(keyId.HexValue, out var derivation))
             {
          
                     Log.Verbose("... Derived Key (cache hit) key_id: {key_id}, derivation: {derivation}", keyId, derivation);
@@ -119,22 +119,22 @@ namespace Grin.KeychainImpl
                 var ident = extkeyNew.Identifier(Secp);
 
 
-                if (!cache.ContainsKey(ident.Hex))
+                if (!cache.ContainsKey(ident.HexValue))
                 {
                     Log.Verbose("... Derived Key (cache miss) key_id: {key_id}, derivation: {derivation}", ident,
                         extkeyNew.NChild);
-                    cache.TryAdd(ident.Hex, extkeyNew.NChild);
+                    cache.TryAdd(ident.HexValue, extkeyNew.NChild);
                 }
 
 
-                if (ident.Hex == keyId.Hex)
+                if (ident.HexValue == keyId.HexValue)
                 {
                     return extkeyNew.Key;
                 }
             }
 
 
-            throw new Exception($"KeyDerivation - cannot find extkey for {keyId.Hex}");
+            throw new Exception($"KeyDerivation - cannot find extkey for {keyId.HexValue}");
         }
 
         // if we know the derivation index we can just straight to deriving the key

@@ -190,13 +190,13 @@ namespace Grin.WalletImpl.WalletTypes
         /// unconfirmed coinbase
         public void add_output(OutputData outd)
         {
-            outputs.Add(outd.key_id.Hex, outd.clone());
+            outputs.Add(outd.key_id.HexValue, outd.clone());
         }
 
         // TODO - careful with this, only for Unconfirmed (maybe Locked)?
         public void delete_output(Identifier id)
         {
-            outputs.Remove(id.Hex);
+            outputs.Remove(id.HexValue);
         }
 
 
@@ -204,7 +204,7 @@ namespace Grin.WalletImpl.WalletTypes
         /// TODO - we should track identifier on these outputs (not just n_child)
         public void lock_output(OutputData outd)
         {
-            var outToLock = outputs[outd.key_id.Hex];
+            var outToLock = outputs[outd.key_id.HexValue];
             if (outToLock?.value == outd.value)
             {
                 outToLock.Lock();
@@ -213,7 +213,7 @@ namespace Grin.WalletImpl.WalletTypes
 
         public OutputData get_output(Identifier key_id)
         {
-            return outputs[key_id.Hex];
+            return outputs[key_id.HexValue];
         }
 
         /// Select spendable coins from the wallet.
@@ -234,7 +234,7 @@ namespace Grin.WalletImpl.WalletTypes
 
             var eligible = outputs.Values
                 .Where(o => o.root_key_id == root_key_id && o.eligible_to_spend(current_height, minimum_confirmations))
-                .OrderBy(o => o.key_id.Hex)
+                .OrderBy(o => o.key_id.HexValue)
                 .ToArray();
 
 

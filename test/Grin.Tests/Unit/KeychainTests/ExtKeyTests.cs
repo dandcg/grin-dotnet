@@ -24,7 +24,7 @@ namespace Grin.Tests.Unit.KeychainTests
 
             var identifier = Identifier.From_hex(hex);
 
-            var hasAnIdentifier = new HasAnIdentifier {Identifier = identifier.Hex};
+            var hasAnIdentifier = new HasAnIdentifier {Identifier = identifier.HexValue};
 
             var json = JsonConvert.SerializeObject(hasAnIdentifier);
             Assert.Equal("{\"identifier\":\"942b6c0bd43bdcb24f3e\"}", json);
@@ -51,10 +51,10 @@ namespace Grin.Tests.Unit.KeychainTests
             uint nChild = 0;
 
             Assert.Equal(extk.Key.Value, secretKey.Value);
-            Assert.Equal(extk.Identifier(s).Bytes, Identifier.From_bytes(identifier).Bytes);
+            Assert.Equal(extk.Identifier(s).Value, Identifier.From_bytes(identifier).Value);
             Assert.Equal(
-                extk.RootKeyId.Bytes,
-                Identifier.From_bytes(identifier).Bytes
+                extk.RootKeyId.Value,
+                Identifier.From_bytes(identifier).Value
             );
             Assert.Equal(extk.Chaincode, chaincode);
             Assert.Equal(extk.Depth, depth);
@@ -79,12 +79,12 @@ namespace Grin.Tests.Unit.KeychainTests
             uint nChild = 0;
             Assert.Equal(derived.Key.Value, secretKey.Value);
             Assert.Equal(
-                derived.Identifier(s).Bytes,
-                Identifier.From_bytes(identifier).Bytes
+                derived.Identifier(s).Value,
+                Identifier.From_bytes(identifier).Value
             );
             Assert.Equal(
-                derived.RootKeyId.Bytes,
-                Identifier.From_bytes(rootKeyId).Bytes
+                derived.RootKeyId.Value,
+                Identifier.From_bytes(rootKeyId).Value
             );
             Assert.Equal(derived.Chaincode, chaincode);
             Assert.Equal(derived.Depth, depth);

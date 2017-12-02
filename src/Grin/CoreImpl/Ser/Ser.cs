@@ -92,7 +92,7 @@ namespace Grin.CoreImpl.Ser
 
         public static void WriteIdentifier(this Identifier identifier, IWriter writer)
         {
-            writer.write_fixed_bytes(identifier.Bytes);
+            writer.write_fixed_bytes(identifier.Value);
         }
     }
 }
