@@ -84,7 +84,7 @@ namespace Secp256k1Proxy.Tests
             var pk_slice = pk.serialize_vec(none, false);
             var sk_slice = sk.Value;
             var new_pk = PublicKey.from_slice(none, pk_slice);
-            var new_sk = SecretKey.from_slice(none, sk_slice);
+            var new_sk = SecretKey.From_slice(none, sk_slice);
 
             Assert.Equal(sk.Value, new_sk.Value);
             Assert.Equal(pk.Value, new_pk.Value);
@@ -106,11 +106,11 @@ namespace Secp256k1Proxy.Tests
         public void invalid_pubkey()
         {
             var s = Secp256k1.New();
-            var sig = RecoverableSigniture.from_compact(s, ByteUtil.get_bytes(1, 64), RecoveryId.from_i32(0));
+            var sig = RecoverableSigniture.From_compact(s, ByteUtil.get_bytes(1, 64), RecoveryId.from_i32(0));
             var pk = PublicKey.New();
             var msgBytes = ByteUtil.get_random_bytes(RandomNumberGenerator.Create());
             var msg = Message.from_slice(msgBytes);
-            var ex = Assert.Throws<Exception>(() => { s.Verify(msg, sig.to_standard(s), pk); });
+            var ex = Assert.Throws<Exception>(() => { s.Verify(msg, sig.To_standard(s), pk); });
             Assert.Equal("InvalidPublicKey", ex.Message);
         }
 
@@ -127,11 +127,11 @@ namespace Secp256k1Proxy.Tests
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1
             };
 
-            var sk = SecretKey.from_slice(s, one);
+            var sk = SecretKey.From_slice(s, one);
             var msg = Message.from_slice(one);
 
             var sig = s.sign_recoverable(msg, sk);
-            var rsig = RecoverableSigniture.from_compact(s, new byte[]
+            var rsig = RecoverableSigniture.From_compact(s, new byte[]
                 {
                     0x66, 0x73, 0xff, 0xad, 0x21, 0x47, 0x74, 0x1f,
                     0x04, 0x77, 0x2b, 0x6f, 0x92, 0x1f, 0x0b, 0xa6,
@@ -287,7 +287,7 @@ namespace Secp256k1Proxy.Tests
             var (sk, pk) = s.generate_keypair(RandomNumberGenerator.Create());
 
             var sigr = s.sign_recoverable(msg, sk);
-            var sig = sigr.to_standard(s);
+            var sig = sigr.To_standard(s);
 
             var msgBytes2 = ByteUtil.get_random_bytes(RandomNumberGenerator.Create());
             var msg2 = Message.from_slice(msgBytes2);
@@ -325,12 +325,12 @@ namespace Secp256k1Proxy.Tests
             var msg = Message.from_slice(msgBytes);
 
             // Zero is not a valid sig
-            var sig = RecoverableSigniture.from_compact(s, new byte[64], RecoveryId.from_i32(0));
+            var sig = RecoverableSigniture.From_compact(s, new byte[64], RecoveryId.from_i32(0));
             var ex =Assert.Throws<Exception>(() => { s.Recover(msg, sig); });
             Assert.Equal("InvalidSignature", ex.Message);
 
             // ...but 111..111 is
-            var sig2 = RecoverableSigniture.from_compact(s, ByteUtil.get_bytes(1,64), RecoveryId.from_i32(0));
+            var sig2 = RecoverableSigniture.From_compact(s, ByteUtil.get_bytes(1,64), RecoveryId.from_i32(0));
             s.Recover(msg, sig2);
         }
 
@@ -359,7 +359,7 @@ namespace Secp256k1Proxy.Tests
         public void test_debug_output()
         {
             var s = Secp256k1.New();
-            var sig = RecoverableSigniture.from_compact(s, new Byte[] {
+            var sig = RecoverableSigniture.From_compact(s, new byte[] {
                 0x66, 0x73, 0xff, 0xad, 0x21, 0x47, 0x74, 0x1f,
                 0x04, 0x77, 0x2b, 0x6f, 0x92, 0x1f, 0x0b, 0xa6,
                 0xaf, 0x0c, 0x1e, 0x77, 0xfc, 0x43, 0x9e, 0x65,
@@ -373,7 +373,7 @@ namespace Secp256k1Proxy.Tests
             //TODO: Finish here
             //Assert.Equal("RecoverableSignature(98882e09f4ed6dc3659e43fc771e0cafa60b1f926f2b77041f744721adff7366898cb609d0ee128d06ae9aa3c48020ff9f705e02f80e1280a8ade05216971a4c01)", $"{sig}");
 
-            var msg = Message.from_slice(new Byte[]{1, 2, 3, 4, 5, 6, 7, 8,
+            var msg = Message.from_slice(new byte[]{1, 2, 3, 4, 5, 6, 7, 8,
                                9, 10, 11, 12, 13, 14, 15, 16,
                                17, 18, 19, 20, 21, 22, 23, 24,
                                25, 26, 27, 28, 29, 30, 31, 255});
@@ -399,9 +399,9 @@ namespace Secp256k1Proxy.Tests
                 0xff, 0x20, 0x80, 0xc4, 0xa3, 0x9a, 0xae, 0x06,
                 0x8d, 0x12, 0xee, 0xd0, 0x09, 0xb6, 0x8c, 0x89
             };
-            var sig = RecoverableSigniture.from_compact(
+            var sig = RecoverableSigniture.From_compact(
                 s, bytes_in, recid_in);
-            var (recid_out, bytes_out) = sig.serialize_compact(s);
+            var (recid_out, bytes_out) = sig.Serialize_compact(s);
             Assert.Equal(recid_in.Value, recid_out.Value);
             Assert.Equal(bytes_in, bytes_out);
         }

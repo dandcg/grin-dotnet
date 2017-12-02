@@ -23,12 +23,12 @@ namespace Grin.KeychainImpl.Blind
 
         public static BlindingFactor from_slice(Secp256k1 secp, byte[] data)
         {
-            return new BlindingFactor(SecretKey.from_slice(secp, data));
+            return new BlindingFactor(SecretKey.From_slice(secp, data));
         }
 
         public BlindingFactor clone()
         {
-            return new BlindingFactor(Key.clone());
+            return new BlindingFactor(Key.Clone());
         }
     }
 }

@@ -12,7 +12,7 @@ namespace Grin.WalletImpl.WalletTypes
         public const ulong DEFAULT_BASE_FEE = Consensus.MILLI_GRIN;
 
         /// Transaction fee calculation
-        public static UInt64 tx_fee(uint input_len, uint output_len, uint? base_fee)
+        public static ulong tx_fee(uint input_len, uint output_len, uint? base_fee)
         {
             var use_base_fee = base_fee ?? DEFAULT_BASE_FEE;
 
@@ -23,7 +23,7 @@ namespace Grin.WalletImpl.WalletTypes
                 tx_weight = 1;
             }
 
-            return ((UInt64) tx_weight) * use_base_fee;
+            return ((ulong) tx_weight) * use_base_fee;
         }
 
 

@@ -42,7 +42,7 @@ namespace Grin.Tests.Unit.KeychainTests
             var seed = HexUtil.from_hex("000102030405060708090a0b0c0d0e0f");
             var extk = ExtendedKey.from_seed(s, seed);
             var sec = HexUtil.from_hex("c3f5ae520f474b390a637de4669c84d0ed9bbc21742577fac930834d3c3083dd");
-            var secret_key = SecretKey.from_slice(s, sec);
+            var secret_key = SecretKey.From_slice(s, sec);
             var chaincode = HexUtil.from_hex("e7298e68452b0c6d54837670896e1aee76b118075150d90d4ee416ece106ae72");
 
 
@@ -71,7 +71,7 @@ namespace Grin.Tests.Unit.KeychainTests
             var derived = extk.Derive(s, 0);
             var sec = HexUtil.from_hex("d75f70beb2bd3b56f9b064087934bdedee98e4b5aae6280c58b4eff38847888f"
             );
-            var secret_key = SecretKey.from_slice(s, sec);
+            var secret_key = SecretKey.From_slice(s, sec);
             var chaincode = HexUtil.from_hex("243cb881e1549e714db31d23af45540b13ad07941f64a786bbf3313b4de1df52");
             var root_key_id = HexUtil.from_hex("83e59c48297b78b34b73");
             var identifier = HexUtil.from_hex("0185adb4d8b730099c93");

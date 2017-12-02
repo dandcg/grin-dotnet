@@ -10,7 +10,7 @@ namespace Grin.CoreImpl.Ser
 
         Output[] outputs_committed();
 
-        Int64 overage();
+        long overage();
 
     }
 }

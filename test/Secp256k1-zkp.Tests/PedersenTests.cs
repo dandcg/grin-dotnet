@@ -18,7 +18,7 @@ namespace Secp256k1Proxy.Tests
 
             Commitment Commit(ulong value)
             {
-                var blinding = SecretKey.ZERO_KEY;
+                var blinding = SecretKey.ZeroKey;
                 return secp.commit(value, blinding);
             }
 
@@ -56,8 +56,8 @@ namespace Secp256k1Proxy.Tests
             }
 
             Assert.True(secp.verify_commit_sum(
-                new[] { Commit(5, SecretKey.ONE_KEY) },
-                new[] { Commit(5, SecretKey.ONE_KEY) }
+                new[] { Commit(5, SecretKey.OneKey) },
+                new[] { Commit(5, SecretKey.OneKey) }
                 ));
             
             //// we expect this not to verify
@@ -65,17 +65,17 @@ namespace Secp256k1Proxy.Tests
             //// the keys themselves do not add to 0
 
             Assert.False(secp.verify_commit_sum(
-                new[] { Commit(3, SecretKey.ONE_KEY), Commit(2, SecretKey.ONE_KEY) }, 
-                new[] { Commit(5, SecretKey.ONE_KEY) }));
+                new[] { Commit(3, SecretKey.OneKey), Commit(2, SecretKey.OneKey) }, 
+                new[] { Commit(5, SecretKey.OneKey) }));
 
 
             //// to get these to verify we need to
             //// use the same "sum" of blinding factors on both sides
 
-            var two_key = secp.blind_sum(new []{SecretKey.ONE_KEY, SecretKey.ONE_KEY},new SecretKey[]{} );
+            var two_key = secp.blind_sum(new []{SecretKey.OneKey, SecretKey.OneKey},new SecretKey[]{} );
 
             Assert.True(secp.verify_commit_sum(
-                new[] { Commit(3, SecretKey.ONE_KEY), Commit(2, SecretKey.ONE_KEY) },
+                new[] { Commit(3, SecretKey.OneKey), Commit(2, SecretKey.OneKey) },
                 new[] { Commit(5, two_key) }));
 
         }
@@ -233,7 +233,7 @@ namespace Secp256k1Proxy.Tests
              commit = secp.commit(0, blinding);
             range_proof = secp.range_proof(0, 0, blinding, commit, msg);
             secp.verify_range_proof(commit, range_proof);
-             proof_info = secp.rewind_range_proof(commit, range_proof, blinding.clone());
+             proof_info = secp.rewind_range_proof(commit, range_proof, blinding.Clone());
             Assert.True(proof_info.success);
             Assert.Equal<ulong>(0,proof_info.min);
             Assert.Equal<ulong>(0,proof_info.value);

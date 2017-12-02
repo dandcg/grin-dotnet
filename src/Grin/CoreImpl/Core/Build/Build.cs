@@ -115,7 +115,7 @@ namespace Grin.CoreImpl.Core.Build
         }
 
         /// Sets the lock_height on the transaction being built.
-        public static Append with_lock_height(this Context build, UInt64 lock_height)
+        public static Append with_lock_height(this Context build, ulong lock_height)
         {
             return new Append(build.Tx.with_lock_height(lock_height), build.Sum);
         

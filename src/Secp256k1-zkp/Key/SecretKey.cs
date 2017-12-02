@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Security.Cryptography;
 using Common;
 using Secp256k1Proxy.Ffi;
@@ -6,12 +7,12 @@ using Secp256k1Proxy.Lib;
 
 namespace Secp256k1Proxy.Key
 {
-    public class SecretKey
+    public class SecretKey:ICloneable<SecretKey>
     {
-        public static SecretKey ZERO_KEY = new SecretKey(new byte[]
+        public static SecretKey ZeroKey = new SecretKey(new byte[]
             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
 
-        public static SecretKey ONE_KEY = new SecretKey(new byte[]
+        public static SecretKey OneKey = new SecretKey(new byte[]
             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1});
 
       
@@ -34,15 +35,15 @@ namespace Secp256k1Proxy.Key
             return new SecretKey(data);
         }
 
-        public SecretKey clone()
+        public SecretKey Clone()
         {
-            return new SecretKey(Value);
+            return new SecretKey(Value.ToArray());
         }
 
 
 
         /// Converts a `SECRET_KEY_SIZE`-byte slice to a secret key
-        public static SecretKey from_slice(Secp256k1 secp, byte[] data)
+        public static SecretKey From_slice(Secp256k1 secp, byte[] data)
         { 
             switch (data.Length)
             {
@@ -64,9 +65,9 @@ namespace Secp256k1Proxy.Key
 
 
         /// Adds one secret key to another, modulo the curve order
-        public void add_assign(Secp256k1 secp, SecretKey other)
+        public void Add_assign(Secp256k1 secp, SecretKey other)
         {
-            if (Proxy.secp256k1_ec_privkey_tweak_add(secp.Ctx, this.Value, other.Value) != 1)
+            if (Proxy.secp256k1_ec_privkey_tweak_add(secp.Ctx, Value, other.Value) != 1)
             {
                 throw new Exception("InvalidSecretKey");
             }
@@ -74,15 +75,15 @@ namespace Secp256k1Proxy.Key
 
 
         /// Multiplies one secret key by another, modulo the curve order
-        public void mul_assign(Secp256k1 secp, SecretKey other)
+        public void Mul_assign(Secp256k1 secp, SecretKey other)
         {
-            if (Proxy.secp256k1_ec_privkey_tweak_mul(secp.Ctx,  this.Value, other.Value) != 1)
+            if (Proxy.secp256k1_ec_privkey_tweak_mul(secp.Ctx,  Value, other.Value) != 1)
             {
                 throw new Exception("InvalidSecretKey");
             }
         }
 
-        public void extend_from_slice(byte[] bytes)
+        public void Extend_from_slice(byte[] bytes)
         {
             throw new NotImplementedException();
         }

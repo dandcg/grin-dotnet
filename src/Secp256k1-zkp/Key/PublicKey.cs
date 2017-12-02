@@ -11,9 +11,9 @@ namespace Secp256k1Proxy.Key
 
  
 
-    public class PublicKey
+    public class PublicKey:ICloneable<PublicKey>
     {
-        public byte[] Value { get; private set; }
+        public byte[] Value { get; }
 
         private PublicKey(byte[] value)
         {
@@ -74,7 +74,7 @@ namespace Secp256k1Proxy.Key
         }
 
 
-        public static PublicKey from(byte[] value)
+        public static PublicKey From(byte[] value)
         {
             return new PublicKey(value);
         }
@@ -87,21 +87,21 @@ namespace Secp256k1Proxy.Key
         public byte[] serialize_vec(Secp256k1 secp, bool isCompressed)
         {
 
-            Int64 ret_len = Constants.Constants.PUBLIC_KEY_SIZE;
+            long retLen = Constants.Constants.PUBLIC_KEY_SIZE;
             var ret = new byte[Constants.Constants.PUBLIC_KEY_SIZE];
             
-            var compressed = (uint) (isCompressed==true
+            var compressed = (uint) (isCompressed
                 ? Secp256K1Options.SECP256K1_SER_COMPRESSED
                 : Secp256K1Options.SECP256K1_SER_UNCOMPRESSED);
             
-                var err = Proxy.secp256k1_ec_pubkey_serialize(secp.Ctx, ret, ref ret_len, this.Value, compressed);
+                var err = Proxy.secp256k1_ec_pubkey_serialize(secp.Ctx, ret, ref retLen, Value, compressed);
             
             if (err != 1)
             {
                 throw new Exception("This should never happen!");
             }
         
-            Array.Resize(ref ret,(int)ret_len);
+            Array.Resize(ref ret,(int)retLen);
 
             return ret;
 
@@ -138,6 +138,11 @@ namespace Secp256k1Proxy.Key
             throw new Exception("InvalidSecretKey");
 
 
+        }
+
+        public PublicKey Clone()
+        {
+            return new PublicKey(Value.ToArray());
         }
     }
 }

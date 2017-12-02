@@ -53,7 +53,7 @@ namespace Grin.KeychainImpl.ExtKey
             var keyBytes = slice.Skip(47).Take(32).ToArray();
 
 
-            ext.Key = SecretKey.from_slice(secp, keyBytes);
+            ext.Key = SecretKey.From_slice(secp, keyBytes);
 
             return ext;
         }
@@ -89,7 +89,7 @@ namespace Grin.KeychainImpl.ExtKey
 
             var keyBytes = derived.Take(32).ToArray();
 
-            ext.Key = SecretKey.from_slice(secp, keyBytes);
+            ext.Key = SecretKey.From_slice(secp, keyBytes);
 
             ext.RootKeyId = ext.Identifier(secp);
 
@@ -124,9 +124,9 @@ namespace Grin.KeychainImpl.ExtKey
 
             var derived = blake2B.ComputeHash(seed);
 
-            var secretKey = SecretKey.from_slice(secp, derived.Take(32).ToArray());
+            var secretKey = SecretKey.From_slice(secp, derived.Take(32).ToArray());
 
-            secretKey.add_assign(secp, Key);
+            secretKey.Add_assign(secp, Key);
             
             // TODO check if key != 0 ?
             
@@ -151,7 +151,7 @@ namespace Grin.KeychainImpl.ExtKey
                 RootKeyId = RootKeyId.Clone(),
                 NChild = NChild,
                 Chaincode = Chaincode,
-                Key = Key.clone()
+                Key = Key.Clone()
             };
         }
 

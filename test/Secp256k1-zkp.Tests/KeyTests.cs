@@ -18,11 +18,11 @@ namespace Secp256k1Proxy.Tests
             SecretKey sk = null;
 
             var ex = Assert.Throws<Exception>(
-                () => { sk = SecretKey.from_slice(secp256k1, ByteUtil.get_bytes(1, 31)); });
+                () => { sk = SecretKey.From_slice(secp256k1, ByteUtil.get_bytes(1, 31)); });
 
             Assert.Equal("InvalidSecretKey", ex.Message);
 
-            sk = SecretKey.from_slice(secp256k1, ByteUtil.get_bytes(1, 32));
+            sk = SecretKey.From_slice(secp256k1, ByteUtil.get_bytes(1, 32));
 
             Assert.NotEmpty(sk.Value);
         }
@@ -68,11 +68,11 @@ namespace Secp256k1Proxy.Tests
             SecretKey sk = null;
 
             var ex = Assert.Throws<Exception>(
-                () => { sk = SecretKey.from_slice(secp256k1, ByteUtil.get_bytes(1, 31)); });
+                () => { sk = SecretKey.From_slice(secp256k1, ByteUtil.get_bytes(1, 31)); });
 
             Assert.Equal("InvalidSecretKey", ex.Message);
 
-            sk = SecretKey.from_slice(secp256k1, ByteUtil.get_bytes(1, 32));
+            sk = SecretKey.From_slice(secp256k1, ByteUtil.get_bytes(1, 32));
 
             Assert.NotEmpty(sk.Value);
         }
@@ -86,14 +86,14 @@ namespace Secp256k1Proxy.Tests
             Exception ex;
 
             // Zero
-            ex = Assert.Throws<Exception>(() => { SecretKey.from_slice(s, ByteUtil.get_bytes(0, 32)); });
+            ex = Assert.Throws<Exception>(() => { SecretKey.From_slice(s, ByteUtil.get_bytes(0, 32)); });
             Assert.Equal("InvalidSecretKey", ex.Message);
             // -1
-            ex = Assert.Throws<Exception>(() => { SecretKey.from_slice(s, ByteUtil.get_bytes(0xff, 32)); });
+            ex = Assert.Throws<Exception>(() => { SecretKey.From_slice(s, ByteUtil.get_bytes(0xff, 32)); });
             Assert.Equal("InvalidSecretKey", ex.Message);
 
             // Top of range
-            var sk1 = SecretKey.from_slice(s, new byte[]
+            var sk1 = SecretKey.From_slice(s, new byte[]
             {
                 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
                 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFE,
@@ -106,7 +106,7 @@ namespace Secp256k1Proxy.Tests
             // One past top of range
             ex = Assert.Throws<Exception>(() =>
             {
-                SecretKey.from_slice(s, new byte[]
+                SecretKey.From_slice(s, new byte[]
                 {
                     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
                     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFE,
@@ -431,12 +431,12 @@ namespace Secp256k1Proxy.Tests
             var( sk2, pk2) = s.generate_keypair(RandomNumberGenerator.Create());
 
             Assert.Equal(PublicKey.from_secret_key(s, sk1).Value, pk1.Value);
-            sk1.add_assign(s, sk2);
+            sk1.Add_assign(s, sk2);
             pk1.add_exp_assign(s, sk2);
             Assert.Equal(PublicKey.from_secret_key(s, sk1).Value, pk1.Value);
 
             Assert.Equal(PublicKey.from_secret_key(s, sk2).Value, pk2.Value);
-            sk2.add_assign(s, sk1);
+            sk2.Add_assign(s, sk1);
             pk2.add_exp_assign(s, sk1);
             Assert.Equal(PublicKey.from_secret_key(s, sk2).Value, pk2.Value);
         }
@@ -450,13 +450,13 @@ namespace Secp256k1Proxy.Tests
             var( sk2, pk2) = s.generate_keypair(RandomNumberGenerator.Create());
 
             Assert.Equal(PublicKey.from_secret_key(s, sk1).Value, pk1.Value);
-            sk1.mul_assign(s, sk2);
+            sk1.Mul_assign(s, sk2);
             pk1.mul_assign(s, sk2);
             Assert.Equal(PublicKey.from_secret_key(s, sk1).Value, pk1.Value);
 
             var pp = PublicKey.from_secret_key(s, sk2);
             Assert.Equal(pp.Value, pk2.Value);
-            sk2.mul_assign(s, sk1);
+            sk2.Mul_assign(s, sk1);
             pk2.mul_assign(s, sk1);
             Assert.Equal(PublicKey.from_secret_key(s, sk2).Value, pk2.Value);
         }

@@ -41,7 +41,7 @@ namespace Grin.KeychainImpl
         public static Keychain Burn_enabled(Keychain keychain, Identifier burnKeyId)
         {
             var keyOverridesNew =
-                new Dictionary<string, SecretKey> {{burnKeyId.Hex, SecretKey.from_slice(keychain.Secp, new byte[32])}};
+                new Dictionary<string, SecretKey> {{burnKeyId.Hex, SecretKey.From_slice(keychain.Secp, new byte[32])}};
             return new Keychain(keychain.Secp, keychain.Extkey.Clone(), keyOverridesNew, keychain.KeyDerivationCache);
         }
 

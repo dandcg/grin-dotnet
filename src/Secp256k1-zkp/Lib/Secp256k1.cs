@@ -143,7 +143,7 @@ namespace Secp256k1Proxy.Lib
 
             if (Proxy.secp256k1_ecdsa_recover(Ctx, pkBytes, sig.Value, msg.Value) != 1)
                 throw new Exception("InvalidSignature");
-            return PublicKey.from(pkBytes);
+            return PublicKey.From(pkBytes);
         }
 
         /// Checks that `sig` is a valid ECDSA signature for `msg` using the public

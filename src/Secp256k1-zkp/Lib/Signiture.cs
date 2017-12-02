@@ -103,7 +103,7 @@ namespace Secp256k1Proxy.Lib
         public byte[] serialize_der(Secp256k1 secp)
         {
             var ret = new byte[72];
-            Int64 ret_len = ret.Length;
+            long ret_len = ret.Length;
 
             var err = Proxy.secp256k1_ecdsa_signature_serialize_der(secp.Ctx, ret,ref ret_len,Value);
 

@@ -49,7 +49,7 @@ namespace Grin.CoreImpl.Core.Mod
      
             if (committed.overage() != 0)
             {
-                var over_commit = secp.commit_value((UInt64)Math.Abs(committed.overage()));
+                var over_commit = secp.commit_value((ulong)Math.Abs(committed.overage()));
                 if (committed.overage() < 0)
                 {
                     inputCommits.Add(over_commit);

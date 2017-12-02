@@ -15,12 +15,12 @@ namespace Grin.CoreImpl.Core.Mod
         }
 
         /// The nonces
-        public UInt32[] nonces { get; private set; }
+        public uint[] nonces { get; private set; }
         /// The proof size
         public uint proof_size { get; private set; }
 
         /// Builds a proof with all bytes zeroed out
-        public static Proof New(UInt32[] in_nonces)
+        public static Proof New(uint[] in_nonces)
         {
             return new Proof
             {
@@ -35,26 +35,26 @@ namespace Grin.CoreImpl.Core.Mod
             return new Proof
             {
                 proof_size = proofSize,
-                nonces = new UInt32[proofSize]
+                nonces = new uint[proofSize]
             };
         }
 
 
         /// Converts the proof to a vector of u64s
-        public UInt64[] to_u64s()
+        public ulong[] to_u64s()
         {
-            var out_nonces = new UInt64[proof_size];
+            var out_nonces = new ulong[proof_size];
 
             for (var n = 0; n < proof_size; n++)
             {
-                out_nonces[n] = (UInt64) nonces[n];
+                out_nonces[n] = (ulong) nonces[n];
             }
 
             return out_nonces;
         }
 
         /// Converts the proof to a vector of u32s
-        public UInt32[] to_u32s()
+        public uint[] to_u32s()
         {
             return Clone().nonces;
         }

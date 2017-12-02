@@ -48,7 +48,7 @@ namespace Secp256k1Proxy.Ffi
     
         [DllImport(LibName)]
         // pub fn secp256k1_ec_pubkey_serialize(cx: *const Context, output: *const c_uchar, out_len: *mut size_t, pk: *const PublicKey, compressed: c_uint) -> c_int;
-        public static extern int secp256k1_ec_pubkey_serialize(IntPtr ctx, byte[] ret, [In, Out] ref Int64 retLength, [In] byte[] pubkey, uint compressed);
+        public static extern int secp256k1_ec_pubkey_serialize(IntPtr ctx, byte[] ret, [In, Out] ref long retLength, [In] byte[] pubkey, uint compressed);
 
         // [ Signatures ]
 
@@ -245,8 +245,8 @@ namespace Secp256k1Proxy.Ffi
         //        extra_commit_len: size_t,
         //		gen: *const c_uchar
         //	) -> c_int;
-        public static extern int secp256k1_rangeproof_rewind(IntPtr selfCtx, byte[] blind_out, ref UInt64 value,
-            byte[] message, ref UInt64 mlen, byte[] nonce, ref UInt64 min, ref UInt64 max, byte[] commit,
+        public static extern int secp256k1_rangeproof_rewind(IntPtr selfCtx, byte[] blind_out, ref ulong value,
+            byte[] message, ref ulong mlen, byte[] nonce, ref ulong min, ref ulong max, byte[] commit,
             byte[] proofProof, int proofPlen, byte[] extra_commit, int extra_commit_len, byte[] generatorH);
         
 
@@ -262,7 +262,7 @@ namespace Secp256k1Proxy.Ffi
         //        extra_commit_len: size_t,
         //		gen: *const c_uchar
         //	) -> c_int;
-        public static extern int secp256k1_rangeproof_verify(IntPtr ctx, ref UInt64 min_value, ref UInt64 max_value,
+        public static extern int secp256k1_rangeproof_verify(IntPtr ctx, ref ulong min_value, ref ulong max_value,
             byte[] commit, byte[] proof, int plen, byte[] extra_commit, int extra_commit_len, byte[] gen);
       
 
@@ -285,7 +285,7 @@ namespace Secp256k1Proxy.Ffi
         //		gen: *const c_uchar
         //	) -> c_int;
         public static extern int secp256k1_rangeproof_sign(IntPtr selfCtx,  IntPtr proof, ref int plen, ulong min_value,
-            byte[] commit, byte[] blind, byte[] nonce, int exp, int min_bits, UInt64 value, byte[] message,
+            byte[] commit, byte[] blind, byte[] nonce, int exp, int min_bits, ulong value, byte[] message,
             int msg_len, byte[] extra_commit, int extra_commit_len, byte[] gen);
 
 

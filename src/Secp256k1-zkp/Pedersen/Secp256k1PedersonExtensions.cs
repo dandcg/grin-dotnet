@@ -169,7 +169,7 @@ namespace Secp256k1Proxy.Pedersen
 
             if (err == 1)
 
-                return SecretKey.from_slice(self, ret);
+                return SecretKey.From_slice(self, ret);
             ;
             // secp256k1 should never return an invalid private
             throw new Exception("This should never happen!");
@@ -193,7 +193,7 @@ namespace Secp256k1Proxy.Pedersen
             // of the commitment for which we are generating the range proof
             // so we can later recover the value and the message by unwinding the range proof
             // with the same nonce
-            var nonce = blind.clone();
+            var nonce = blind.Clone();
 
             var extra_commit = ByteUtil.get_bytes(0, 33);
 
@@ -308,7 +308,7 @@ namespace Secp256k1Proxy.Pedersen
             var blind = new byte[32];
 
             var message = new byte[Constants.Constants.PROOF_MSG_SIZE];
-            var mlen = (UInt64)Constants.Constants.PROOF_MSG_SIZE;
+            var mlen = (ulong)Constants.Constants.PROOF_MSG_SIZE;
             
             ulong min = 0;
             ulong max = 0;
