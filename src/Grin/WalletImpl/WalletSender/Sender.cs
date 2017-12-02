@@ -194,7 +194,7 @@ namespace Grin.WalvarImpl.WalvarSender
             var(tx_burn, _) = Build.transaction(parts.ToArray(), keychain);
             tx_burn.validate(keychain.Secp);
 
-            var tx_hex = HexUtil.to_hex(Ser.ser_vec(tx_burn));
+            var tx_hex = HexUtil.to_hex(Ser.Ser_vec(tx_burn));
 
             var url = $"{config.check_node_api_http_addr}/v1/pool/push";
 

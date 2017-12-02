@@ -1,37 +1,34 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Common.Algo
 {
     public static class Algo
     {
-
         public static IEnumerable<IEnumerable<T>> Tuples<T>(this IEnumerable<T> input, int groupCount)
         {
-            if (null == input) throw new ArgumentException("input");
+            if (input == null) throw new ArgumentException("input");
             if (groupCount < 1) throw new ArgumentException("groupCount");
 
-            var e = input.GetEnumerator();
-
-            bool done = false;
-            while (!done)
+            using (var e = input.GetEnumerator())
             {
-                var l = new List<T>();
-                for (var n = 0; n < groupCount; ++n)
+                while (true)
                 {
-                    if (!e.MoveNext())
+                    var l = new List<T>();
+                    for (var n = 0; n < groupCount; ++n)
                     {
-                        if (n != 0)
+                        if (!e.MoveNext())
                         {
-                            yield return l;
+                            if (n != 0)
+                            {
+                                yield return l;
+                            }
+                            yield break;
                         }
-                        yield break;
+                        l.Add(e.Current);
                     }
-                    l.Add(e.Current);
+                    yield return l;
                 }
-                yield return l;
             }
         }
     }

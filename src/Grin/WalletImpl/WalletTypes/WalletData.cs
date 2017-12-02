@@ -204,13 +204,10 @@ namespace Grin.WalletImpl.WalletTypes
         /// TODO - we should track identifier on these outputs (not just n_child)
         public void lock_output(OutputData outd)
         {
-            var out_to_lock = outputs[outd.key_id.Hex];
-            if (out_to_lock != null)
+            var outToLock = outputs[outd.key_id.Hex];
+            if (outToLock?.value == outd.value)
             {
-                if (out_to_lock.value == outd.value)
-                {
-                    out_to_lock.Lock();
-                }
+                outToLock.Lock();
             }
         }
 

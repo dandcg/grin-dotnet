@@ -168,9 +168,10 @@ namespace Secp256k1Proxy.Pedersen
 
 
             if (err == 1)
-
+            {
                 return SecretKey.From_slice(self, ret);
-            ;
+            }
+
             // secp256k1 should never return an invalid private
             throw new Exception("This should never happen!");
         }

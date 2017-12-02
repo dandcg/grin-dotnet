@@ -39,7 +39,7 @@ namespace Grin.CoreImpl.Core.Mod
             var outputCommits = new List<Commitment>();
             foreach (var output in committed.outputs_committed())
             {
-              outputCommits.Add(output.commit);
+              outputCommits.Add(output.Commit);
 
             }
 

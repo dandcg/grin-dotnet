@@ -79,10 +79,10 @@ namespace Grin.CoreImpl.Core.Mod
 
         public void read(IReader reader)
         {
-            var proof_size =Global.proofsize();
-            var pow = new uint[ proof_size];
+            var proofSize =Global.proofsize();
+            var pow = new uint[ proofSize];
 
-            for (var n = 0; n < proof_size; n++)
+            for (var n = 0; n < proofSize; n++)
             {
                 pow[n] =reader.read_u32();
             }

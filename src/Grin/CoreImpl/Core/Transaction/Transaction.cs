@@ -145,8 +145,8 @@ namespace Grin.CoreImpl.Core.Transaction
             var input_len = reader.read_u64();
             var output_len = reader.read_u64();
 
-            inputs = Ser.Ser.read_and_verify_sorted<Input>(reader, input_len);
-            outputs = Ser.Ser.read_and_verify_sorted<Output>(reader, output_len);
+            inputs = Ser.Ser.Read_and_verify_sorted<Input>(reader, input_len);
+            outputs = Ser.Ser.Read_and_verify_sorted<Output>(reader, output_len);
         }
 
 

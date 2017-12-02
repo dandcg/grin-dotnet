@@ -31,7 +31,7 @@ namespace Grin.WalletImpl.WalletTypes
             {
                 amount = receiveAmount,
                 blind_sum = HexUtil.to_hex(blindSum.Key.Value),
-                tx = HexUtil.to_hex(Ser.ser_vec(transaction))
+                tx = HexUtil.to_hex(Ser.Ser_vec(transaction))
             };
         }
 
@@ -48,7 +48,7 @@ namespace Grin.WalletImpl.WalletTypes
 
             using (var ms = new MemoryStream(tx_bin))
             {
-                var transaction = Ser.deserialize(ms, Transaction.Empty());
+                var transaction = Ser.Deserialize(ms, Transaction.Empty());
 
                 //  Error::Format("Could not deserialize transaction, invalid format.".to_string())
 

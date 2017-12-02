@@ -42,7 +42,7 @@ namespace Grin.KeychainImpl.ExtKey
             var ext = new ExtendedKey {Depth = slice[0]};
 
             var rootKeyBytes = slice.Skip(1).Take(10).ToArray();
-            ext.RootKeyId = ExtKey.Identifier.from_bytes(rootKeyBytes);
+            ext.RootKeyId = ExtKey.Identifier.From_bytes(rootKeyBytes);
 
             var nchildBytes = slice.Skip(11).Take(4).ToArray();
             Array.Reverse(nchildBytes);
@@ -104,7 +104,7 @@ namespace Grin.KeychainImpl.ExtKey
             // get public key from private
             var keyId = PublicKey.from_secret_key(secp, Key);
 
-            return ExtKey.Identifier.from_key_id(secp, keyId);
+            return ExtKey.Identifier.From_key_id(secp, keyId);
         }
 
         /// Derive an extended key from an extended key

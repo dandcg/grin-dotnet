@@ -174,9 +174,7 @@ namespace Secp256k1Proxy.Tests
 
                 //round_trip_serde!(sig1);
 
-                Exception ex;
-
-                ex = Assert.Throws<Exception>(() => { Signiture.from_compact(s, der); });
+                var ex = Assert.Throws<Exception>(() => { Signiture.from_compact(s, der); });
                 Assert.Equal("InvalidSignature", ex.Message);
 
                 ex = Assert.Throws<Exception>(() => { Signiture.from_compact(s, compact.Take(5).ToArray()); });

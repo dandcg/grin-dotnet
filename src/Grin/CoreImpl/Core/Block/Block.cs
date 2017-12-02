@@ -161,9 +161,9 @@ namespace Grin.CoreImpl.Core.Block
 
             var out_set = new HashSet<string>();
 
-            foreach (var o in outputs.Where(w => !w.features.HasFlag(OutputFeatures.COINBASE_OUTPUT)))
+            foreach (var o in outputs.Where(w => !w.Features.HasFlag(OutputFeatures.COINBASE_OUTPUT)))
             {
-                out_set.Add(o.commit.Hex);
+                out_set.Add(o.Commit.Hex);
             }
 
 
@@ -172,7 +172,7 @@ namespace Grin.CoreImpl.Core.Block
             var new_inputs = inputs.Where(w => !commitments_to_compact.Contains(w.Commitment.Hex))
                 .Select(s => s.Clone());
 
-            var new_outputs = outputs.Where(w => !commitments_to_compact.Contains(w.commit.Hex)).Select(s => s.Clone());
+            var new_outputs = outputs.Where(w => !commitments_to_compact.Contains(w.Commit.Hex)).Select(s => s.Clone());
 
 
             var new_kernels = kernels.Select(s => s.Clone());
@@ -224,7 +224,7 @@ namespace Grin.CoreImpl.Core.Block
         /// TODO - performs various verification steps - discuss renaming this to "verify"
         public void validate(Secp256k1 secp)
         {
-            if (Consensus.exceeds_weight((uint) inputs.Length, (uint) outputs.Length, (uint) kernels.Length))
+            if (Consensus.Exceeds_weight((uint) inputs.Length, (uint) outputs.Length, (uint) kernels.Length))
             {
                 throw new BlockErrorException(BlockError.WeightExceeded);
             }
@@ -283,7 +283,7 @@ namespace Grin.CoreImpl.Core.Block
         //   the coinbase-marked kernels.
         public void verify_coinbase()
         {
-            var cb_outs = outputs.Where(w => w.features.HasFlag(OutputFeatures.COINBASE_OUTPUT)).Select(s => s.commit)
+            var cb_outs = outputs.Where(w => w.Features.HasFlag(OutputFeatures.COINBASE_OUTPUT)).Select(s => s.Commit)
                 .ToArray();
 
             var cb_kerns = kernels.Where(w => w.features.HasFlag(KernelFeatures.COINBASE_KERNEL)).Select(s => s.excess)
@@ -295,7 +295,7 @@ namespace Grin.CoreImpl.Core.Block
             Commitment kerns_sum;
             try
             {
-                var over_commit = secp.commit_value(Consensus.reward(total_fees()));
+                var over_commit = secp.commit_value(Consensus.Reward(total_fees()));
                 out_adjust_sum = secp.commit_sum(cb_outs, new[] {over_commit});
                 kerns_sum = secp.commit_sum(cb_kerns, new Commitment[] { });
             }
@@ -315,7 +315,7 @@ namespace Grin.CoreImpl.Core.Block
         {
             var secp = keychain.Secp;
 
-            var commit = keychain.Commit(Consensus.reward(fees), keyId);
+            var commit = keychain.Commit(Consensus.Reward(fees), keyId);
             var switch_commit = keychain.Switch_commit(keyId);
             var switch_commit_hash = SwitchCommitHash.From_switch_commit(switch_commit);
 
@@ -331,18 +331,18 @@ namespace Grin.CoreImpl.Core.Block
             );
 
             var msg = ProofMessage.empty();
-            var rproof = keychain.Range_proof(Consensus.reward(fees), keyId, commit, msg);
+            var rproof = keychain.Range_proof(Consensus.Reward(fees), keyId, commit, msg);
 
             var output = new Output
             {
-                features = OutputFeatures.COINBASE_OUTPUT,
-                commit = commit,
-                switch_commit_hash = switch_commit_hash,
-                proof = rproof
+                Features = OutputFeatures.COINBASE_OUTPUT,
+                Commit = commit,
+                SwitchCommitHash = switch_commit_hash,
+                Proof = rproof
             };
 
-            var over_commit = secp.commit_value(Consensus.reward(fees));
-            var out_commit = output.commit;
+            var over_commit = secp.commit_value(Consensus.Reward(fees));
+            var out_commit = output.Commit;
             var excess = secp.commit_sum(new[] {out_commit}, new[] {over_commit});
 
             var msg2 = Message.from_slice(new byte[Constants.MESSAGE_SIZE]);
@@ -370,9 +370,9 @@ namespace Grin.CoreImpl.Core.Block
             var output_len = reader.read_u64();
             var kernel_len = reader.read_u64();
 
-            inputs = Ser.Ser.read_and_verify_sorted<Input>(reader, input_len);
-            outputs = Ser.Ser.read_and_verify_sorted<Output>(reader, output_len);
-            kernels = Ser.Ser.read_and_verify_sorted<TxKernel>(reader, kernel_len);
+            inputs = Ser.Ser.Read_and_verify_sorted<Input>(reader, input_len);
+            outputs = Ser.Ser.Read_and_verify_sorted<Output>(reader, output_len);
+            kernels = Ser.Ser.Read_and_verify_sorted<TxKernel>(reader, kernel_len);
 
         }
 

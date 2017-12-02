@@ -13,36 +13,35 @@ namespace Secp256k1Proxy.Tests
         [Fact]
         public void skey_from_slice()
         {
-            var secp256k1 = Secp256k1.New();
+            var secp256K1 = Secp256k1.New();
 
-            SecretKey sk = null;
+            // ReSharper disable once JoinDeclarationAndInitializer
+            SecretKey sk;
 
             var ex = Assert.Throws<Exception>(
-                () => { sk = SecretKey.From_slice(secp256k1, ByteUtil.get_bytes(1, 31)); });
+                () => { sk = SecretKey.From_slice(secp256K1, ByteUtil.get_bytes(1, 31)); });
 
             Assert.Equal("InvalidSecretKey", ex.Message);
 
-            sk = SecretKey.From_slice(secp256k1, ByteUtil.get_bytes(1, 32));
+            sk = SecretKey.From_slice(secp256K1, ByteUtil.get_bytes(1, 32));
 
             Assert.NotEmpty(sk.Value);
         }
 
 
         [Fact]
-        public void pubkey_from_slice()
+        public void Pubkey_from_slice()
         {
-            var secp256k1 = Secp256k1.New();
+            var secp256K1 = Secp256k1.New();
 
-            Exception ex = null;
-
-            ex = Assert.Throws<Exception>(() => { PublicKey.from_slice(secp256k1, null); });
+            var ex = Assert.Throws<Exception>(() => { PublicKey.from_slice(secp256K1, null); });
             Assert.Equal("InvalidPublicKey", ex.Message);
 
-            ex = Assert.Throws<Exception>(() => { PublicKey.from_slice(secp256k1, new byte[] {1, 2, 3}); });
+            ex = Assert.Throws<Exception>(() => { PublicKey.from_slice(secp256K1, new byte[] {1, 2, 3}); });
             Assert.Equal("InvalidPublicKey", ex.Message);
 
 
-            var uncompressed = PublicKey.from_slice(secp256k1, new byte[]
+            var uncompressed = PublicKey.from_slice(secp256K1, new byte[]
             {
                 4, 54, 57, 149, 239, 162, 148, 175, 246, 254, 239, 75, 154, 152, 10, 82, 234, 224, 85, 220, 40, 100, 57,
                 121, 30, 162, 94, 156, 135, 67, 74, 49, 179, 57, 236, 53, 162, 124, 149, 144, 168, 77, 74, 30, 72, 211,
@@ -51,7 +50,7 @@ namespace Secp256k1Proxy.Tests
             Assert.NotEmpty(uncompressed.Value);
 
 
-            var compressed = PublicKey.from_slice(secp256k1, new byte[]
+            var compressed = PublicKey.from_slice(secp256K1, new byte[]
             {
                 3, 23, 183, 225, 206, 31, 159, 148, 195, 42, 67, 115, 146, 41, 248, 140, 11, 3, 51, 41, 111, 180, 110,
                 143, 114, 134, 88, 73, 198, 174, 52, 184, 78
@@ -61,32 +60,31 @@ namespace Secp256k1Proxy.Tests
 
 
         [Fact]
-        public void keypair_slice_round_trip()
+        public void Keypair_slice_round_trip()
         {
-            var secp256k1 = Secp256k1.New();
+            var secp256K1 = Secp256k1.New();
 
-            SecretKey sk = null;
+            // ReSharper disable once JoinDeclarationAndInitializer
+            SecretKey sk;
 
             var ex = Assert.Throws<Exception>(
-                () => { sk = SecretKey.From_slice(secp256k1, ByteUtil.get_bytes(1, 31)); });
+                () => { sk = SecretKey.From_slice(secp256K1, ByteUtil.get_bytes(1, 31)); });
 
             Assert.Equal("InvalidSecretKey", ex.Message);
 
-            sk = SecretKey.From_slice(secp256k1, ByteUtil.get_bytes(1, 32));
+            sk = SecretKey.From_slice(secp256K1, ByteUtil.get_bytes(1, 32));
 
             Assert.NotEmpty(sk.Value);
         }
 
 
         [Fact]
-        public void invalid_secret_key()
+        public void Invalid_secret_key()
         {
             var s = Secp256k1.New();
 
-            Exception ex;
-
             // Zero
-            ex = Assert.Throws<Exception>(() => { SecretKey.From_slice(s, ByteUtil.get_bytes(0, 32)); });
+            var ex = Assert.Throws<Exception>(() => { SecretKey.From_slice(s, ByteUtil.get_bytes(0, 32)); });
             Assert.Equal("InvalidSecretKey", ex.Message);
             // -1
             ex = Assert.Throws<Exception>(() => { SecretKey.From_slice(s, ByteUtil.get_bytes(0xff, 32)); });
@@ -104,7 +102,7 @@ namespace Secp256k1Proxy.Tests
             Assert.NotEmpty(sk1.Value);
 
             // One past top of range
-            ex = Assert.Throws<Exception>(() =>
+            Assert.Throws<Exception>(() =>
             {
                 SecretKey.From_slice(s, new byte[]
                 {
@@ -118,7 +116,7 @@ namespace Secp256k1Proxy.Tests
 
 
         [Fact]
-        public void test_pubkey_from_slice_bad_context()
+        public void Test_pubkey_from_slice_bad_context()
         {
             var s = Secp256k1.WithoutCaps();
             var sk = SecretKey.New(s, RandomNumberGenerator.Create());
@@ -139,7 +137,7 @@ namespace Secp256k1Proxy.Tests
         }
 
         [Fact]
-        public void test_add_exp_bad_context()
+        public void Test_add_exp_bad_context()
         {
             var s = Secp256k1.WithCaps(ContextFlag.Full);
             var (sk, pk) = s.generate_keypair(RandomNumberGenerator.Create());
@@ -161,7 +159,7 @@ namespace Secp256k1Proxy.Tests
         }
 
         [Fact]
-        public void test_bad_deserialize()
+        public void Test_bad_deserialize()
         {
             //use std.io.Cursor;
             //use serialize.{ json, Decodable};
@@ -197,7 +195,7 @@ namespace Secp256k1Proxy.Tests
         }
 
         [Fact]
-        public void test_serialize()
+        public void Test_serialize()
         {
             //use std.io.Cursor;
             //use serialize.{ json, Decodable, Encodable};
@@ -226,7 +224,7 @@ namespace Secp256k1Proxy.Tests
         }
 
         [Fact]
-        public void test_bad_serde_deserialize()
+        public void Test_bad_serde_deserialize()
         {
             //use serde.Deserialize;
             //use json;
@@ -282,7 +280,7 @@ namespace Secp256k1Proxy.Tests
 
 
         [Fact]
-        public void test_serialize_serde()
+        public void Test_serialize_serde()
         {
             //var s = Secp256k1.new();
             //for _ in 0..500 {
@@ -293,7 +291,7 @@ namespace Secp256k1Proxy.Tests
         }
 
         [Fact]
-        public void test_out_of_range()
+        public void Test_out_of_range()
         {
             //struct BadRng(u8);
             //impl Rng for BadRng
@@ -309,33 +307,33 @@ namespace Secp256k1Proxy.Tests
             //s.generate_keypair(&BadRng(0xff)).unwrap();
         }
 
-        private void ext_u32()
-        {
-        }
+        //private void Ext_u32()
+        //{
+        //}
 
 
         // This will set a secret key to a little over the
         // group order, then decrement with repeated calls
         // until it returns a valid key
 
-        private void fill_bytes(byte[] data)
-        {
-            var group_order = new byte[32]
-            {
-                0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-                0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe,
-                0xba, 0xae, 0xdc, 0xe6, 0xaf, 0x48, 0xa0, 0x3b,
-                0xbf, 0xd2, 0x5e, 0x8c, 0xd0, 0x36, 0x41, 0x41
-            };
+        //private void Fill_bytes(byte[] data)
+        //{
+        //    var groupOrder = new byte[]
+        //    {
+        //        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+        //        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe,
+        //        0xba, 0xae, 0xdc, 0xe6, 0xaf, 0x48, 0xa0, 0x3b,
+        //        0xbf, 0xd2, 0x5e, 0x8c, 0xd0, 0x36, 0x41, 0x41
+        //    };
 
-            //assert_eq!(data.len(), 32);
-            //data.copy_from_slice(&group_order[..]);
-            //data[31] = self.0;
-            //self.0 -= 1;
-        }
+        //    //assert_eq!(data.len(), 32);
+        //    //data.copy_from_slice(&group_order[..]);
+        //    //data[31] = self.0;
+        //    //self.0 -= 1;
+        //}
 
         [Fact]
-        public void test_pubkey_from_bad_slice()
+        public void Test_pubkey_from_bad_slice()
         {
             var s = Secp256k1.New();
 
@@ -357,12 +355,14 @@ namespace Secp256k1Proxy.Tests
 
             Assert.Throws<Exception>(() =>
             {
-                PublicKey.from_slice(s, ByteUtil.get_bytes(0, Constants.Constants.UNCOMPRESSED_PUBLIC_KEY_SIZE - 1));
+                PublicKey.from_slice(s,
+                    ByteUtil.get_bytes(0, Constants.Constants.UNCOMPRESSED_PUBLIC_KEY_SIZE - 1));
             });
 
             Assert.Throws<Exception>(() =>
             {
-                PublicKey.from_slice(s, ByteUtil.get_bytes(0, Constants.Constants.UNCOMPRESSED_PUBLIC_KEY_SIZE + 1));
+                PublicKey.from_slice(s,
+                    ByteUtil.get_bytes(0, Constants.Constants.UNCOMPRESSED_PUBLIC_KEY_SIZE + 1));
             });
 
             //// Bad parse
@@ -376,11 +376,10 @@ namespace Secp256k1Proxy.Tests
             {
                 PublicKey.from_slice(s, ByteUtil.get_bytes(0x55, Constants.Constants.COMPRESSED_PUBLIC_KEY_SIZE));
             });
-
         }
 
         [Fact]
-        public void test_debug_output()
+        public void Test_debug_output()
         {
             //struct DumbRng(u32);
             //impl Rng for DumbRng
@@ -400,7 +399,7 @@ namespace Secp256k1Proxy.Tests
         }
 
         [Fact]
-        public void test_pubkey_serialize()
+        public void Test_pubkey_serialize()
         {
             //struct DumbRng(u32);
             //impl Rng for DumbRng
@@ -423,7 +422,7 @@ namespace Secp256k1Proxy.Tests
         }
 
         [Fact]
-        public void test_addition()
+        public void Test_addition()
         {
             var s = Secp256k1.New();
 
@@ -442,7 +441,7 @@ namespace Secp256k1Proxy.Tests
         }
 
         [Fact]
-        public void test_multiplication()
+        public void Test_multiplication()
         {
             var s = Secp256k1.New();
 
@@ -462,9 +461,8 @@ namespace Secp256k1Proxy.Tests
         }
 
         [Fact]
-        public void pubkey_hash()
+        public void Pubkey_hash()
         {
-
             var s = Secp256k1.New();
             var set = new HashSet<byte[]>();
 
@@ -479,23 +477,15 @@ namespace Secp256k1Proxy.Tests
 
                 set.Add(hash);
             }
-
         }
 
         private byte[] Hash(byte[] data)
 
         {
-            using (MD5 md5Hash = MD5.Create())
+            using (var md5Hash = MD5.Create())
             {
-
-
                 return md5Hash.ComputeHash(data);
-
-
-
             }
-
         }
-
     }
 }

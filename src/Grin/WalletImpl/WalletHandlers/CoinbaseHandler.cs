@@ -38,7 +38,7 @@ namespace Grin.WalletImpl.WalletHandlers
             //     api::Error::Internal(format!("Error serializing output: {:?}", e))
 
             // })?;
-            var out_bin = Ser.ser_vec(outp);
+            var out_bin = Ser.Ser_vec(outp);
 
             // let kern_bin = ser::ser_vec(&kern).map_err(| e | {
 
@@ -46,7 +46,7 @@ namespace Grin.WalletImpl.WalletHandlers
 
             // })?;
 
-            var kern_bin = Ser.ser_vec(kern);
+            var kern_bin = Ser.Ser_vec(kern);
 
             //    let key_id_bin = match block_fees.key_id_set {
 
@@ -63,7 +63,7 @@ namespace Grin.WalletImpl.WalletHandlers
             //    };
 
 
-            var key_id_bin = block_fees.key_id != null ? block_fees.key_id.Bytes : new byte[Identifier.IdentifierSize];
+            var key_id_bin = block_fees.KeyId != null ? block_fees.KeyId.Bytes : new byte[Identifier.IdentifierSize];
 
             return new CbData(HexUtil.to_hex(out_bin), HexUtil.to_hex(kern_bin), HexUtil.to_hex(key_id_bin));
        

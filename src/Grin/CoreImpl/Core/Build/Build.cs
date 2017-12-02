@@ -91,10 +91,10 @@ namespace Grin.CoreImpl.Core.Build
             return new Append(
                 build.Tx.with_output(new Output
                 {
-                    features = OutputFeatures.DEFAULT_OUTPUT,
-                    commit = commit,
-                    switch_commit_hash = switch_commit_hash,
-                    proof = rproof
+                    Features = OutputFeatures.DEFAULT_OUTPUT,
+                    Commit = commit,
+                    SwitchCommitHash = switch_commit_hash,
+                    Proof = rproof
                 })
                 ,
                 build.Sum.add_key_id(key_id.Clone()));

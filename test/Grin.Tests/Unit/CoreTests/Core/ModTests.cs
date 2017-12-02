@@ -16,7 +16,7 @@ namespace Grin.Tests.Unit.CoreTests.Core
     public class ModTests : IClassFixture<LoggingFixture>
     {
         [Fact]
-        public void test_amount_to_hr()
+        public void Test_amount_to_hr()
         {
             Assert.True(50123456789 == ModHelper.amount_from_hr_string("50.123456789"));
             Assert.True(50 == ModHelper.amount_from_hr_string(".000000050"));
@@ -27,7 +27,7 @@ namespace Grin.Tests.Unit.CoreTests.Core
         }
 
         [Fact]
-        public void test_hr_to_amount()
+        public void Test_hr_to_amount()
         {
             Assert.Equal("50.123456789", ModHelper.amount_to_hr_string(50123456789));
             Assert.Equal("0.000000050", ModHelper.amount_to_hr_string(50));
@@ -38,7 +38,7 @@ namespace Grin.Tests.Unit.CoreTests.Core
 
 
         [Fact]
-        public void test_zero_commit_fails()
+        public void Test_zero_commit_fails()
         {
             var keychain = Keychain.From_random_seed();
             var keyId1 = keychain.Derive_key_id(1);
@@ -60,12 +60,12 @@ namespace Grin.Tests.Unit.CoreTests.Core
         }
 
         [Fact]
-        public void simple_tx_ser()
+        public void Simple_tx_ser()
         {
-            var tx = tx2i1o();
+            var tx = Tx2I1O();
             using (var vec = new MemoryStream())
             {
-                Ser.serialize(vec, tx);
+                Ser.Serialize(vec, tx);
                 Console.WriteLine(vec.Length);
                 Assert.True(vec.Length > 5360);
                 Assert.True(vec.Length < 5380);
@@ -73,16 +73,16 @@ namespace Grin.Tests.Unit.CoreTests.Core
         }
 
         [Fact]
-        public void simple_tx_ser_deser()
+        public void Simple_tx_ser_deser()
         {
-            var tx = tx2i1o();
+            var tx = Tx2I1O();
             using (var vec = new MemoryStream())
             {
-                Ser.serialize(vec, tx);
+                Ser.Serialize(vec, tx);
 
                 vec.Position = 0;
 
-                var dtx = Ser.deserialize(vec, Transaction.Empty());
+                var dtx = Ser.Deserialize(vec, Transaction.Empty());
 
 
                 Assert.Equal<ulong>(2, dtx.fee);
@@ -94,23 +94,23 @@ namespace Grin.Tests.Unit.CoreTests.Core
 
 
         [Fact]
-        public void tx_double_ser_deser()
+        public void Tx_double_ser_deser()
         {
             // checks serializing doesn't mess up the tx and produces consistent results
-            var btx = tx2i1o();
+            var btx = Tx2I1O();
             using (var vec = new MemoryStream())
             {
-                Ser.serialize(vec, btx);
+                Ser.Serialize(vec, btx);
                 vec.Position = 0;
 
-                var dtx = Ser.deserialize(vec, Transaction.Empty());
+                var dtx = Ser.Deserialize(vec, Transaction.Empty());
 
                 using (var vec2 = new MemoryStream())
                 {
-                    Ser.serialize(vec2, btx);
+                    Ser.Serialize(vec2, btx);
                     vec2.Position = 0;
 
-                    var dtx2 = Ser.deserialize(vec2, Transaction.Empty());
+                    var dtx2 = Ser.Deserialize(vec2, Transaction.Empty());
 
                     Assert.Equal(btx.hash(), dtx.hash());
                     Assert.Equal(dtx.hash(), dtx2.hash());
@@ -120,18 +120,18 @@ namespace Grin.Tests.Unit.CoreTests.Core
 
 
         [Fact]
-        public void hash_output()
+        public void Hash_output()
         {
             var keychain = Keychain.From_random_seed();
-            var key_id1 = keychain.Derive_key_id(1);
-            var key_id2 = keychain.Derive_key_id(2);
-            var key_id3 = keychain.Derive_key_id(3);
+            var keyId1 = keychain.Derive_key_id(1);
+            var keyId2 = keychain.Derive_key_id(2);
+            var keyId3 = keychain.Derive_key_id(3);
 
             var (tx, _) = Build.transaction(new Func<Context, Append>[]
                 {
-                    c => c.input(75, key_id1),
-                    c => c.output(42, key_id2),
-                    c => c.output(32, key_id3),
+                    c => c.input(75, keyId1),
+                    c => c.output(42, keyId2),
+                    c => c.output(32, keyId3),
                     c => c.with_fee(1)
                 },
                 keychain);
@@ -143,28 +143,28 @@ namespace Grin.Tests.Unit.CoreTests.Core
         }
 
         [Fact]
-        public void blind_tx()
+        public void Blind_tx()
         {
             var keychain = Keychain.From_random_seed();
 
-            var btx = tx2i1o();
+            var btx = Tx2I1O();
             btx.verify_sig(keychain.Secp);
 
             // checks that the range proof on our blind output is sufficiently hiding
             var outp = btx.outputs[0];
-            var proof = outp.proof;
+            var proof = outp.Proof;
             var info = keychain.Secp.range_proof_info(proof);
             Assert.Equal<ulong>(0, info.min);
             Assert.Equal(ulong.MaxValue, info.max);
         }
 
         [Fact]
-        public void tx_hash_diff()
+        public void Tx_hash_diff()
         {
-            var btx1 = tx2i1o();
-            var btx2 = tx1i1o();
+            var btx1 = Tx2I1O();
+            var btx2 = Tx1I1O();
 
-            if (btx1.hash() == btx2.hash())
+            if (btx1.hash().Hex == btx2.hash().Hex)
             {
                 throw new Exception("diff txs have same hash");
             }
@@ -173,22 +173,22 @@ namespace Grin.Tests.Unit.CoreTests.Core
         /// Simulate the standard exchange between 2 parties when creating a basic
         /// 2 inputs, 2 outputs transaction.
         [Fact]
-        public void tx_build_exchange()
+        public void Tx_build_exchange()
         {
             var keychain = Keychain.From_random_seed();
-            var key_id1 = keychain.Derive_key_id(1);
-            var key_id2 = keychain.Derive_key_id(2);
-            var key_id3 = keychain.Derive_key_id(3);
-            var key_id4 = keychain.Derive_key_id(4);
+            var keyId1 = keychain.Derive_key_id(1);
+            var keyId2 = keychain.Derive_key_id(2);
+            var keyId3 = keychain.Derive_key_id(3);
+            var keyId4 = keychain.Derive_key_id(4);
 
-            Transaction tx_alice;
-            BlindingFactor blind_sum;
+            Transaction txAlice;
+            BlindingFactor blindSum;
 
             {
                 // Alice gets 2 of her pre-existing outputs to send 5 coins to Bob, they
                 // become inputs in the new transaction
                 (Func<Context, Append> in1, Func<Context, Append> in2) =
-                    ( c => c.input(4, key_id1), c => c.input(3, key_id2));
+                    ( c => c.input(4, keyId1), c => c.input(3, keyId2));
 
 
                 // Alice builds her transaction, with change, which also produces the sum
@@ -198,115 +198,114 @@ namespace Grin.Tests.Unit.CoreTests.Core
                     {
                         in1,
                         in2,
-                        c => c.output(1, key_id3),
+                        c => c.output(1, keyId3),
                         c => c.with_fee(2)
                     },
                     keychain);
 
-                tx_alice = tx;
-                blind_sum = sum;
+                txAlice = tx;
+                blindSum = sum;
             }
 
 
             // From now on, Bob only has the obscured transaction and the sum of
             // blinding factors. He adds his output, finalizes the transaction so it's
             // ready for broadcast.
-            var (tx_final, _) = Build.transaction(new Func<Context, Append>[]
+            var (txFinal, _) = Build.transaction(new Func<Context, Append>[]
                 {
-                    c => c.initial_tx(tx_alice),
-                    c => c.with_excess(blind_sum),
-                    c => c.output(4, key_id4)
+                    c => c.initial_tx(txAlice),
+                    c => c.with_excess(blindSum),
+                    c => c.output(4, keyId4)
                 },
                 keychain
             );
 
-            tx_final.validate(keychain.Secp);
+            txFinal.validate(keychain.Secp);
         }
 
         [Fact]
-        public void reward_empty_block()
+        public void Reward_empty_block()
         {
             var keychain = Keychain.From_random_seed();
-            var key_id = keychain.Derive_key_id(1);
+            var keyId = keychain.Derive_key_id(1);
 
-            var b = Block.New(BlockHeader.Default(), new Transaction[0], keychain, key_id);
+            var b = Block.New(BlockHeader.Default(), new Transaction[0], keychain, keyId);
             b.compact().validate(keychain.Secp);
         }
 
         [Fact]
-        public void reward_with_tx_block()
+        public void Reward_with_tx_block()
         {
             var keychain = Keychain.From_random_seed();
-            var key_id = keychain.Derive_key_id(1);
+            var keyId = keychain.Derive_key_id(1);
 
-            var tx1 = tx2i1o();
+            var tx1 = Tx2I1O();
             tx1.verify_sig(keychain.Secp);
 
-            var b = Block.New(BlockHeader.Default(), new[] {tx1}, keychain, key_id);
+            var b = Block.New(BlockHeader.Default(), new[] {tx1}, keychain, keyId);
             b.compact().validate(keychain.Secp);
         }
 
         [Fact]
-        public void simple_block()
+        public void Simple_block()
         {
             var keychain = Keychain.From_random_seed();
-            var key_id = keychain.Derive_key_id(1);
+            var keyId = keychain.Derive_key_id(1);
 
-            var tx1 = tx2i1o();
-            var tx2 = tx1i1o();
+            var tx1 = Tx2I1O();
+            var tx2 = Tx1I1O();
 
             var b = Block.New(
                 BlockHeader.Default(),
                 new[] {tx1, tx2},
                 keychain,
-                key_id
+                keyId
             );
             b.validate(keychain.Secp);
         }
 
         [Fact]
-        public void test_block_with_timelocked_tx()
+        public void Test_block_with_timelocked_tx()
         {
             var keychain = Keychain.From_random_seed();
 
-            var key_id1 = keychain.Derive_key_id(1);
-            var key_id2 = keychain.Derive_key_id(2);
-            var key_id3 = keychain.Derive_key_id(3);
+            var keyId1 = keychain.Derive_key_id(1);
+            var keyId2 = keychain.Derive_key_id(2);
+            var keyId3 = keychain.Derive_key_id(3);
 
             // first check we can add a timelocked tx where lock height matches current block height
             // and that the resulting block is valid
             var (tx1, _) = Build.transaction(new Func<Context, Append>[]
                 {
-                    c => c.input(5, key_id1.Clone()),
-                    c => c.output(3, key_id2.Clone()),
+                    c => c.input(5, keyId1.Clone()),
+                    c => c.output(3, keyId2.Clone()),
                     c => c.with_fee(2),
                     c => c.with_lock_height(1)
                 },
                 keychain
             );
-            ;
-
+            
             var b = Block.New(
                 BlockHeader.Default(),
                 new[] {tx1},
                 keychain,
-                key_id3.Clone()
+                keyId3.Clone()
             );
             b.validate(keychain.Secp);
 
             // now try adding a timelocked tx where lock height is greater than current block height
             (tx1, _) = Build.transaction(new Func<Context, Append>[]
             {
-                c => c.input(5, key_id1.Clone()),
-                c => c.output(3, key_id2.Clone()),
+                c => c.input(5, keyId1.Clone()),
+                c => c.output(3, keyId2.Clone()),
                 c => c.with_fee(2),
                 c => c.with_lock_height(2)
             }, keychain);
-            ;
+            
             b = Block.New(BlockHeader.Default(),
                 new[] {tx1},
                 keychain,
-                key_id3.Clone()
+                keyId3.Clone()
             );
 
             var ex = Assert.Throws<BlockErrorException>(() => b.validate(keychain.Secp));
@@ -315,36 +314,36 @@ namespace Grin.Tests.Unit.CoreTests.Core
         }
 
         [Fact]
-        public void test_verify_1i1o_sig()
+        public void Test_verify_1i1o_sig()
         {
             var keychain = Keychain.From_random_seed();
-            var tx = tx1i1o();
+            var tx = Tx1I1O();
             tx.verify_sig(keychain.Secp);
         }
 
         [Fact]
-        public void test_verify_2i1o_sig()
+        public void Test_verify_2i1o_sig()
         {
             var keychain = Keychain.From_random_seed();
-            var tx = tx2i1o();
+            var tx = Tx2I1O();
             tx.verify_sig(keychain.Secp);
         }
 
 
         // utility producing a transaction with 2 inputs and a single outputs
-        public static Transaction tx2i1o()
+        public static Transaction Tx2I1O()
         {
             var keychain = Keychain.From_random_seed();
-            var key_id1 = keychain.Derive_key_id(1);
-            var key_id2 = keychain.Derive_key_id(2);
-            var key_id3 = keychain.Derive_key_id(3);
+            var keyId1 = keychain.Derive_key_id(1);
+            var keyId2 = keychain.Derive_key_id(2);
+            var keyId3 = keychain.Derive_key_id(3);
 
             var (tx, _) = Build.transaction(new Func<Context, Append>[]
 
                 {
-                    c => c.input(10, key_id1),
-                    c => c.input(11, key_id2),
-                    c => c.output(19, key_id3),
+                    c => c.input(10, keyId1),
+                    c => c.input(11, keyId2),
+                    c => c.output(19, keyId3),
                     c => c.with_fee(2)
                 },
                 keychain
@@ -354,17 +353,17 @@ namespace Grin.Tests.Unit.CoreTests.Core
         }
 
         // utility producing a transaction with a single input and output
-        public static Transaction tx1i1o()
+        public static Transaction Tx1I1O()
         {
             var keychain = Keychain.From_random_seed();
-            var key_id1 = keychain.Derive_key_id(1);
-            var key_id2 = keychain.Derive_key_id(2);
+            var keyId1 = keychain.Derive_key_id(1);
+            var keyId2 = keychain.Derive_key_id(2);
 
             var (tx, _) = Build.transaction(new Func<Context, Append>[]
 
                 {
-                    c => c.input(5, key_id1),
-                    c => c.output(3, key_id2),
+                    c => c.input(5, keyId1),
+                    c => c.output(3, keyId2),
                     c => c.with_fee(2)
                 },
                 keychain

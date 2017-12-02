@@ -1,4 +1,5 @@
-﻿using Grin.CoreImpl.Ser;
+﻿using Common;
+using Grin.CoreImpl.Ser;
 using Grin.KeychainImpl;
 using Grin.KeychainImpl.ExtKey;
 using Secp256k1Proxy.Lib;
@@ -17,38 +18,32 @@ namespace Grin.CoreImpl.Core.Transaction
     /// The hash of an output only covers its features, lock_height, commitment,
     /// and switch commitment. The range proof is expected to have its own hash
     /// and is stored and committed to separately.
-    public class Output : IReadable, IWriteable
+    public class Output : IReadable, IWriteable, ICloneable<Output>
     {
-    
-        public Output()
-        {
-            
-        }
-
         /// Options for an output's structure or use
-        public OutputFeatures features { get; set; }
+        public OutputFeatures Features { get; set; }
 
         /// The homomorphic commitment representing the output's amount
-        public Commitment commit { get; set; }
+        public Commitment Commit { get; set; }
 
         /// The switch commitment hash, a 160 bit length blake2 hash of blind*J
-        public SwitchCommitHash switch_commit_hash { get; set; }
+        public SwitchCommitHash SwitchCommitHash { get; set; }
 
         /// A proof that the commitment is in the right range
-        public RangeProof proof { get; set; }
+        public RangeProof Proof { get; set; }
 
 
         /// Validates the range proof using the commitment
         public void Verify_proof(Secp256k1 secp)
         {
-            secp.verify_range_proof(commit, proof);
+            secp.verify_range_proof(Commit, Proof);
         }
 
         /// Given the original blinding factor we can recover the
         /// value from the range proof and the commitment
         public ulong? Recover_value(Keychain keychain, Identifier keyId)
         {
-            var pi = keychain.Rewind_range_proof(keyId, commit, proof);
+            var pi = keychain.Rewind_range_proof(keyId, Commit, Proof);
 
             if (pi.success)
             {
@@ -60,21 +55,21 @@ namespace Grin.CoreImpl.Core.Transaction
 
         public void read(IReader reader)
         {
-            features = (OutputFeatures) reader.read_u8();
-            commit = Ser.Ser.ReadCommitment(reader);
-            switch_commit_hash = SwitchCommitHash.readnew(reader);
-            proof = Ser.Ser.ReadRangeProof(reader);
+            Features = (OutputFeatures) reader.read_u8();
+            Commit = Ser.Ser.ReadCommitment(reader);
+            SwitchCommitHash = SwitchCommitHash.readnew(reader);
+            Proof = Ser.Ser.ReadRangeProof(reader);
         }
 
         public void write(IWriter writer)
         {
-            writer.write_u8((byte) features);
-            commit.WriteCommitment(writer);
-            switch_commit_hash.write(writer);
+            writer.write_u8((byte) Features);
+            Commit.WriteCommitment(writer);
+            SwitchCommitHash.write(writer);
 
             if (writer.serialization_mode() == SerializationMode.Full)
             {
-                writer.write_bytes(proof.Proof);
+                writer.write_bytes(Proof.Proof);
             }
         }
 
@@ -83,10 +78,10 @@ namespace Grin.CoreImpl.Core.Transaction
         {
             return new Output()
             {
-                features=features,
-                commit=commit.Clone(),
-                switch_commit_hash= switch_commit_hash.Clone(),
-                proof=proof.Clone()
+                Features=Features,
+                Commit=Commit.Clone(),
+                SwitchCommitHash= SwitchCommitHash.Clone(),
+                Proof=Proof.Clone()
 
             };
         }

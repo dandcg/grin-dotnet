@@ -14,22 +14,22 @@ namespace Grin.Tests.Unit.WalletTests
         public void output_commitment_equals_input_commitment_on_spend()
        {
            var keychain = Keychain.From_random_seed();
-           var key_id1 = keychain.Derive_key_id(1);
+           var keyId1 = keychain.Derive_key_id(1);
 
            var (tx1,_) = Build.transaction(new Func<Context, Append>[]
                {
-                   context=>context.output(105,key_id1.Clone())
+                   context=>context.output(105,keyId1.Clone())
                }
                , keychain);
 
             var (tx2, _) = Build.transaction(new Func<Context, Append>[]
                {
-                   context=>context.input(105,key_id1.Clone())
+                   context=>context.input(105,keyId1.Clone())
                }
                , keychain);
 
 
-            Assert.Equal(tx1.outputs[0].commit.Value, tx2.inputs[0].Commitment.Value);
+            Assert.Equal(tx1.outputs[0].Commit.Value, tx2.inputs[0].Commitment.Value);
         }
 
     }

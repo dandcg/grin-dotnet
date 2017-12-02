@@ -15,8 +15,8 @@ namespace Grin.Tests.Unit.CoreTests.Core
         public void test_kernel_ser_deser()
         {
             var keychain = Keychain.From_random_seed();
-            var key_id = keychain.Derive_key_id(1);
-            var commit = keychain.Commit(5, key_id);
+            var keyId = keychain.Derive_key_id(1);
+            var commit = keychain.Commit(5, keyId);
 
             // just some bytes for testing ser/deser
             var sig = new byte[] {1, 0, 0, 0, 0, 0, 0, 1};
@@ -31,7 +31,7 @@ namespace Grin.Tests.Unit.CoreTests.Core
             };
 
             var stream = new MemoryStream();
-            Ser.serialize(stream, kernel);
+            Ser.Serialize(stream, kernel);
 
             Console.WriteLine("-------");
             Console.WriteLine(stream.ToArray().AsString());
@@ -39,7 +39,7 @@ namespace Grin.Tests.Unit.CoreTests.Core
 
             stream.Position = 0;
 
-            var kernel2 = Ser.deserialize(stream, new TxKernel());
+            var kernel2 = Ser.Deserialize(stream, new TxKernel());
             Assert.Equal(KernelFeatures.DEFAULT_KERNEL, kernel2.features);
             Assert.Equal<ulong>(0, kernel2.lock_height);
             Assert.Equal(commit.Value, kernel2.excess.Value);
@@ -57,7 +57,7 @@ namespace Grin.Tests.Unit.CoreTests.Core
             };
             
             stream = new MemoryStream();
-            Ser.serialize(stream, kernel);
+            Ser.Serialize(stream, kernel);
 
             Console.WriteLine("-------");
             Console.WriteLine(stream.ToArray().AsString());
@@ -65,7 +65,7 @@ namespace Grin.Tests.Unit.CoreTests.Core
 
             stream.Position = 0;
 
-            kernel2 = Ser.deserialize(stream, new TxKernel());
+            kernel2 = Ser.Deserialize(stream, new TxKernel());
             Assert.Equal(KernelFeatures.DEFAULT_KERNEL, kernel2.features);
             Assert.Equal<ulong>(100, kernel2.lock_height);
             Assert.Equal(commit.Value, kernel2.excess.Value);
@@ -77,22 +77,22 @@ namespace Grin.Tests.Unit.CoreTests.Core
         public void test_output_ser_deser()
         {
             var keychain = Keychain.From_random_seed();
-            var key_id_set = keychain.Derive_key_id(1);
-            var commit = keychain.Commit(5, key_id_set);
-            var switch_commit = keychain.Switch_commit(key_id_set);
-            var switch_commit_hash = SwitchCommitHash.From_switch_commit(switch_commit);
+            var keyIdSet = keychain.Derive_key_id(1);
+            var commit = keychain.Commit(5, keyIdSet);
+            var switchCommit = keychain.Switch_commit(keyIdSet);
+            var switchCommitHash = SwitchCommitHash.From_switch_commit(switchCommit);
             var msg = ProofMessage.empty();
-            var proof = keychain.Range_proof(5, key_id_set, commit, msg);
+            var proof = keychain.Range_proof(5, keyIdSet, commit, msg);
 
             var outp = new Output { 
-                features= OutputFeatures.DEFAULT_OUTPUT,
-                commit= commit,
-                switch_commit_hash= switch_commit_hash,
-                proof= proof
+                Features= OutputFeatures.DEFAULT_OUTPUT,
+                Commit= commit,
+                SwitchCommitHash= switchCommitHash,
+                Proof= proof
             };
 
             var stream = new MemoryStream();
-            Ser.serialize(stream, outp);
+            Ser.Serialize(stream, outp);
 
             Console.WriteLine("-------");
             Console.WriteLine(stream.ToArray().AsString());
@@ -100,41 +100,41 @@ namespace Grin.Tests.Unit.CoreTests.Core
 
             stream.Position = 0;
 
-            var dout = Ser.deserialize(stream, new Output());
+            var dout = Ser.Deserialize(stream, new Output());
 
-            Assert.Equal(OutputFeatures.DEFAULT_OUTPUT, dout.features);
-            Assert.Equal(outp.commit.Value , dout.commit.Value);
-            Assert.Equal(outp.proof.Proof, dout.proof.Proof);
+            Assert.Equal(OutputFeatures.DEFAULT_OUTPUT, dout.Features);
+            Assert.Equal(outp.Commit.Value , dout.Commit.Value);
+            Assert.Equal(outp.Proof.Proof, dout.Proof.Proof);
         }
 
         [Fact]
         public void test_output_value_recovery()
         {
             var keychain = Keychain.From_random_seed();
-            var key_id = keychain.Derive_key_id(1);
+            var keyId = keychain.Derive_key_id(1);
 
-            var commit = keychain.Commit(1003, key_id);
-            var switch_commit = keychain.Switch_commit(key_id);
-            var switch_commit_hash = SwitchCommitHash.From_switch_commit(switch_commit);
+            var commit = keychain.Commit(1003, keyId);
+            var switchCommit = keychain.Switch_commit(keyId);
+            var switchCommitHash = SwitchCommitHash.From_switch_commit(switchCommit);
             var msg = ProofMessage.empty();
-            var proof = keychain.Range_proof(1003, key_id, commit, msg);
+            var proof = keychain.Range_proof(1003, keyId, commit, msg);
 
             var output = new Output
             {
-                features = OutputFeatures.DEFAULT_OUTPUT,
-                commit = commit,
-                switch_commit_hash = switch_commit_hash,
-                proof = proof
+                Features = OutputFeatures.DEFAULT_OUTPUT,
+                Commit = commit,
+                SwitchCommitHash = switchCommitHash,
+                Proof = proof
             };
 
             // check we can successfully recover the value with the original blinding factor
-            var recovered_value = output.Recover_value(keychain, key_id);
-            Assert.Equal<ulong?>(1003, recovered_value);
+            var recoveredValue = output.Recover_value(keychain, keyId);
+            Assert.Equal<ulong?>(1003, recoveredValue);
 
             // check we cannot recover the value without the original blinding factor
-            var key_id2 = keychain.Derive_key_id(2);
-            var not_recoverable = output.Recover_value(keychain, key_id2);
-            Assert.Null(not_recoverable);
+            var keyId2 = keychain.Derive_key_id(2);
+            var notRecoverable = output.Recover_value(keychain, keyId2);
+            Assert.Null(notRecoverable);
         }
     }
 }

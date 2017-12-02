@@ -28,7 +28,7 @@ namespace Grin.CoreImpl
         public const ulong REWARD = 50 * GRIN_BASE;
 
         /// Actual block reward for a given total fee amount
-        public static ulong reward(ulong fee)
+        public static ulong Reward(ulong fee)
         {
             return REWARD + fee / 2;
         }
@@ -83,7 +83,7 @@ namespace Grin.CoreImpl
 
 
         /// Whether a block exceeds the maximum acceptable weight
-        public static bool exceeds_weight(uint input_len, uint output_len, uint kernel_len)
+        public static bool Exceeds_weight(uint input_len, uint output_len, uint kernel_len)
 
         {
             return input_len * BLOCK_INPUT_WEIGHT + output_len * BLOCK_OUTPUT_WEIGHT +
@@ -96,7 +96,7 @@ namespace Grin.CoreImpl
 
         /// Check whether the block version is valid at a given height, implements
         /// 6 months interval scheduled hard forks for the first 2 years.
-        public bool valid_header_version(ulong height, ushort version)
+        public bool Valid_header_version(ulong height, ushort version)
         {
             // uncomment below as we go from hard fork to hard fork
             if (height <= HARD_FORK_INTERVAL && version == 1)
@@ -212,8 +212,7 @@ namespace Grin.CoreImpl
             {
                 adj_ts = ts_damp;
             }
-            ;
-
+            
             var diffNum =
                 Math.Max(diff_avg * Difficulty.From_num(BLOCK_TIME_WINDOW).num / Difficulty.From_num(adj_ts).num,
                     Difficulty.minimum().num);
@@ -221,10 +220,10 @@ namespace Grin.CoreImpl
             return Difficulty.From_num(diffNum);
         }
 
-        /// Consensus rule that collections of items are sorted lexicographically over the wire.
-//public void VerifySortOrder<T> {
-//	/// Verify a collection of items is sorted as required.
-//	fn verify_sort_order(&self) -> Result<(), ser::Error>;
-//}
-    }
+        // Consensus rule that collections of items are sorted lexicographically over the wire.
+        //public void VerifySortOrder<T> {
+            // Verify a collection of items is sorted as required.
+            //fn verify_sort_order(&self) -> Result<(), ser::Error>;
+        //}
+}
 }
