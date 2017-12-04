@@ -52,10 +52,7 @@ namespace Grin.Tests.Unit.KeychainTests
 
             Assert.Equal(extk.Key.Value, secretKey.Value);
             Assert.Equal(extk.Identifier(s).Value, Identifier.From_bytes(identifier).Value);
-            Assert.Equal(
-                extk.RootKeyId.Value,
-                Identifier.From_bytes(identifier).Value
-            );
+            Assert.Equal(extk.RootKeyId.Value, Identifier.From_bytes(identifier).Value);
             Assert.Equal(extk.Chaincode, chaincode);
             Assert.Equal(extk.Depth, depth);
             Assert.Equal(extk.NChild, nChild);

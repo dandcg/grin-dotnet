@@ -73,26 +73,30 @@ namespace Grin.KeychainImpl.ExtKey
                     throw new Exception("InvalidSeedSize");
             }
 
+            var keyData = Encoding.ASCII.GetBytes("Mimble seed");
+
+            var blake2B = new HMACBlake2B(keyData, 512);
+            
+            var derived = blake2B.ComputeHash(seed);
+
+            var chaincode = derived.Skip(32).ToArray();
+
+            var secretKeyBytes = derived.Take(32).ToArray();
+
+            var secretKey = SecretKey.From_slice(secp, secretKeyBytes);
+            
             var ext = new ExtendedKey
             {
                 Depth = 0,
                 RootKeyId = ExtKey.Identifier.Zero(),
-                NChild = 0
+                NChild = 0,
+                Chaincode=chaincode,
+                Key=secretKey,
+
             };
 
-            var keyData = Encoding.ASCII.GetBytes("Mimble seed");
-            var blake2B = new HMACBlake2B(keyData, 512);
-
-            var derived = blake2B.ComputeHash(seed);
-
-            ext.Chaincode = derived.Skip(32).Take(32).ToArray();
-
-            var keyBytes = derived.Take(32).ToArray();
-
-            ext.Key = SecretKey.From_slice(secp, keyBytes);
-
             ext.RootKeyId = ext.Identifier(secp);
-
+            
             return ext;
         }
 

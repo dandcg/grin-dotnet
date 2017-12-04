@@ -60,17 +60,17 @@ namespace Grin.WalletImpl.WalletChecker
 
             // build a local map of wallet outputs by commits
             // and a list of outputs we want to query the node for
-            WalletData.read_wallet(config.DataFileDir,
+            WalletData.Read_wallet(config.DataFileDir,
                 walletData =>
                 {
                     foreach (var op in walletData
                         .Outputs
                         .Values
-                        .Where(w => w.RootKeyId == keychain.Root_key_id() && w.Status != OutputStatus.Spent))
+                        .Where(w => w.RootKeyId == keychain.Root_key_id().HexValue && w.Status != OutputStatus.Spent))
                     {
                         var commit = keychain.commit_with_key_index(op.Value, op.NChild);
                         commits.Add(commit);
-                        walletOutputs.Add(commit.Hex, op.KeyId.Clone());
+                        walletOutputs.Add(commit.Hex, Identifier.From_hex(op.KeyId));
                     }
 
                     return walletData;
@@ -128,7 +128,7 @@ namespace Grin.WalletImpl.WalletChecker
 // the corresponding api output (if it exists)
 // and refresh it in-place in the wallet.
 // Note: minimizing the time we spend holding the wallet lock.
-            WalletData.with_wallet(config.DataFileDir, walletData =>
+            WalletData.With_wallet(config.DataFileDir, walletData =>
             {
                 foreach (var commit in commits)
                 {

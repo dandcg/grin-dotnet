@@ -1,5 +1,8 @@
+using System;
 using System.Linq;
 using Grin.KeychainImpl.ExtKey;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Grin.WalletImpl.WalletTypes
 {
@@ -10,8 +13,7 @@ namespace Grin.WalletImpl.WalletTypes
     {
 
 
-        public OutputData(Identifier rootKeyId, Identifier keyId, uint nChild, ulong value, OutputStatus status,
-            ulong height, ulong lockHeight, bool isCoinbase)
+        public OutputData(string rootKeyId, string keyId, uint nChild, ulong value, OutputStatus status, ulong height, ulong lockHeight, bool isCoinbase)
         {
             RootKeyId = rootKeyId;
             KeyId = keyId;
@@ -24,32 +26,43 @@ namespace Grin.WalletImpl.WalletTypes
         }
 
         /// Root key_id_set that the key for this output is derived from
-        public Identifier RootKeyId { get; set; }
+        [JsonProperty("root_key_id")]
+        public string RootKeyId { get; set; }
 
         /// Derived key for this output
-        public Identifier KeyId { get; set; }
+        [JsonProperty("key_id")]
+        public string KeyId { get; set; }
 
         /// How many derivations down from the root key
+        [JsonProperty("n_child")]
         public uint NChild { get; set; }
 
         /// Commitment of the output, necessary to rebuild the commitment
+        [JsonProperty("value")]
         public ulong Value { get; set; }
 
         /// Current status of the output
+        [JsonProperty("status")]
+        [JsonConverter(typeof(StringEnumConverter))]
         public OutputStatus Status { get;  set; }
 
+ 
+
         /// Height of the output
+        [JsonProperty("height")]
         public ulong Height { get; set; }
 
         /// Height we are locked until
+       [JsonProperty("lock_height")]
         public ulong LockHeight { get; set; }
 
         /// Is this a coinbase output? Is it subject to coinbase locktime?
+        [JsonProperty("is_coinbase")]
         public bool IsCoinbase { get; set; }
 
         public OutputData Clone()
         {
-            return new OutputData(RootKeyId.Clone(),KeyId.Clone(),NChild,Value,Status,Height, LockHeight,IsCoinbase);
+            return new OutputData(RootKeyId,KeyId,NChild,Value,Status,Height, LockHeight,IsCoinbase);
         }
 
         /// Lock a given output to avoid conflicting use
@@ -65,6 +78,8 @@ namespace Grin.WalletImpl.WalletTypes
         /// never will).
         public ulong num_confirmations(ulong currentHeight)
         {
+   
+
             if (Status == OutputStatus.Unconfirmed)
             {
                 return 0;

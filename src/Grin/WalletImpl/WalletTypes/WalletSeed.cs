@@ -12,6 +12,12 @@ namespace Grin.WalletImpl.WalletTypes
 {
     public class WalletSeed
     {
+        public override string ToString()
+        {
+            return HexValue;
+        }
+
+
         private WalletSeed(byte[] value)
         {
             Value = value;
@@ -19,17 +25,19 @@ namespace Grin.WalletImpl.WalletTypes
 
         public byte[] Value { get; }
 
+        public string HexValue => HexUtil.to_hex(Value);
 
         public static WalletSeed from_bytes(byte[] bytes)
         {
-            var seed = bytes.Take(32).ToArray();
-            return new WalletSeed(seed);
+            var idx = Math.Min(32, bytes.Length);
+            var seed = bytes.Take(idx).ToArray();
+            var ws= new WalletSeed(seed);
+            return ws;
         }
 
         public static WalletSeed from_hex(string hex)
         {
             var bytes = HexUtil.from_hex(hex);
-
             return from_bytes(bytes);
         }
 

@@ -81,17 +81,17 @@ namespace Grin.WalletImpl.WalletReceiver
         )
 
         {
-            return WalletData.read_wallet(config.DataFileDir, walletData =>
+            return WalletData.Read_wallet(config.DataFileDir, walletData =>
             {
-                var existing = walletData.get_output(keyId);
+                var existing = walletData.Get_output(keyId);
 
                 if (existing != null)
 
                 {
-                    var keyId2 = existing.KeyId.Clone();
+                    var keyId2 = existing.KeyId;
                     var derivation = existing.NChild;
 
-                    return (keyId2, derivation);
+                    return (Identifier.From_hex(keyId2), derivation);
                 }
 
                 throw new Exception("This should never happen!");
@@ -116,11 +116,11 @@ namespace Grin.WalletImpl.WalletReceiver
             Keychain keychain
         )
         {
-            var res = WalletData.read_wallet(config.DataFileDir,
+            var res = WalletData.Read_wallet(config.DataFileDir,
                 walletData =>
                 {
                     var rootKeyId = keychain.Root_key_id();
-                    var derivation = walletData.next_child(rootKeyId.Clone());
+                    var derivation = walletData.Next_child(rootKeyId.Clone());
                     var keyId = keychain.Derive_key_id(derivation);
                     return (keyId, derivation);
                 });
@@ -151,12 +151,12 @@ namespace Grin.WalletImpl.WalletReceiver
 
             // Now acquire the wallet lock and write the new output.
             var fees = blockFees;
-            WalletData.with_wallet(config.DataFileDir, walletData =>
+            WalletData.With_wallet(config.DataFileDir, walletData =>
             {
                 // track the new output and return the stuff needed for reward
                 var opd = new OutputData(
-                    rootKeyId.Clone(),
-                    keyId.Clone(),
+                    rootKeyId.HexValue,
+                    keyId.HexValue,
                     derivation,
                     Consensus.Reward(fees.Fees),
                     OutputStatus.Unconfirmed,
@@ -164,7 +164,7 @@ namespace Grin.WalletImpl.WalletReceiver
                     0,
                     true);
 
-                walletData.add_output(opd);
+                walletData.Add_output(opd);
                 return opd;
             });
 
@@ -228,8 +228,8 @@ namespace Grin.WalletImpl.WalletReceiver
             // operate within a lock on wallet data
 
             var opd = new OutputData(
-                rootKeyId.Clone(),
-                keyId.Clone(),
+                rootKeyId.HexValue,
+                keyId.HexValue,
                 derivation,
                 outAmount,
                 OutputStatus.Unconfirmed,
@@ -237,11 +237,10 @@ namespace Grin.WalletImpl.WalletReceiver
                 0,
                 false);
 
-            WalletData.with_wallet(config.DataFileDir,
+            WalletData.With_wallet(config.DataFileDir,
                 walletData =>
                 {
-                    walletData.add_output(opd);
-
+                    walletData.Add_output(opd);
                     return opd;
                 });
 

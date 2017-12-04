@@ -22,7 +22,7 @@ namespace Grin.WalletImpl.WalletInfo
             var result = Checker.refresh_outputs(config, keychain);
 
 
-            WalletData.read_wallet(config.DataFileDir, walletData =>
+            WalletData.Read_wallet(config.DataFileDir, walletData =>
             {
                 ulong currentHeight;
 
@@ -43,7 +43,7 @@ namespace Grin.WalletImpl.WalletInfo
                 ulong lockedTotal = 0;
 
 
-                foreach (var op in walletData.Outputs.Values.Where(w => w.RootKeyId == keychain.Root_key_id()))
+                foreach (var op in walletData.Outputs.Values.Where(w => w.RootKeyId == keychain.Root_key_id().HexValue))
 
 
                 {

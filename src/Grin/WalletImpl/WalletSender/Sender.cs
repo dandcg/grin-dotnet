@@ -59,11 +59,11 @@ namespace Grin.WalletImpl.WalletSender
             // so we avoid accidental double spend attempt.
             void UpdateWallet()
             {
-                WalletData.with_wallet(config.DataFileDir, walletData =>
+                WalletData.With_wallet(config.DataFileDir, walletData =>
                 {
                     foreach (var coin in coins)
                     {
-                        walletData.lock_output(coin);
+                        walletData.Lock_output(coin);
                     }
                     return walletData;
                 });
@@ -72,10 +72,10 @@ namespace Grin.WalletImpl.WalletSender
             // Closure to acquire walvar lock and devare the change output in case of tx failure.
             void RollbackWallet()
             {
-                WalletData.with_wallet(config.DataFileDir, walletData =>
+                WalletData.With_wallet(config.DataFileDir, walletData =>
                 {
                     Log.Information("cleaning up unused change output from walvar");
-                    walletData.delete_output(changeKey);
+                    walletData.Delete_output(changeKey);
                     return walletData;
                 });
             }
@@ -128,7 +128,7 @@ namespace Grin.WalletImpl.WalletSender
             var keyId = keychain.Root_key_id().Clone();
 
 // select some spendable coins from the walvar
-            var coins = WalletData.read_wallet(config.DataFileDir,
+            var coins = WalletData.Read_wallet(config.DataFileDir,
                 walletData => walletData.Select(
                     keyId.Clone(),
                     amount,
@@ -170,7 +170,7 @@ namespace Grin.WalletImpl.WalletSender
             var keyId = keychain.Root_key_id();
 
 // select some spendable coins from the walvar
-            var coins = WalletData.read_wallet(
+            var coins = WalletData.Read_wallet(
                 config.DataFileDir, walletData => walletData.Select(
                     keyId.Clone(),
                     amount,
@@ -242,16 +242,16 @@ namespace Grin.WalletImpl.WalletSender
             }
 
             // track the output representing our change
-            var changeKey = WalletData.with_wallet(config.DataFileDir,
+            var changeKey = WalletData.With_wallet(config.DataFileDir,
                 walletData =>
                 {
                     var rootKeyId = keychain.Root_key_id();
-                    var changeDerivation = walletData.next_child(rootKeyId.Clone());
+                    var changeDerivation = walletData.Next_child(rootKeyId.Clone());
                     var changekey = keychain.Derive_key_id(changeDerivation);
 
-                    walletData.add_output(new OutputData(
-                        rootKeyId.Clone(),
-                        changekey.Clone(),
+                    walletData.Add_output(new OutputData(
+                        rootKeyId.HexValue,
+                        changekey.HexValue,
                         changeDerivation,
                         change,
                         OutputStatus.Unconfirmed,

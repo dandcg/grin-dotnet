@@ -36,6 +36,9 @@ namespace Grin.KeychainImpl
             return Extkey.RootKeyId.Clone();
         }
 
+
+        
+
         // For tests and burn only, associate a key identifier with a known secret key.
         //
         public static Keychain Burn_enabled(Keychain keychain, Identifier burnKeyId)
