@@ -107,7 +107,6 @@ namespace Grin.KeychainImpl.ExtKey
         {
             // get public key from private
             var keyId = PublicKey.from_secret_key(secp, Key);
-
             return ExtKey.Identifier.From_key_id(secp, keyId);
         }
 

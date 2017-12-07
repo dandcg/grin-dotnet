@@ -15,6 +15,8 @@ namespace Secp256k1Proxy.Key
     {
         public byte[] Value { get; }
 
+        public string HexValue => HexUtil.to_hex(Value);
+
         private PublicKey(byte[] value)
         {
             Value = value;
@@ -83,7 +85,6 @@ namespace Secp256k1Proxy.Key
         /// the y-coordinate is represented by only a single bit, as x determines
         /// it up to one bit.
         
-        [HandleProcessCorruptedStateExceptions]
         public byte[] serialize_vec(Secp256K1 secp, bool isCompressed)
         {
 

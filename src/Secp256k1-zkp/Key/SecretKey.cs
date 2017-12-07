@@ -23,6 +23,9 @@ namespace Secp256k1Proxy.Key
 
         public byte[] Value { get; }
 
+        public string HexValue => HexUtil.to_hex(Value);
+
+
         /// Creates a new random secret key
         public static SecretKey New(Secp256K1 secp, RandomNumberGenerator rng)
         {
