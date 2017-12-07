@@ -21,6 +21,11 @@ namespace Secp256k1Proxy.Key
             Value = value;
         }
 
+        public override string ToString()
+        {
+            return HexValue;
+        }
+
         public byte[] Value { get; }
 
         public string HexValue => HexUtil.to_hex(Value);
