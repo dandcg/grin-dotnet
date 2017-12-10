@@ -71,17 +71,13 @@ namespace Grin.WalletImpl.WalletHandlers
 
 
 
-        public IActionResult Handle(WalletReceiveRequest receiveRequest)
+        public IActionResult Handle(BlockFees cb)
         {
-            if (receiveRequest.Coinbase != null)
-            {
-                var coinbase = build_coinbase(receiveRequest.Coinbase);
-                return new JsonResult(coinbase);
 
-            }
-            return new BadRequestResult();
+            var coinbase = build_coinbase(cb);
+            return new JsonResult(coinbase);
+
         }
-
 
 // TODO - error handling - what to return if we fail to get the wallet lock for some reason...
     //impl Handler for CoinbaseHandler {

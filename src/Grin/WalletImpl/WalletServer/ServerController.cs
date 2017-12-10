@@ -4,6 +4,7 @@ using Grin.WalletImpl.WalletHandlers;
 using Grin.WalletImpl.WalletSender;
 using Grin.WalletImpl.WalletTypes;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace Grin.WalletImpl.WalletServer
 {
@@ -75,7 +76,8 @@ namespace Grin.WalletImpl.WalletServer
         [HttpPost]
         public IActionResult ReceiveCoinbase()
         {
-            var tt = Request.Body.ReadJson<WalletReceiveRequest>();
+            var str = Request.Body.ReadString();
+            var tt = JsonConvert.DeserializeObject<BlockFees>(str);
             var res = coinbasehandler.Handle(tt);
             return res;
         }
