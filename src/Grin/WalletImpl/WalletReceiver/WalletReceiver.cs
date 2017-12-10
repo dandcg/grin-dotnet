@@ -62,7 +62,7 @@ namespace Grin.WalletImpl.WalletReceiver
             
             var uri = $"{config.CheckNodeApiHttpAddr}/v1/pool/push";
 
-            var res = ApiClient.PostAsync(uri, new JsonContent(new TxWrapper {TxHex = txHex})).Result;
+            var res = ApiClient.PostAsync(uri, new TxWrapper {TxHex = txHex}).Result;
             
             Log.Debug("{statusCode}",res.StatusCode);
             // var res = ApiClient.PostAsync(uri, new JsonContent(new TxWrapper(){tx_hex=tx_hex})).Result;

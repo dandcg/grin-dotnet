@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using Common;
 using Grin.ApiImpl.ApiClient;
 using Grin.ApiImpl.ApiTypes;
 using Grin.KeychainImpl;
@@ -120,7 +121,7 @@ namespace Grin.WalletImpl.WalletChecker
 
             foreach (var op in outputs)
             {
-                apiOutputs.Add(op.Commit.Hex, op);
+                apiOutputs.Add(HexUtil.to_hex(op.Commit),op);
             }
 
 
@@ -160,7 +161,7 @@ namespace Grin.WalletImpl.WalletChecker
             //todo:asyncification
    
             var response = ApiClient.GetAsync(uri).Result;
-            if (response.IsSuccessStatusCode)
+            if (!response.IsSuccessStatusCode)
             {
                 Log.Warning("Failed to refresh from {Url} : {StatusCode} - {ReasonPhrase}", response.StatusCode, response.ReasonPhrase);
                 throw new WalletErrorException(WalletError.Node);

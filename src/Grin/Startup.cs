@@ -26,7 +26,7 @@ namespace Grin
             walletConfig.DataFileDir = directory;
 
             var walletSeed = WalletSeed.from_file(walletConfig);
-            var keychain =Keychain.From_seed(walletSeed.Value);
+            var keychain =walletSeed.derive_keychain("password");
 
             services.AddSingleton(pr => walletConfig);
             services.AddSingleton(pr => keychain);

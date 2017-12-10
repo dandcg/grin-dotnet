@@ -1,23 +1,31 @@
 ﻿using System;
 using Grin.CoreImpl.Core.Block;
 using Grin.CoreImpl.Core.Transaction;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using Secp256k1Proxy.Pedersen;
 
 namespace Grin.ApiImpl.ApiTypes
 {
     public struct ApiOutput : ICloneable
     {
+
         /// The type of output Coinbase|Transaction
-        public ApiOutputType OutputType { get; set; }
+        [JsonProperty(PropertyName = "output_type")]
+        public string OutputType { get; set; }
 
         /// The homomorphic commitment representing the output's amount
-        public Commitment Commit { get; set; }
+        [JsonProperty(PropertyName = "commit")]
+        public byte[] Commit { get; set; }
 
         /// switch commit hash
-        public SwitchCommitHash SwitchCommitHash { get; set; }
+        [JsonProperty(PropertyName = "switch_commit_hash")]
+        public byte[] SwitchCommitHash { get; set; }
+
 
         /// A proof that the commitment is in the right range
-        public RangeProof Proof { get; set; }
+        [JsonProperty(PropertyName = "proof")]
+        public byte[] Proof { get; set; }
 
         /// The height of the block creating this output
         public ulong Height { get; set; }
