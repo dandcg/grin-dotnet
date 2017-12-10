@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Text;
 using Common;
 using Grin.ApiImpl.ApiClient;
 using Grin.CoreImpl.Core.Build;
@@ -198,7 +200,9 @@ namespace Grin.WalletImpl.WalletSender
 
             var url = $"{config.CheckNodeApiHttpAddr}/v1/pool/push";
 
-            var res = ApiClient.PostAsync(url, new TxWrapper {TxHex = txHex}).Result;
+            var json = JsonConvert.SerializeObject(new TxWrapper { TxHex = txHex });
+            
+            var res = ApiClient.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json")).Result;
 
             Log.Debug("{StatusCode}",res.StatusCode);
 

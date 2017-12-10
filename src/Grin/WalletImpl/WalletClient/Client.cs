@@ -1,8 +1,11 @@
 using System;
 using System.IO;
+using System.Net.Http;
+using System.Text;
 using Common;
 using Grin.ApiImpl.ApiClient;
 using Grin.WalletImpl.WalletTypes;
+using Newtonsoft.Json;
 using Polly;
 using Serilog;
 
@@ -47,7 +50,10 @@ namespace Grin.WalletImpl.WalletClient
 
         public static void single_send_partial_tx(string url, PartialTx partialTx)
         {
-            var req = ApiClient.PostAsync(url, partialTx).Result;
+
+            var json = JsonConvert.SerializeObject(partialTx);
+
+            var req = ApiClient.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json")).Result;
 
             if (req.IsSuccessStatusCode)
             {

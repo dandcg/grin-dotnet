@@ -1,4 +1,6 @@
 using System;
+using System.Net.Http;
+using System.Text;
 using Common;
 using Grin.ApiImpl.ApiClient;
 using Grin.CoreImpl;
@@ -60,9 +62,10 @@ namespace Grin.WalletImpl.WalletReceiver
 
             //todo:asyncification
 
-            var uri = $"{config.CheckNodeApiHttpAddr}/v1/pool/push";
-            var txw = new TxWrapper {TxHex = txHex};
-            var res = ApiClient.PostAsync(uri, txw).Result;
+            var url = $"{config.CheckNodeApiHttpAddr}/v1/pool/push";
+          
+            var json = JsonConvert.SerializeObject(new TxWrapper { TxHex = txHex });
+            var res = ApiClient.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json")).Result;
 
             Log.Debug("{statusCode}", res.StatusCode);
 
