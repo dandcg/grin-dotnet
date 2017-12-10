@@ -55,18 +55,20 @@ namespace Grin.WalletImpl.WalletReceiver
             var (amount, blinding, tx) = PartialTx.read_partial_tx(keychain, partialTx);
 
             var finalTx = receive_transaction(config, keychain, amount, blinding, tx);
-            
-            var txHex = HexUtil.to_hex(Ser.Ser_vec(finalTx));
-            
-            //todo:asyncification
-            
-            var uri = $"{config.CheckNodeApiHttpAddr}/v1/pool/push";
 
-            var res = ApiClient.PostAsync(uri, new TxWrapper {TxHex = txHex}).Result;
-            
-            Log.Debug("{statusCode}",res.StatusCode);
+            var txHex = HexUtil.to_hex(Ser.Ser_vec(finalTx));
+
+            //todo:asyncification
+
+            var uri = $"{config.CheckNodeApiHttpAddr}/v1/pool/push";
+            var txw = new TxWrapper {TxHex = txHex};
+            var res = ApiClient.PostAsync(uri, txw).Result;
+
+            Log.Debug("{statusCode}", res.StatusCode);
+
+
             // var res = ApiClient.PostAsync(uri, new JsonContent(new TxWrapper(){tx_hex=tx_hex})).Result;
-            
+
             //let url = format!("{}/v1/pool/push", config.check_node_api_http_addr.as_str());
             //let _: () = api::client::post(url.as_str(), &TxWrapper { tx_hex: tx_hex
             //})
@@ -111,21 +113,15 @@ namespace Grin.WalletImpl.WalletReceiver
             //})?;
         }
 
-        public static (Identifier, uint) next_available_key(
-            WalletConfig config,
+        public static (Identifier key_id, uint derivation) next_available_key(
+            WalletData walletData,
             Keychain keychain
         )
         {
-            var res = WalletData.Read_wallet(config.DataFileDir,
-                walletData =>
-                {
-                    var rootKeyId = keychain.Root_key_id();
-                    var derivation = walletData.Next_child(rootKeyId.Clone());
-                    var keyId = keychain.Derive_key_id(derivation);
-                    return (keyId, derivation);
-                });
-
-            return res;
+            var rootKeyId = keychain.Root_key_id();
+            var derivation = walletData.Next_child(rootKeyId.Clone());
+            var keyId = keychain.Derive_key_id(derivation);
+            return (keyId, derivation);
         }
 
         /// Build a coinbase output and the corresponding kernel
@@ -136,23 +132,23 @@ namespace Grin.WalletImpl.WalletReceiver
         )
         {
             var rootKeyId = keychain.Root_key_id();
+
             var keyId = blockFees.KeyId;
-
-
-            uint derivation;
-            if (keyId != null)
-            {
-                (keyId, derivation) = retrieve_existing_key(config, keyId);
-            }
-            else
-            {
-                (keyId, derivation) = next_available_key(config, keychain);
-            }
+            uint derivation = 0;
 
             // Now acquire the wallet lock and write the new output.
             var fees = blockFees;
             WalletData.With_wallet(config.DataFileDir, walletData =>
             {
+                if (keyId != null)
+                {
+                    (keyId, derivation) = retrieve_existing_key(config, keyId);
+                }
+                else
+                {
+                    (keyId, derivation) = next_available_key(walletData, keychain);
+                }
+
                 // track the new output and return the stuff needed for reward
                 var opd = new OutputData(
                     rootKeyId.HexValue,
@@ -198,8 +194,6 @@ namespace Grin.WalletImpl.WalletReceiver
             var rootKeyId = keychain.Root_key_id();
 
 
-            var (keyId, derivation) = next_available_key(config, keychain);
-
             // double check the fee amount included in the partial tx
             // we don't necessarily want to just trust the sender
             // we could just overwrite the fee here (but we won't) due to the ecdsa sig
@@ -214,6 +208,30 @@ namespace Grin.WalletImpl.WalletReceiver
             var outAmount = amount - fee;
 
 
+
+            var (keyId, derivation) =  WalletData.With_wallet(config.DataFileDir,
+                walletData =>
+                {
+                 var   (kId, der) = next_available_key(walletData, keychain);
+                    
+                    // operate within a lock on wallet data
+
+                    var opd = new OutputData(
+                        rootKeyId.HexValue,
+                        kId.HexValue,
+                        der,
+                        outAmount,
+                        OutputStatus.Unconfirmed,
+                        0,
+                        0,
+                        false);
+
+
+                    walletData.Add_output(opd);
+                    return (kId, der);
+                });
+
+
             var (txFinal, _) = Build.Transaction(new Func<Context, Append>[]
                 {
                     c => c.initial_tx(partial),
@@ -224,25 +242,6 @@ namespace Grin.WalletImpl.WalletReceiver
 
             // make sure the resulting transaction is valid (could have been lied to on excess).
             txFinal.Validate(keychain.Secp);
-
-            // operate within a lock on wallet data
-
-            var opd = new OutputData(
-                rootKeyId.HexValue,
-                keyId.HexValue,
-                derivation,
-                outAmount,
-                OutputStatus.Unconfirmed,
-                0,
-                0,
-                false);
-
-            WalletData.With_wallet(config.DataFileDir,
-                walletData =>
-                {
-                    walletData.Add_output(opd);
-                    return opd;
-                });
 
             Log.Debug(
                 "Received txn and built output - {root_key_id}, {key_id}, {derivation}",
