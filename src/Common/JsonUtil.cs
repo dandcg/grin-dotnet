@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace Common
 {
@@ -9,7 +10,7 @@ namespace Common
 
         public static string ReadString(this Stream stream)
         {
-            using (var reader = new StreamReader(stream))
+            using (var reader = new StreamReader(stream, Encoding.UTF8))
             {
 
                 return reader.ReadToEnd();

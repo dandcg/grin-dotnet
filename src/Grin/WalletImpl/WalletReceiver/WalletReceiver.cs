@@ -65,9 +65,18 @@ namespace Grin.WalletImpl.WalletReceiver
             var url = $"{config.CheckNodeApiHttpAddr}/v1/pool/push";
           
             var json = JsonConvert.SerializeObject(new TxWrapper { TxHex = txHex });
-            var res = ApiClient.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json")).Result;
 
-            Log.Debug("{statusCode}", res.StatusCode);
+            var res = ApiClient.PostContentAsync(url, new StringContent(json, Encoding.UTF8, "application/json")).Result;
+
+            if (!res.IsSuccessStatusCode)
+
+            {
+                Log.Debug("{statusCode}", res.StatusCode);
+                throw new WalletErrorException(WalletError.Node, $"{res.StatusCode}");
+
+            }
+
+         
 
 
             // var res = ApiClient.PostAsync(uri, new JsonContent(new TxWrapper(){tx_hex=tx_hex})).Result;

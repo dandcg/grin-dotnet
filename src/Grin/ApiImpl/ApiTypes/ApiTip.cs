@@ -1,6 +1,7 @@
 ﻿using System;
 using Common;
 using Grin.ChainImpl.ChainTypes;
+using Newtonsoft.Json;
 
 namespace Grin.ApiImpl.ApiTypes
 {
@@ -8,15 +9,19 @@ namespace Grin.ApiImpl.ApiTypes
     public class ApiTip : ICloneable
     {
         /// Height of the tip (max height of the fork)
+        [JsonProperty(PropertyName = "height")]
         public ulong Height { get; set; }
 
         // Last block pushed to the fork
+        [JsonProperty(PropertyName = "last_block_pushed")]
         public string LastBlockPushed { get; set; }
 
         // Block previous to last
+        [JsonProperty(PropertyName = "prev_block_to_last")]
         public string PrevBlockToLast { get; set; }
 
         // Total difficulty accumulated on that fork
+        [JsonProperty(PropertyName = "total_difficulty")]
         public ulong TotalDifficulty { get; set; }
 
 

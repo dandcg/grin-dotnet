@@ -202,7 +202,7 @@ namespace Grin.WalletImpl.WalletSender
 
             var json = JsonConvert.SerializeObject(new TxWrapper { TxHex = txHex });
             
-            var res = ApiClient.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json")).Result;
+            var res = ApiClient.PostContentAsync(url, new StringContent(json, Encoding.UTF8, "application/json")).Result;
 
             Log.Debug("{StatusCode}",res.StatusCode);
 

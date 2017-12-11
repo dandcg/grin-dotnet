@@ -46,15 +46,15 @@ namespace Grin.WalletImpl.WalletTypes
             var blinding = BlindingFactor.from_slice(keychain.Secp, blindBin);
             var txBin = HexUtil.from_hex(partialTx.Tx);
 
+            Transaction transaction;
             using (var ms = new MemoryStream(txBin))
             {
-                var transaction = Ser.Deserialize(ms, Transaction.Empty());
 
-                //  Error::Format("Could not deserialize transaction, invalid format.".to_string())
-
-
-                return (partialTx.Amount, blinding, transaction);
+                transaction = Ser.Deserialize(ms, Transaction.Empty());
+               ;
             }
+
+            return (partialTx.Amount, blinding, transaction);
         }
     }
 }

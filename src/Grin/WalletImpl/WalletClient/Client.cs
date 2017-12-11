@@ -52,8 +52,12 @@ namespace Grin.WalletImpl.WalletClient
         {
 
             var json = JsonConvert.SerializeObject(partialTx);
+            var stringContent = new StringContent(
+                json,
+                Encoding.UTF8,
+                "application/json");
 
-            var req = ApiClient.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json")).Result;
+            var req = ApiClient.PostContentAsync(url, stringContent).Result;
 
             if (req.IsSuccessStatusCode)
             {
@@ -69,7 +73,13 @@ namespace Grin.WalletImpl.WalletClient
         /// Makes a single request to the wallet API to create a new coinbase output.
         public static CbData single_create_coinbase(string url, BlockFees blockFees)
         {
-            var req = ApiClient.PostAsync(url, blockFees).Result;
+            var json = JsonConvert.SerializeObject(blockFees);
+            var stringContent = new StringContent(
+                json,
+                Encoding.UTF8,
+                "application/json");
+
+            var req = ApiClient.PostContentAsync(url, stringContent).Result;
 
             if (req.IsSuccessStatusCode)
             {

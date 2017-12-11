@@ -167,15 +167,6 @@
         <TestName>Grin.Tests.Unit.KeychainTests.KeychainTests.Test_key_derivation</TestName>
       </NamedTestSelector>
       <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.CoreTests.Core.TransactionTests.Test_output_value_recovery</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.CoreTests.Core.TransactionTests.Test_output_ser_deser</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Grin.Tests.Unit.CoreTests.Core.TransactionTests.Test_kernel_ser_deser</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
         <TestName>Grin.Tests.Unit.CoreTests.Core.ModTests.Tx_hash_diff</TestName>
       </NamedTestSelector>
       <NamedTestSelector>
@@ -261,6 +252,12 @@
       </NamedTestSelector>
       <NamedTestSelector>
         <TestName>Grin.Tests.Scratch.Wallet.Test</TestName>
+      </NamedTestSelector>
+      <FixtureTestSelector>
+        <FixtureName>Grin.Tests.Unit.KeychainTests.ExtKeyTests</FixtureName>
+      </FixtureTestSelector>
+      <NamedTestSelector>
+        <TestName>Grin.Tests.Scratch.WalletTests.TestRootKeyFromWalletSeed</TestName>
       </NamedTestSelector>
     </IgnoredTests>
     <ImplicitProjectDependencyPathsRelativeToSolutionDirectory />

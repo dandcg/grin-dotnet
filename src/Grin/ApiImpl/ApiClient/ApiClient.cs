@@ -1,17 +1,30 @@
 ﻿using System;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Grin.ApiImpl.ApiClient
 {
     public static class ApiClient
     {
-        public static async Task<HttpResponseMessage> PostAsync(string uri, object obj)
+        //public static async Task<HttpResponseMessage> PostAsync(string uri, object obj)
+        //{
+        //    using (var c = new HttpClient())
+        //    {
+
+        //        c.Timeout = TimeSpan.FromSeconds(15);
+        //        var res = await c.PostAsync(uri, new JsonContent(obj));
+        //        return res;
+        //    }
+        //}
+
+        public static async Task<HttpResponseMessage> PostContentAsync(string uri, HttpContent content)
         {
             using (var c = new HttpClient())
             {
+
                 c.Timeout = TimeSpan.FromSeconds(15);
-                var res = await c.PostAsync(uri, new JsonContent(obj));
+                var res = await c.PostAsync(uri, content);
                 return res;
             }
         }
