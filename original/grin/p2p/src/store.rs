@@ -96,26 +96,21 @@ impl PeerStore {
 	}
 
 	pub fn save_peer(&self, p: &PeerData) -> Result<(), Error> {
-		debug!(LOGGER, "saving peer to store {:?}", p);
+		debug!(LOGGER, "save_peer: {:?} marked {:?}", p.addr, p.flags);
 
-		self.db.put_ser(
-			&to_key(PEER_PREFIX, &mut format!("{}", p.addr).into_bytes())[..],
-			p,
-		)
+		self.db.put_ser(&peer_key(p.addr)[..], p)
 	}
 
-	fn get_peer(&self, peer_addr: SocketAddr) -> Result<PeerData, Error> {
+	pub fn get_peer(&self, peer_addr: SocketAddr) -> Result<PeerData, Error> {
 		option_to_not_found(self.db.get_ser(&peer_key(peer_addr)[..]))
 	}
 
 	pub fn exists_peer(&self, peer_addr: SocketAddr) -> Result<bool, Error> {
-		self.db
-			.exists(&to_key(PEER_PREFIX, &mut format!("{}", peer_addr).into_bytes())[..])
+		self.db.exists(&peer_key(peer_addr)[..])
 	}
 
 	pub fn delete_peer(&self, peer_addr: SocketAddr) -> Result<(), Error> {
-		self.db
-			.delete(&to_key(PEER_PREFIX, &mut format!("{}", peer_addr).into_bytes())[..])
+		self.db.delete(&peer_key(peer_addr)[..])
 	}
 
 	pub fn find_peers(&self, state: State, cap: Capabilities, count: usize) -> Vec<PeerData> {
@@ -127,15 +122,12 @@ impl PeerStore {
 		peers.iter().take(count).cloned().collect()
 	}
 
-	/// List all known peers (for the /v1/peers api endpoint)
+	/// List all known peers
+	/// Used for /v1/peers, for seed / sync (debug & if too few peers connected)
 	pub fn all_peers(&self) -> Vec<PeerData> {
-		let peers_iter = self.db
-			.iter::<PeerData>(&to_key(PEER_PREFIX, &mut "".to_string().into_bytes()));
-		let mut peers = vec![];
-		for p in peers_iter {
-			peers.push(p);
-		}
-		peers
+		self.db
+			.iter::<PeerData>(&to_key(PEER_PREFIX, &mut "".to_string().into_bytes()))
+			.collect::<Vec<_>>()
 	}
 
 	/// Convenience method to load a peer data, update its status and save it
@@ -148,5 +140,5 @@ impl PeerStore {
 }
 
 fn peer_key(peer_addr: SocketAddr) -> Vec<u8> {
-	to_key(PEER_PREFIX, &mut format!("{}", peer_addr).into_bytes())
+	to_key(PEER_PREFIX, &mut format!("{}", peer_addr.ip()).into_bytes())
 }

@@ -25,10 +25,12 @@ use serde_json;
 
 use chain;
 use core::core::Transaction;
+use core::core::hash::Hash;
 use core::core::hash::Hashed;
 use core::ser;
 use pool;
 use p2p;
+use regex::Regex;
 use rest::*;
 use util::secp::pedersen::Commitment;
 use types::*;
@@ -229,12 +231,12 @@ impl Handler for SumTreeHandler {
 }
 
 pub struct PeersAllHandler {
-	pub peer_store: Arc<p2p::PeerStore>,
+	pub p2p_server: Arc<p2p::Server>,
 }
 
 impl Handler for PeersAllHandler {
 	fn handle(&self, _req: &mut Request) -> IronResult<Response> {
-		let peers = &self.peer_store.all_peers();
+		let peers = &self.p2p_server.all_peers();
 		json_response_pretty(&peers)
 	}
 }
@@ -246,7 +248,7 @@ pub struct PeersConnectedHandler {
 impl Handler for PeersConnectedHandler {
 	fn handle(&self, _req: &mut Request) -> IronResult<Response> {
 		let mut peers = vec![];
-		for p in &self.p2p_server.all_peers() {
+		for p in &self.p2p_server.connected_peers() {
 			let p = p.read().unwrap();
 			let peer_info = p.info.clone();
 			peers.push(peer_info);
@@ -270,6 +272,53 @@ impl ChainHandler {
 impl Handler for ChainHandler {
 	fn handle(&self, _req: &mut Request) -> IronResult<Response> {
 		json_response(&self.get_tip())
+	}
+}
+
+// Gets block details given either a hash or height.
+// GET /v1/block/<hash>
+// GET /v1/block/<height>
+pub struct BlockHandler {
+	pub chain: Arc<chain::Chain>,
+}
+
+impl BlockHandler {
+	fn get_block(&self, h: &Hash) -> Result<BlockPrintable, Error> {
+		let block = self.chain.clone().get_block(h).map_err(|_| Error::NotFound)?;
+		Ok(BlockPrintable::from_block(&block))
+	}
+
+	// Try to decode the string as a height or a hash.
+	fn parse_input(&self, input: String) -> Result<Hash, Error> {
+		if let Ok(height) = input.parse() {
+			match self.chain.clone().get_header_by_height(height) {
+				Ok(header) => return Ok(header.hash()),
+				Err(_) => return Err(Error::NotFound),
+			}
+		}
+		lazy_static! {
+			static ref RE: Regex = Regex::new(r"[0-9a-fA-F]{64}").unwrap();
+		}
+		if !RE.is_match(&input) {
+			return Err(Error::Argument(
+					String::from("Not a valid hash or height.")))
+		}
+		let vec = util::from_hex(input).unwrap();
+		Ok(Hash::from_vec(vec))
+	}
+}
+
+impl Handler for BlockHandler {
+	fn handle(&self, req: &mut Request) -> IronResult<Response> {
+		let url = req.url.clone();
+		let mut path_elems = url.path();
+		if *path_elems.last().unwrap() == "" {
+			path_elems.pop();
+		}
+		let el = *path_elems.last().unwrap();
+		let h = try!(self.parse_input(el.to_string()));
+		let b = try!(self.get_block(&h));
+		json_response(&b)
 	}
 }
 
@@ -374,13 +423,15 @@ pub fn start_rest_apis<T>(
 	chain: Arc<chain::Chain>,
 	tx_pool: Arc<RwLock<pool::TransactionPool<T>>>,
 	p2p_server: Arc<p2p::Server>,
-	peer_store: Arc<p2p::PeerStore>,
 ) where
 	T: pool::BlockChain + Send + Sync + 'static,
 {
 	thread::spawn(move || {
 		// build handlers and register them under the appropriate endpoint
 		let utxo_handler = UtxoHandler {
+			chain: chain.clone(),
+		};
+		let block_handler = BlockHandler {
 			chain: chain.clone(),
 		};
 		let chain_tip_handler = ChainHandler {
@@ -396,7 +447,7 @@ pub fn start_rest_apis<T>(
 			tx_pool: tx_pool.clone(),
 		};
 		let peers_all_handler = PeersAllHandler {
-			peer_store: peer_store.clone(),
+			p2p_server: p2p_server.clone(),
 		};
 		let peers_connected_handler = PeersConnectedHandler {
 			p2p_server: p2p_server.clone(),
@@ -404,6 +455,7 @@ pub fn start_rest_apis<T>(
 
 		let route_list = vec!(
 			"get /".to_string(),
+			"get /blocks".to_string(),
 			"get /chain".to_string(),
 			"get /chain/utxos".to_string(),
 			"get /sumtrees/roots".to_string(),
@@ -418,6 +470,7 @@ pub fn start_rest_apis<T>(
 		let index_handler = IndexHandler { list: route_list };
 		let router = router!(
 			index: get "/" => index_handler,
+			blocks: get "/blocks/*" => block_handler,
 			chain_tip: get "/chain" => chain_tip_handler,
 			chain_utxos: get "/chain/utxos/*" => utxo_handler,
 			sumtree_roots: get "/sumtrees/*" => sumtree_handler,

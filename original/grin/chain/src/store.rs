@@ -31,6 +31,7 @@ const BLOCK_HEADER_PREFIX: u8 = 'h' as u8;
 const BLOCK_PREFIX: u8 = 'b' as u8;
 const HEAD_PREFIX: u8 = 'H' as u8;
 const HEADER_HEAD_PREFIX: u8 = 'I' as u8;
+const SYNC_HEAD_PREFIX: u8 = 's' as u8;
 const HEADER_HEIGHT_PREFIX: u8 = '8' as u8;
 const OUTPUT_COMMIT_PREFIX: u8 = 'o' as u8;
 const HEADER_BY_OUTPUT_PREFIX: u8 = 'p' as u8;
@@ -80,14 +81,21 @@ impl ChainStore for ChainKVStore {
 		self.db.put_ser(&vec![HEADER_HEAD_PREFIX], t)
 	}
 
+	fn get_sync_head(&self) -> Result<Tip, Error> {
+		option_to_not_found(self.db.get_ser(&vec![SYNC_HEAD_PREFIX]))
+	}
+
+	fn save_sync_head(&self, t: &Tip) -> Result<(), Error> {
+		self.db.put_ser(&vec![SYNC_HEAD_PREFIX], t)
+	}
+
 	fn get_block(&self, h: &Hash) -> Result<Block, Error> {
 		option_to_not_found(self.db.get_ser(&to_key(BLOCK_PREFIX, &mut h.to_vec())))
 	}
 
 	fn get_block_header(&self, h: &Hash) -> Result<BlockHeader, Error> {
 		option_to_not_found(
-			self.db
-				.get_ser(&to_key(BLOCK_HEADER_PREFIX, &mut h.to_vec())),
+			self.db.get_ser(&to_key(BLOCK_HEADER_PREFIX, &mut h.to_vec())),
 		)
 	}
 
@@ -148,14 +156,19 @@ impl ChainStore for ChainKVStore {
 		match block_hash {
 			Some(hash) => {
 				let block_header = self.get_block_header(&hash)?;
-				let header_at_height = self.get_header_by_height(block_header.height)?;
-				if block_header.hash() == header_at_height.hash() {
-					Ok(block_header)
-				} else {
-					Err(Error::NotFoundErr)
-				}
+				self.is_on_current_chain(&block_header)?;
+				Ok(block_header)
 			}
 			None => Err(Error::NotFoundErr),
+		}
+	}
+
+	fn is_on_current_chain(&self, header: &BlockHeader) -> Result<(), Error> {
+		let header_at_height = self.get_header_by_height(header.height)?;
+		if header.hash() == header_at_height.hash() {
+			Ok(())
+		} else {
+			Err(Error::NotFoundErr)
 		}
 	}
 
@@ -210,33 +223,24 @@ impl ChainStore for ChainKVStore {
 	/// current chain and updating "header_by_height" until we reach a
 	/// block_header
 	/// that is consistent with its height (everything prior to this will be
-	/// consistent)
-	fn setup_height(&self, bh: &BlockHeader) -> Result<(), Error> {
+	/// consistent).
+	/// We need to handle the case where we have no index entry for a given height to
+	/// account for the case where we just switched to a new fork and the height jumped
+	/// beyond current chain height.
+	fn setup_height(&self, header: &BlockHeader) -> Result<(), Error> {
 		self.db
-			.put_ser(&u64_to_key(HEADER_HEIGHT_PREFIX, bh.height), bh)?;
-		if bh.height == 0 {
+			.put_ser(&u64_to_key(HEADER_HEIGHT_PREFIX, header.height), header)?;
+
+		if header.height == 0 {
 			return Ok(());
 		}
 
-		let mut prev_h = bh.previous;
-		let mut prev_height = bh.height - 1;
-		while prev_height > 0 {
-			let prev = self.get_header_by_height(prev_height)?;
-			if prev.hash() != prev_h {
-				let real_prev = self.get_block_header(&prev_h)?;
-				self.db
-					.put_ser(
-						&u64_to_key(HEADER_HEIGHT_PREFIX, real_prev.height),
-						&real_prev,
-					)
-					.unwrap();
-				prev_h = real_prev.previous;
-				prev_height = real_prev.height - 1;
-			} else {
-				break;
-			}
+		let prev_header = self.get_block_header(&header.previous)?;
+		if let Ok(_) = self.is_on_current_chain(&prev_header) {
+			Ok(())
+		} else {
+			self.setup_height(&prev_header)
 		}
-		Ok(())
 	}
 }
 

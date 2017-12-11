@@ -100,6 +100,23 @@ impl From<io::Error> for Error {
 	}
 }
 
+impl Error {
+	/// Whether the error is due to a block that was intrinsically wrong
+	pub fn is_bad_block(&self) -> bool {
+		// shorter to match on all the "not the block's fault" errors
+		match *self {
+			Error::Unfit(_) |
+				Error::Orphan |
+				Error::StoreErr(_, _) |
+				Error::SerErr(_) |
+				Error::SumTreeErr(_)|
+				Error::GenesisBlockRequired |
+				Error::Other(_) => false,
+			_ => true,
+		}
+	}
+}
+
 /// The tip of a fork. A handle to the fork ancestry from its leaf in the
 /// blockchain tree. References the max height and the latest and previous
 /// blocks
@@ -200,8 +217,18 @@ pub trait ChainStore: Send + Sync {
 	/// Save the provided tip as the current head of the block header chain
 	fn save_header_head(&self, t: &Tip) -> Result<(), store::Error>;
 
+	/// Get the tip of the current sync header chain
+	fn get_sync_head(&self) -> Result<Tip, store::Error>;
+
+	/// Save the provided tip as the current head of the sync header chain
+	fn save_sync_head(&self, t: &Tip) -> Result<(), store::Error>;
+
 	/// Gets the block header at the provided height
 	fn get_header_by_height(&self, height: u64) -> Result<BlockHeader, store::Error>;
+
+	/// Is the block header on the current chain?
+	/// Use the header_by_height index to verify the block header is where we think it is.
+	fn is_on_current_chain(&self, header: &BlockHeader) -> Result<(), store::Error>;
 
 	/// Gets an output by its commitment
 	fn get_output_by_commit(&self, commit: &Commitment) -> Result<Output, store::Error>;

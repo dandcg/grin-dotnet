@@ -33,7 +33,7 @@ use sumtree;
 use types::*;
 use util::LOGGER;
 
-const MAX_ORPHANS: usize = 20;
+const MAX_ORPHANS: usize = 50;
 
 /// Facade to the blockchain block processing pipeline and storage. Provides
 /// the current view of the UTXO set according to the chain state. Also
@@ -97,6 +97,17 @@ impl Chain {
 				tip
 			}
 			Err(e) => return Err(Error::StoreErr(e, "chain init load head".to_owned())),
+		};
+
+		// make sure sync_head is available for later use
+		let _ = match chain_store.get_sync_head() {
+			Ok(tip) => tip,
+			Err(NotFoundErr) => {
+				let tip = chain_store.head().unwrap();
+				chain_store.save_sync_head(&tip)?;
+				tip
+			},
+			Err(e) => return Err(Error::StoreErr(e, "chain init sync head".to_owned())),
 		};
 
 		info!(
@@ -176,19 +187,18 @@ impl Chain {
 		res
 	}
 
-	/// Attempt to add a new header to the header chain. Only necessary during
-	/// sync.
-	pub fn process_block_header(
+	/// Attempt to add a new header to the header chain.
+	/// This is only ever used during sync and uses sync_head.
+	pub fn sync_block_header(
 		&self,
 		bh: &BlockHeader,
 		opts: Options,
 	) -> Result<Option<Tip>, Error> {
-		let head = self.store
-			.get_header_head()
-			.map_err(|e| Error::StoreErr(e, "chain header head".to_owned()))?;
-		let ctx = self.ctx_from_head(head, opts);
-
-		pipe::process_block_header(bh, ctx)
+		let sync_head = self.get_sync_head()?;
+		let header_head = self.get_header_head()?;
+		let sync_ctx = self.ctx_from_head(sync_head, opts);
+		let header_ctx = self.ctx_from_head(header_head, opts);
+		pipe::sync_block_header(bh, sync_ctx, header_ctx)
 	}
 
 	fn ctx_from_head(&self, head: Tip, opts: Options) -> pipe::BlockContext {
@@ -276,6 +286,17 @@ impl Chain {
 		sumtrees.roots()
 	}
 
+	/// Reset the header head to the same as the main head. When sync is running,
+	/// the header head will go ahead to try to download as many as possible.
+	/// However if a block, when fully received, is found invalid, the header
+	/// head need to backtrack to the last known valid position.
+	pub fn reset_header_head(&self) -> Result<(), Error> {
+		let head = self.head.lock().unwrap();
+		debug!(LOGGER, "Reset header head to {} at {}",
+					head.last_block_h, head.height);
+		self.store.save_header_head(&head).map_err(From::from)
+	}
+
 	/// returns the last n nodes inserted into the utxo sum tree
 	/// returns sum tree hash plus output itself (as the sum is contained
 	/// in the output anyhow)
@@ -340,6 +361,14 @@ impl Chain {
 		})
 	}
 
+	/// Verifies the given block header is actually on the current chain.
+	/// Checks the header_by_height index to verify the header is where we say it is
+	pub fn is_on_current_chain(&self, header: &BlockHeader) -> Result<(), Error> {
+		self.store.is_on_current_chain(header).map_err(|e| {
+			Error::StoreErr(e, "chain is_on_current_chain".to_owned())
+		})
+	}
+
 	/// Gets the block header by the provided output commitment
 	pub fn get_block_header_by_output_commit(
 		&self,
@@ -350,7 +379,15 @@ impl Chain {
 			.map_err(|e| Error::StoreErr(e, "chain get commitment".to_owned()))
 	}
 
-	/// Get the tip of the header chain
+	/// Get the tip of the current "sync" header chain.
+	/// This may be significantly different to current header chain.
+	pub fn get_sync_head(&self) -> Result<Tip, Error> {
+		self.store
+			.get_sync_head()
+			.map_err(|e| Error::StoreErr(e, "chain get sync head".to_owned()))
+	}
+
+	/// Get the tip of the header chain.
 	pub fn get_header_head(&self) -> Result<Tip, Error> {
 		self.store
 			.get_header_head()

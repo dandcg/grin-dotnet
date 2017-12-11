@@ -167,6 +167,8 @@ fn handle_payload(
 		}
 		Type::GetBlock => {
 			let h = ser::deserialize::<Hash>(&mut &buf[..])?;
+			debug!(LOGGER, "handle_payload: GetBlock {}", h);
+
 			let bo = adapter.get_block(h);
 			if let Some(b) = bo {
 				// serialize and send the block over
@@ -185,7 +187,7 @@ fn handle_payload(
 		Type::Block => {
 			let b = ser::deserialize::<core::Block>(&mut &buf[..])?;
 			let bh = b.hash();
-			adapter.block_received(b);
+			adapter.block_received(b, addr);
 			Ok(Some(bh))
 		}
 		Type::GetHeaders => {
@@ -211,7 +213,7 @@ fn handle_payload(
 		}
 		Type::Headers => {
 			let headers = ser::deserialize::<Headers>(&mut &buf[..])?;
-			adapter.headers_received(headers.headers);
+			adapter.headers_received(headers.headers, addr);
 			Ok(None)
 		}
 		Type::GetPeerAddrs => {

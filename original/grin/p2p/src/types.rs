@@ -25,6 +25,7 @@ use core::core;
 use core::core::hash::Hash;
 use core::core::target::Difficulty;
 use core::ser;
+use grin_store;
 
 /// Maximum number of block headers a peer should ever send
 pub const MAX_BLOCK_HEADERS: u32 = 512;
@@ -40,8 +41,10 @@ pub const MAX_PEER_ADDRS: u32 = 256;
 pub enum Error {
 	Serialization(ser::Error),
 	Connection(io::Error),
+	Banned,
 	ConnectionClose,
 	Timeout,
+	Store(grin_store::Error),
 	PeerWithSelf,
 	ProtocolMismatch {
 		us: u32,
@@ -56,6 +59,11 @@ pub enum Error {
 impl From<ser::Error> for Error {
 	fn from(e: ser::Error) -> Error {
 		Error::Serialization(e)
+	}
+}
+impl From<grin_store::Error> for Error {
+	fn from(e: grin_store::Error) -> Error {
+		Error::Store(e)
 	}
 }
 impl From<io::Error> for Error {
@@ -162,12 +170,12 @@ pub trait NetAdapter: Sync + Send {
 	fn transaction_received(&self, tx: core::Transaction);
 
 	/// A block has been received from one of our peers
-	fn block_received(&self, b: core::Block);
+	fn block_received(&self, b: core::Block, addr: SocketAddr);
 
 	/// A set of block header has been received, typically in response to a
 	/// block
 	/// header request.
-	fn headers_received(&self, bh: Vec<core::BlockHeader>);
+	fn headers_received(&self, bh: Vec<core::BlockHeader>, addr: SocketAddr);
 
 	/// Finds a list of block headers based on the provided locator. Tries to
 	/// identify the common chain and gets the headers that follow it
